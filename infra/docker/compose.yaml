@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: mirror.gcr.io/postgres:18
+    container_name: flux-postgres
+    environment:
+      POSTGRES_DB: flux
+      POSTGRES_USER: flux
+      POSTGRES_PASSWORD: flux
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
