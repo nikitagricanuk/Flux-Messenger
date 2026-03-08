@@ -16,8 +16,10 @@ application {
 dependencies {
     implementation(project(":shared:api-contract"))
     implementation(project(":shared:core"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.4")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {
