@@ -1,10 +1,12 @@
-package ru.flux.flux.messenger;
+package ru.flux.flux.messenger.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
+import ru.flux.flux.messenger.repositories.ChatRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,10 +36,7 @@ public class ChatService {
 
     @Transactional
     public ChatResponse createChat(CreateChatRequest request) {
-        Chat chat = new Chat();
-        chat.setName(request.name());
-        chat.setType(request.type());
-        chat.setMemberIds(request.memberIds());
+        Chat chat = new Chat(request.type(), request.name(), request.memberIds());
 
         Chat saved = repository.save(chat);
         return toResponse(saved);

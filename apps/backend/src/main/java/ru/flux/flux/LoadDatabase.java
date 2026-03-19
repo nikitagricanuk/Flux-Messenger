@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.flux.flux.messenger.Chat;
-import ru.flux.flux.messenger.ChatRepository;
+import ru.flux.flux.messenger.repositories.ChatRepository;
 import ru.flux.flux.messenger.ChatType;
 
 import java.util.List;

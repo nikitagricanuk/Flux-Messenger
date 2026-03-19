@@ -1,10 +1,10 @@
-package ru.flux.flux.messenger;
+package ru.flux.flux.messenger.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.flux.flux.messenger.services.ChatService;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
-import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
