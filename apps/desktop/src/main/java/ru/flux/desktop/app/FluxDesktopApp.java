@@ -25,7 +25,8 @@ public class FluxDesktopApp {
     public void start() {
         configureFrame();
         registerScreens();
-        showScreen(ScreenId.ALL_CHATS.id());
+        // showScreen(ScreenId.ALL_CHATS.id());
+        showScreen(ScreenId.CONTACTS.id());
         frame.setVisible(true);
     }
 
@@ -39,7 +40,8 @@ public class FluxDesktopApp {
     }
 
     private void registerScreens() {
-        registerScreen(ScreenId.ALL_CHATS.id(), new AllChatsScreen(new ChatApiClient()));
+        // registerScreen(ScreenId.ALL_CHATS.id(), new AllChatsScreen(new ChatApiClient()));
+        registerScreen(ScreenId.CONTACTS.id(), new ru.flux.desktop.chats.ui.ContactsScreen().ContentPanel);
     }
 
     private void registerScreen(String id, JPanel screen) {

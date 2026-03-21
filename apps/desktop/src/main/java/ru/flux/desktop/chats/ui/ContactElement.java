@@ -1,31 +1,45 @@
 package ru.flux.desktop.chats.ui;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ContactElement {
-    final JPanel ContactBox;
-    private final JPanel ContentPanel;
+
+    public final JPanel ContactBox;
+
     private final JLabel Avatar;
     private final JLabel Name;
     private final JLabel PhoneNumber;
 
-    public ContactElement(JLabel avatar, JLabel name, JLabel phoneNumber) {
-        ContactBox = new JPanel();                            
-        ContactBox.setLayout(new BoxLayout(ContactBox, BoxLayout.X_AXIS));
-        ContentPanel = new JPanel();
-        ContentPanel.setLayout(new BoxLayout(ContentPanel, BoxLayout.Y_AXIS));
+    private final JPanel TextPanel;
+    private final JPanel RightPanel;
+
+    public ContactElement(JLabel avatar, JLabel name, JLabel phoneNumber, JLabel icon1, JLabel icon2) {
+
+        ContactBox = new JPanel(new BorderLayout());
 
         this.Avatar = avatar;
         this.Name = name;
         this.PhoneNumber = phoneNumber;
 
-        ContentPanel.add(Name);
-        ContentPanel.add(PhoneNumber);
+        // панель текста (вертикально)
+        TextPanel = new JPanel();
+        TextPanel.setLayout(new BoxLayout(TextPanel, BoxLayout.Y_AXIS));
+        TextPanel.add(Name);
+        TextPanel.add(PhoneNumber);
 
-        ContactBox.add(Avatar);
-        ContactBox.add(ContentPanel);
+        // панель справа (иконки)
+        RightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        RightPanel.add(icon1);
+        RightPanel.add(icon2);
+
+        // собираем всё
+        ContactBox.add(Avatar, BorderLayout.PAGE_START);
+        ContactBox.add(TextPanel, BorderLayout.CENTER);
+        ContactBox.add(RightPanel, BorderLayout.PAGE_END);
     }
-    
 }
