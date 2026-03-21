@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="flux_primary">#111111</color>
+    <color name="flux_primary_variant">#000000</color>
+    <color name="flux_secondary">#3A7AFE</color>
+    <color name="flux_secondary_variant">#245BD7</color>
+    <color name="flux_surface">#F5F5F5</color>
+    <color name="flux_background">#FFFFFF</color>
+    <color name="flux_text">#111111</color>
+    <color name="flux_on_primary">#FFFFFF</color>
+    <color name="flux_on_secondary">#FFFFFF</color>
+</resources>
