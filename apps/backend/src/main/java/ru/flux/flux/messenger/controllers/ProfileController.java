@@ -33,6 +33,11 @@ public class ProfileController {
         return service.createProfile(request);
     }
 
+    @PutMapping("/{id}")
+    public ProfileResponse updateProfile(@PathVariable UUID id, @RequestBody CreateProfileRequest request) {
+        return service.updateProfile(id, request);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProfileById(@PathVariable UUID id) {

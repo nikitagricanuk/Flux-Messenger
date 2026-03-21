@@ -34,13 +34,18 @@ public class ProfileService {
     @Transactional
     public ProfileResponse createProfile(CreateProfileRequest request) {
         Profile profile = new Profile();
-        profile.setFirstName(request.firstName());
-        profile.setLastName(request.lastName());
-        profile.setNickname(request.nickname());
-        profile.setDateOfBirth(request.dateOfBirth());
-        profile.setPhone(request.phone());
-        profile.setEmail(request.email());
-        profile.setNotifications(Boolean.TRUE.equals(request.notifications()));
+        applyRequest(profile, request);
+
+        Profile saved = repository.save(profile);
+        return toResponse(saved);
+    }
+
+    @Transactional
+    public ProfileResponse updateProfile(UUID id, CreateProfileRequest request) {
+        Profile profile = repository.findById(id)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        applyRequest(profile, request);
 
         Profile saved = repository.save(profile);
         return toResponse(saved);
@@ -52,6 +57,16 @@ public class ProfileService {
             throw new ProfileNotFoundException(id);
         }
         repository.deleteById(id);
+    }
+
+    private void applyRequest(Profile profile, CreateProfileRequest request) {
+        profile.setFirstName(request.firstName());
+        profile.setLastName(request.lastName());
+        profile.setNickname(request.nickname());
+        profile.setDateOfBirth(request.dateOfBirth());
+        profile.setPhone(request.phone());
+        profile.setEmail(request.email());
+        profile.setNotifications(Boolean.TRUE.equals(request.notifications()));
     }
 
     private ProfileResponse toResponse(Profile profile) {
