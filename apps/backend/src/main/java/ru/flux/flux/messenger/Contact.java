@@ -20,6 +20,9 @@ public class Contact {
     private String avatarUrl;
 
     @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -33,12 +36,13 @@ public class Contact {
 
     protected Contact() {}
 
-    public Contact(String avatarUrl, String name, String surname, String phoneNumber, List<String> groups) {
+    public Contact(String avatarUrl, String username, String name, String surname, String phoneNumber, List<String> groups) {
         this.avatarUrl = avatarUrl;
+        this.username = username;
         this.name = name;
         this.surname = surname;
         this.phoneNumber = phoneNumber;
-        this.groups = groups;
+        this.groups = groups != null ? new ArrayList<>(groups) : new ArrayList<>();
     }
 
     @Override
