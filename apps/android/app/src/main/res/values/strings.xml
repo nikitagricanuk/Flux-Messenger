@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">Flux</string>
+    <string name="flux">
+        Flux
+    </string>
+    <string name="fav_tv">
+        Избранное
+    </string>
+    <string name="all_tab">
+            Все
+    </string>
+    <string name="dms_tab">
+            Чаты
+    </string>
+    <string name="groups_tab">
+            Группы
+    </string>
 </resources>
