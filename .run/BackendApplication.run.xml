@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FluxApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="BackendApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ru.flux.flux.FluxApplication" />
+    <module name="flux.apps.backend.main" />
     <option name="ALTERNATIVE_JRE_PATH" value="openjdk-26" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-    <module name="flux" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="ru.flux.flux.FluxApplication" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ru.flux.flux.*" />

@@ -8,7 +8,7 @@ material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
 recyclerview = "1.4.0"
-blurview = "version-3.2.0"
+blurview = "version-2.0.4"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
