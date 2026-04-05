@@ -41,7 +41,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.recyclerview)
-    implementation(libs.blurview)
+    implementation(libs.blurview) {
+        // blurview bundles an older coordinatorlayout which conflicts with the one
+        // pulled by appcompat/material. Exclude it — the project already has it.
+        exclude(group = "androidx.coordinatorlayout", module = "coordinatorlayout")
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

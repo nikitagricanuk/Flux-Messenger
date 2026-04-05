@@ -12,13 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ChatsFragment extends Fragment {
 
     private TextView allTab, dmsTab, groupsTab;
-    private RecyclerView chatsRecycler;
-
-    // Currently active filter: "all", "dm", or "group"
-    private String activeFilter = "all";
+    private ChatAdapter adapter;
 
     @Nullable
     @Override
@@ -35,27 +35,25 @@ public class ChatsFragment extends Fragment {
         allTab    = view.findViewById(R.id.all_tab);
         dmsTab    = view.findViewById(R.id.dms_tab);
         groupsTab = view.findViewById(R.id.groups_tab);
-        chatsRecycler = view.findViewById(R.id.chatsRecycler);
 
+        // Set up RecyclerView
+        RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
         chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new ChatAdapter();
+        chatsRecycler.setAdapter(adapter);
 
-        // Tab click listeners — each just changes the active filter
+        // Load data (replace with real API call later)
+        adapter.setChats(getDummyChats());
+
+        // Tab clicks
         allTab.setOnClickListener(v -> setActiveTab("all"));
         dmsTab.setOnClickListener(v -> setActiveTab("dm"));
         groupsTab.setOnClickListener(v -> setActiveTab("group"));
 
-        // Start with "all" selected
         setActiveTab("all");
     }
 
-    /**
-     * Updates the tab highlight and triggers a list filter.
-     * When you have a real adapter, call adapter.setFilter(filter) here.
-     */
     private void setActiveTab(String filter) {
-        activeFilter = filter;
-
-        // Reset all tabs to no background, then highlight the selected one
         allTab.setBackgroundResource(0);
         dmsTab.setBackgroundResource(0);
         groupsTab.setBackgroundResource(0);
@@ -66,6 +64,18 @@ public class ChatsFragment extends Fragment {
             case "group": groupsTab.setBackgroundResource(R.drawable.bg_segment_selected); break;
         }
 
-        // TODO: when you add ChatAdapter → adapter.setFilter(filter);
+        adapter.setFilter(filter);
+    }
+
+    // Dummy data so you can see the list before the API is ready.
+    // Replace this whole method with a Retrofit call later.
+    private List<Chat> getDummyChats() {
+        return Arrays.asList(
+            new Chat("1", "Евгений Сафонов",      "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm"),
+            new Chat("2", "✨Звёздочки политеха🍕", "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "group"),
+            new Chat("3", "Никита Грицанюк",      "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm"),
+            new Chat("4", "ДримТим ИрНИТУ ± ИГУ", "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "group"),
+            new Chat("5", "Mikhail Katashevtsev",  "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm")
+        );
     }
 }
