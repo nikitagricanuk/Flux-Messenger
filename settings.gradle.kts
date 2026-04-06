@@ -5,4 +5,3 @@ include(":shared:api-contract")
 include(":shared:core")
 include(":shared:client-sdk")
 
-include(":apps:desktop")
