@@ -12,8 +12,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Arrays;
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatsFragment extends Fragment {
 
@@ -36,21 +42,58 @@ public class ChatsFragment extends Fragment {
         dmsTab    = view.findViewById(R.id.dms_tab);
         groupsTab = view.findViewById(R.id.groups_tab);
 
-        // Set up RecyclerView
         RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
         chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ChatAdapter();
         chatsRecycler.setAdapter(adapter);
 
-        // Load data (replace with real API call later)
-        adapter.setChats(getDummyChats());
+        loadChats();
 
-        // Tab clicks
         allTab.setOnClickListener(v -> setActiveTab("all"));
         dmsTab.setOnClickListener(v -> setActiveTab("dm"));
         groupsTab.setOnClickListener(v -> setActiveTab("group"));
 
         setActiveTab("all");
+    }
+
+    private static final String TAG = "ChatsFragment";
+
+    private void loadChats() {
+        Log.d(TAG, "loadChats: making request to /chats");
+        RetrofitClient.getInstance().getApiService().getChats().enqueue(new Callback<List<ChatResponse>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<ChatResponse>> call,
+                                   @NonNull Response<List<ChatResponse>> response) {
+                Log.d(TAG, "onResponse: code=" + response.code());
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Chat> chats = new ArrayList<>();
+                    for (ChatResponse cr : response.body()) {
+                        chats.add(toChat(cr));
+                    }
+                    adapter.setChats(chats);
+                } else {
+                    Log.e(TAG, "onResponse: unsuccessful, code=" + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<ChatResponse>> call, @NonNull Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getClass().getName() + ": " + t.getMessage());
+            }
+        });
+    }
+
+    private Chat toChat(ChatResponse cr) {
+        String type = "DIRECT".equals(cr.type) ? "dm" : "group";
+        String time = "";
+        // lastMessageAt is ISO-8601: "2026-04-12T14:19:23" — grab HH:mm after the T
+        if (cr.lastMessageAt != null) {
+            int tIndex = cr.lastMessageAt.indexOf('T');
+            if (tIndex >= 0 && cr.lastMessageAt.length() >= tIndex + 6) {
+                time = cr.lastMessageAt.substring(tIndex + 1, tIndex + 6); // "HH:mm"
+            }
+        }
+        return new Chat(cr.id, cr.name, cr.lastMessage, cr.profilePicture, time, type);
     }
 
     private void setActiveTab(String filter) {
@@ -65,17 +108,5 @@ public class ChatsFragment extends Fragment {
         }
 
         adapter.setFilter(filter);
-    }
-
-    // Dummy data so you can see the list before the API is ready.
-    // Replace this whole method with a Retrofit call later.
-    private List<Chat> getDummyChats() {
-        return Arrays.asList(
-            new Chat("1", "Евгений Сафонов",      "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm"),
-            new Chat("2", "✨Звёздочки политеха🍕", "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "group"),
-            new Chat("3", "Никита Грицанюк",      "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm"),
-            new Chat("4", "ДримТим ИрНИТУ ± ИГУ", "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "group"),
-            new Chat("5", "Mikhail Katashevtsev",  "Пример крутого сообщения. Это сообщение имеет очень умный…", null, "18:05", "dm")
-        );
     }
 }

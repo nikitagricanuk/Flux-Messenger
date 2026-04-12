@@ -46,6 +46,9 @@ dependencies {
         // pulled by appcompat/material. Exclude it — the project already has it.
         exclude(group = "androidx.coordinatorlayout", module = "coordinatorlayout")
     }
+    implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
