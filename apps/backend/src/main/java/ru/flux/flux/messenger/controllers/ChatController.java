@@ -1,5 +1,6 @@
 package ru.flux.flux.messenger.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.services.ChatService;
@@ -29,7 +30,7 @@ public class ChatController {
     }
 
     @PostMapping
-    public ChatResponse createChat(@RequestBody CreateChatRequest request) {
+    public ChatResponse createChat(@Valid @RequestBody CreateChatRequest request) {
         return chatService.createChat(request);
     }
 
