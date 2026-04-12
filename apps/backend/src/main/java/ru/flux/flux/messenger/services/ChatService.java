@@ -8,6 +8,7 @@ import ru.flux.flux.messenger.dto.CreateChatRequest;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,7 +56,9 @@ public class ChatService {
                 chat.getId(),
                 chat.getName(),
                 chat.getType(),
-                List.copyOf(chat.getMemberIds())
+                List.copyOf(chat.getMemberIds()),
+                "Hey, how are you?",
+                LocalDateTime.now().minusHours(1)
         );
     }
 }
