@@ -40,7 +40,7 @@ public class ChatService {
     public ChatResponse createChat(CreateChatRequest request) {
         if (request.type() == ChatType.DIRECT) {
             boolean exists = !repository.findByTypeAndExactMembers(
-                    ChatType.DIRECT, request.memberIds(), request.memberIds().size()
+                    ChatType.DIRECT.name(), request.memberIds(), request.memberIds().size()
             ).isEmpty();
             if (exists) {
                 throw new IllegalStateException("A direct chat between these users already exists");
