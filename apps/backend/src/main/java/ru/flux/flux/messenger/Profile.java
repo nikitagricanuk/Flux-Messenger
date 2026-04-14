@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,9 +40,15 @@ public class Profile {
     @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
     private String email;
 
+    @Column
+    private String avatarUrl;
+
     @Column(nullable = false)
     @ColumnDefault("true")
     private boolean notifications;
+
+    @ElementCollection
+    private List<UUID> contacts = new ArrayList<>();
 
     public Profile() {}
 

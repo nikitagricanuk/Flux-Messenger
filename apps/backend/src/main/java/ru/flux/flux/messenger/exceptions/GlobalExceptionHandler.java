@@ -34,6 +34,12 @@ public class GlobalExceptionHandler {
         return Map.of("status", 409, "message", ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleBadRequest(IllegalArgumentException ex) {
+        return Map.of("status", 400, "message", ex.getMessage());
+    }
+
     @ExceptionHandler({ChatNotFoundException.class, ProfileNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleNotFound(RuntimeException ex) {

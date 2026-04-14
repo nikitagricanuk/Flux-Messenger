@@ -26,4 +26,12 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
             AND (SELECT COUNT(*) FROM chat_member_ids m2 WHERE m2.chat_id = c.id) = :memberCount
             """, nativeQuery = true)
     List<Chat> findByTypeAndExactMembers(@Param("type") String type, @Param("memberIds") List<UUID> memberIds, @Param("memberCount") long memberCount);
+
+    @Query(value = """
+            SELECT c.* FROM chat c
+            WHERE c.type = 'GROUP'
+            AND EXISTS (SELECT 1 FROM chat_member_ids m1 WHERE m1.chat_id = c.id AND m1.member_ids = :userId)
+            AND EXISTS (SELECT 1 FROM chat_member_ids m2 WHERE m2.chat_id = c.id AND m2.member_ids = :contactId)
+            """, nativeQuery = true)
+    List<Chat> findSharedGroups(@Param("userId") UUID userId, @Param("contactId") UUID contactId);
 }

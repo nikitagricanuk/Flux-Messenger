@@ -35,4 +35,12 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">#99000000</item>
     </style>
+
+    <!-- Removes default background from BottomSheetDialog so bg_bottom_sheet shows correctly -->
+    <style name="BottomSheetStyle" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetModalStyle</item>
+    </style>
+    <style name="BottomSheetModalStyle" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
 </resources>

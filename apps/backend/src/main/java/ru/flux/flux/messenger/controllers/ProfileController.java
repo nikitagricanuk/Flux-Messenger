@@ -2,6 +2,7 @@ package ru.flux.flux.messenger.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.flux.flux.messenger.dto.ContactResponse;
 import ru.flux.flux.messenger.dto.CreateProfileRequest;
 import ru.flux.flux.messenger.dto.ProfileResponse;
 import ru.flux.flux.messenger.services.ProfileService;
@@ -42,5 +43,22 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProfileById(@PathVariable UUID id) {
         service.deleteProfileById(id);
+    }
+
+    @GetMapping("/{id}/contacts")
+    public List<ContactResponse> getContacts(@PathVariable UUID id) {
+        return service.getContacts(id);
+    }
+
+    @PutMapping("/{id}/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addContact(@PathVariable UUID id, @PathVariable UUID contactId) {
+        service.addContact(id, contactId);
+    }
+
+    @DeleteMapping("/{id}/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeContact(@PathVariable UUID id, @PathVariable UUID contactId) {
+        service.removeContact(id, contactId);
     }
 }

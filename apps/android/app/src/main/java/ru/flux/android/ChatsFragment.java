@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,14 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ImageView editIcon = view.findViewById(R.id.imageView);
+        editIcon.setClickable(true);
+        editIcon.setFocusable(true);
+        editIcon.setOnClickListener(v -> {
+            NewMessageBottomSheet sheet = new NewMessageBottomSheet();
+            sheet.show(getParentFragmentManager(), NewMessageBottomSheet.class.getSimpleName());
+        });
 
         allTab    = view.findViewById(R.id.all_tab);
         dmsTab    = view.findViewById(R.id.dms_tab);

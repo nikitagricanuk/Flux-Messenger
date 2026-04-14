@@ -11,6 +11,7 @@ public record ProfileResponse(
         LocalDate dateOfBirth,
         String phone,
         String email,
+        String avatarUrl,
         boolean notifications
 ) {
 }

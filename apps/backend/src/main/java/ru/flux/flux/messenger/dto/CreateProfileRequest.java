@@ -14,6 +14,7 @@ public record CreateProfileRequest(
         LocalDate dateOfBirth,
         @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
         @Email String email,
+        String avatarUrl,
         Boolean notifications
 ) {
 }
