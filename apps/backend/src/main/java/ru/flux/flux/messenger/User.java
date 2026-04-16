@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
-public class Profile {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -50,13 +51,13 @@ public class Profile {
     @ElementCollection
     private List<UUID> contacts = new ArrayList<>();
 
-    public Profile() {}
+    public User() {}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Profile profile)) return false;
-        return id != null && id.equals(profile.id);
+        if (!(o instanceof User user)) return false;
+        return id != null && id.equals(user.id);
     }
 
     @Override

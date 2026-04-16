@@ -3,46 +3,46 @@ package ru.flux.flux.messenger.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.dto.ContactResponse;
-import ru.flux.flux.messenger.dto.CreateProfileRequest;
-import ru.flux.flux.messenger.dto.ProfileResponse;
-import ru.flux.flux.messenger.services.ProfileService;
+import ru.flux.flux.messenger.dto.CreateUserRequest;
+import ru.flux.flux.messenger.dto.UserResponse;
+import ru.flux.flux.messenger.services.UserService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
-public class ProfileController {
-    private final ProfileService service;
+public class UserController {
+    private final UserService service;
 
-    public ProfileController(ProfileService service) {
+    public UserController(UserService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<ProfileResponse> getAllProfiles() {
-        return service.getAllProfiles();
+    public List<UserResponse> getAllUsers() {
+        return service.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ProfileResponse getProfileById(@PathVariable UUID id) {
-        return service.getProfileById(id);
+    public UserResponse getUserById(@PathVariable UUID id) {
+        return service.getUserById(id);
     }
 
     @PostMapping
-    public ProfileResponse createProfile(@RequestBody CreateProfileRequest request) {
-        return service.createProfile(request);
+    public UserResponse createUser(@RequestBody CreateUserRequest request) {
+        return service.createUser(request);
     }
 
     @PutMapping("/{id}")
-    public ProfileResponse updateProfile(@PathVariable UUID id, @RequestBody CreateProfileRequest request) {
-        return service.updateProfile(id, request);
+    public UserResponse updateUser(@PathVariable UUID id, @RequestBody CreateUserRequest request) {
+        return service.updateUser(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProfileById(@PathVariable UUID id) {
-        service.deleteProfileById(id);
+    public void deleteUserById(@PathVariable UUID id) {
+        service.deleteUserById(id);
     }
 
     @GetMapping("/{id}/contacts")

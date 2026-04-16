@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
         return Map.of("status", 400, "message", ex.getMessage());
     }
 
-    @ExceptionHandler({ChatNotFoundException.class, ProfileNotFoundException.class})
+    @ExceptionHandler({ChatNotFoundException.class, UserNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleNotFound(RuntimeException ex) {
         return Map.of("status", 404, "message", ex.getMessage());

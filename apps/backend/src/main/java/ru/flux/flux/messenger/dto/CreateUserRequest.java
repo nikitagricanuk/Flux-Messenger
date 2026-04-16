@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public record CreateProfileRequest(
+public record CreateUserRequest(
         @NotBlank String firstName,
         String lastName,
         @Size(min = 3, max = 32) @Pattern(regexp = "^[a-zA-Z0-9_]+$") String nickname,
