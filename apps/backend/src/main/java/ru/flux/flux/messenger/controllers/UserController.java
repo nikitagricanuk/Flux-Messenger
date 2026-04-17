@@ -1,5 +1,6 @@
 package ru.flux.flux.messenger.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.dto.ContactResponse;
@@ -10,6 +11,7 @@ import ru.flux.flux.messenger.services.UserService;
 import java.util.List;
 import java.util.UUID;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/users")
 public class UserController {

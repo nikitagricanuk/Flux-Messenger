@@ -1,12 +1,16 @@
 package ru.flux.flux.messenger.services;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.ContactResponse;
 import ru.flux.flux.messenger.dto.CreateUserRequest;
+import ru.flux.flux.messenger.dto.SignUpRequest;
 import ru.flux.flux.messenger.dto.UserResponse;
 import ru.flux.flux.messenger.dto.SharedGroupInfo;
+import ru.flux.flux.messenger.exceptions.UserAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.UserNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
@@ -37,7 +41,38 @@ public class UserService {
     }
 
     @Transactional
+    public User registerUser(SignUpRequest request, String encodedPassword) {
+        if (repository.existsByPhone(request.getPhone())) {
+            throw new UserAlreadyExistsException("User with phone " + request.getPhone() + " already exists");
+        }
+        if (repository.existsByUsername(request.getUsername())) {
+            throw new UserAlreadyExistsException("User with username " + request.getUsername() + " already exists");
+        }
+
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .username(request.getUsername())
+                .phone(request.getPhone())
+                .avatarUrl(request.getAvatarUrl())
+                .password(encodedPassword)
+                .notifications(true)
+                .build();
+
+        return repository.save(user);
+    }
+
+    @Transactional
     public UserResponse createUser(CreateUserRequest request) {
+        if (repository.existsByEmail(request.email())) {
+            throw new UserAlreadyExistsException("User with email " + request.email() + " already exists");
+        }
+        else if (repository.existsByPhone(request.phone())) {
+            throw new UserAlreadyExistsException("User with phone " + request.phone() + " already exists");
+        }
+        else if (repository.existsByUsername(request.nickname())) {
+            throw new UserAlreadyExistsException("User with username " + request.nickname() + " already exists");
+        }
         User user = new User();
         applyRequest(user, request);
 
@@ -124,7 +159,7 @@ public class UserService {
     private void applyRequest(User user, CreateUserRequest request) {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
-        user.setNickname(request.nickname());
+        user.setUsername(request.nickname());
         user.setDateOfBirth(request.dateOfBirth());
         user.setPhone(request.phone());
         user.setEmail(request.email());
@@ -132,12 +167,17 @@ public class UserService {
         user.setNotifications(Boolean.TRUE.equals(request.notifications()));
     }
 
+    public UserDetailsService userDetailsService() {
+        return phone -> repository.findByPhone(phone)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + phone));
+    }
+
     private UserResponse toResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getNickname(),
+                user.getHandle(),
                 user.getDateOfBirth(),
                 user.getPhone(),
                 user.getEmail(),
