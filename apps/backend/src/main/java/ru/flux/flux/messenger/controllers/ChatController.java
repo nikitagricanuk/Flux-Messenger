@@ -1,5 +1,7 @@
 package ru.flux.flux.messenger.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.services.ChatService;
@@ -9,6 +11,7 @@ import ru.flux.flux.messenger.dto.CreateChatRequest;
 import java.util.List;
 import java.util.UUID;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/chats")
 public class ChatController {
@@ -29,7 +32,7 @@ public class ChatController {
     }
 
     @PostMapping
-    public ChatResponse createChat(@RequestBody CreateChatRequest request) {
+    public ChatResponse createChat(@Valid @RequestBody CreateChatRequest request) {
         return chatService.createChat(request);
     }
 

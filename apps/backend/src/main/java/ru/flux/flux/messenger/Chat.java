@@ -23,6 +23,9 @@ public class Chat {
     @Column
     private String name; // null for DIRECT, required for GROUP
 
+    @Column
+    private String avatarUrl; // null for DIRECT, required for GROUP
+
     @ElementCollection
     private List<UUID> memberIds = new ArrayList<>();
 

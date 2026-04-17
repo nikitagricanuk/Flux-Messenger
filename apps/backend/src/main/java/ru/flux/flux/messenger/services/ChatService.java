@@ -3,11 +3,13 @@ package ru.flux.flux.messenger.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.flux.flux.messenger.Chat;
+import ru.flux.flux.messenger.ChatType;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +38,17 @@ public class ChatService {
 
     @Transactional
     public ChatResponse createChat(CreateChatRequest request) {
+        if (request.type() == ChatType.DIRECT) {
+            boolean exists = !repository.findByTypeAndExactMembers(
+                    ChatType.DIRECT.name(), request.memberIds(), request.memberIds().size()
+            ).isEmpty();
+            if (exists) {
+                throw new IllegalStateException("A direct chat between these users already exists");
+            }
+        }
+
         Chat chat = new Chat(request.type(), request.name(), request.memberIds());
+        chat.setAvatarUrl(request.avatarUrl());
 
         Chat saved = repository.save(chat);
         return toResponse(saved);
@@ -54,8 +66,11 @@ public class ChatService {
         return new ChatResponse(
                 chat.getId(),
                 chat.getName(),
+                chat.getAvatarUrl(),
                 chat.getType(),
-                List.copyOf(chat.getMemberIds())
+                List.copyOf(chat.getMemberIds()),
+                "Hey, how are you?",
+                LocalDateTime.now().minusHours(1)
         );
     }
 }

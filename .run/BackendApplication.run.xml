@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BackendApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ru.flux.flux.FluxApplication" />
+    <module name="flux.apps.backend.main" />
+    <option name="ALTERNATIVE_JRE_PATH" value="openjdk-26" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="ru.flux.flux.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
