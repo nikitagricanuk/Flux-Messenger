@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Navbar click listeners
         findViewById(R.id.nav_chats).setOnClickListener(v -> navigateTo(new ChatsFragment()));
+        findViewById(R.id.nav_contacts).setOnClickListener(v -> navigateTo(new ContactPage()));
 
         // TODO: replace with real fragments when you create them
-        // findViewById(R.id.nav_contacts).setOnClickListener(v -> navigateTo(new ContactsFragment()));
         // findViewById(R.id.nav_settings).setOnClickListener(v -> navigateTo(new SettingsFragment()));
     }
 
