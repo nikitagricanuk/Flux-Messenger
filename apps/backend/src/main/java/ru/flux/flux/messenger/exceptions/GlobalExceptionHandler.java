@@ -45,4 +45,22 @@ public class GlobalExceptionHandler {
     public Map<String, Object> handleNotFound(RuntimeException ex) {
         return Map.of("status", 404, "message", ex.getMessage());
     }
+
+    @ExceptionHandler({OAuthVerificationException.class, PasskeyVerificationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleAuthVerification(RuntimeException ex) {
+        return Map.of("status", 400, "message", ex.getMessage());
+    }
+
+    @ExceptionHandler(RegistrationTokenExpiredException.class)
+    @ResponseStatus(HttpStatus.GONE)
+    public Map<String, Object> handleRegistrationTokenExpired(RegistrationTokenExpiredException ex) {
+        return Map.of("status", 410, "message", ex.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> handleAlreadyExists(UserAlreadyExistsException ex) {
+        return Map.of("status", 409, "message", ex.getMessage());
+    }
 }
