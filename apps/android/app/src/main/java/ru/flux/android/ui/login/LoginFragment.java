@@ -1,11 +1,12 @@
 package ru.flux.android.ui.login;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -43,10 +44,10 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
+        loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory(requireContext()))
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = binding.username;
+        final EditText usernameEditText = binding.phone;
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
 
@@ -115,6 +116,9 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(v ->
                 loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString()));
+
+        view.findViewById(R.id.textView5).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_login_to_signup));
     }
 
     private void updateUiWithUser(LoggedInUserView model) {

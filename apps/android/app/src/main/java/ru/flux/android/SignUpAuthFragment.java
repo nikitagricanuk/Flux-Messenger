@@ -1,12 +1,12 @@
 package ru.flux.android;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,7 +58,16 @@ public class SignUpAuthFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_sign_up_auth, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        view.findViewById(R.id.login).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_signup_to_completion));
+        view.findViewById(R.id.textView5).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_signup_to_login));
     }
 }

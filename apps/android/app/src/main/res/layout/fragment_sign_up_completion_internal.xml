@@ -193,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="username"
+                    android:hint="phone"
                     android:includeFontPadding="false"
                     android:inputType="textNoSuggestions"
                     android:paddingStart="2dp"

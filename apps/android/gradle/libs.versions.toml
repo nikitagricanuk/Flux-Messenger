@@ -7,6 +7,7 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
+navigationUiKtx = "2.9.7"
 recyclerview = "1.4.0"
 blurview = "version-2.0.4"
 gson = "2.13.1"
@@ -16,6 +17,7 @@ annotation = "1.10.0"
 lifecycleLivedataKtx = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
 fragment = "1.8.9"
+securityCrypto = "1.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +27,8 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationUiKtx" }
+navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 blurview = { group = "com.github.Dimezis", name = "BlurView", version.ref = "blurview" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
@@ -34,6 +38,7 @@ annotation = { group = "androidx.annotation", name = "annotation", version.ref =
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
+security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

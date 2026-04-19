@@ -1,12 +1,14 @@
 package ru.flux.android;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.google.android.material.button.MaterialButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,7 +60,28 @@ public class WelcomeAuthFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_welcome, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        MaterialButton loginBtn = view.findViewById(R.id.login);
+        MaterialButton signupBtn = view.findViewById(R.id.signup);
+
+        loginBtn.setEnabled(true);
+        signupBtn.setEnabled(true);
+
+        loginBtn.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_welcome_to_login));
+        signupBtn.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_welcome_to_signup));
+        view.findViewById(R.id.materialButton).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_welcome_to_3rd_party));
+        view.findViewById(R.id.materialButton3).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_welcome_to_3rd_party));
+        view.findViewById(R.id.materialButton2).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_welcome_to_3rd_party));
     }
 }

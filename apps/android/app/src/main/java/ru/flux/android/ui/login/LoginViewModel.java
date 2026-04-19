@@ -1,20 +1,23 @@
 package ru.flux.android.ui.login;
 
+import android.util.Patterns;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import android.util.Patterns;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import ru.flux.android.R;
 import ru.flux.android.data.LoginRepository;
 import ru.flux.android.data.Result;
-import ru.flux.android.data.model.LoggedInUser;
-import ru.flux.android.R;
 
 public class LoginViewModel extends ViewModel {
 
-    private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
+    private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    private final Executor executor = Executors.newSingleThreadExecutor();
     private LoginRepository loginRepository;
 
     LoginViewModel(LoginRepository loginRepository) {
@@ -30,15 +33,15 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
-
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
+        // Run on background thread, post result to main
+        executor.execute(() -> {
+            Result<String> result = loginRepository.login(username, password);
+            if (result instanceof Result.Success) {
+                loginResult.postValue(new LoginResult(new LoggedInUserView(username)));
+            } else {
+                loginResult.postValue(new LoginResult(R.string.login_failed));
+            }
+        });
     }
 
     public void loginDataChanged(String username, String password) {

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -57,6 +58,11 @@ dependencies {
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.fragment)
+
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
+
+    implementation(libs.security.crypto)
 
 
     testImplementation(libs.junit)
