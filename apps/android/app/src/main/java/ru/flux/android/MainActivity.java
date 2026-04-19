@@ -3,17 +3,22 @@ package ru.flux.android;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import eightbitlab.com.blurview.BlurView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private FrameLayout activeTab;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,29 +40,47 @@ public class MainActivity extends AppCompatActivity {
                 .setFrameClearDrawable(windowBackground)
                 .setBlurRadius(12f);
 
+        // Insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
-        // Load ChatsFragment on first launch only (not after rotation)
-        if (savedInstanceState == null) {
-            navigateTo(new ChatsFragment());
-        }
+        // NavController из NavHostFragment
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_container);
+        navController = navHostFragment.getNavController();
 
-        // Navbar click listeners
-        findViewById(R.id.nav_chats).setOnClickListener(v -> navigateTo(new ChatsFragment()));
-        findViewById(R.id.nav_contacts).setOnClickListener(v -> navigateTo(new ContactPage()));
+        // Табы
+        FrameLayout navChats = findViewById(R.id.nav_chats);
+        FrameLayout navContacts = findViewById(R.id.nav_contacts);
+        FrameLayout navSettings = findViewById(R.id.nav_settings);
 
-        // TODO: replace with real fragments when you create them
-        // findViewById(R.id.nav_settings).setOnClickListener(v -> navigateTo(new SettingsFragment()));
+        // Активный таб по умолчанию
+        setActiveTab(navChats);
+
+        navChats.setOnClickListener(v -> {
+            setActiveTab(navChats);
+            navController.navigate(R.id.chatsFragment);
+        });
+
+        navContacts.setOnClickListener(v -> {
+            setActiveTab(navContacts);
+            navController.navigate(R.id.contactPage);
+        });
+
+//        navSettings.setOnClickListener(v -> {
+//            setActiveTab(navSettings);
+//            navController.navigate(R.id.settingsFragment);
+//        });
     }
 
-    private void navigateTo(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+    private void setActiveTab(FrameLayout selected) {
+        if (activeTab != null) {
+            activeTab.setBackgroundResource(0);
+        }
+        selected.setBackgroundResource(R.drawable.bg_selected_tab);
+        activeTab = selected;
     }
 }
