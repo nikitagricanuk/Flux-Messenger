@@ -39,8 +39,10 @@
 
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
+    <string name="prompt_phone">Телефон</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>
+    <string name="action_sign_up">Зарегистрироваться</string>
     <string name="action_sign_in_short">Войти</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>

@@ -13,57 +13,41 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".ui.login.LoginFragment">
+    tools:context=".SignUpAuthFragment">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
         android:fontFamily="@font/nunito_sans"
-        android:text="Войти"
+        android:text="Зарегистрироваться"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/segment_tabs"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        tools:text="Войти" />
+        tools:text="Зарегистрироваться" />
 
-    <ru.flux.android.ui.SegmentTabsView
-        android:id="@+id/segment_tabs"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="38dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="38dp"
-        app:layout_constraintBottom_toTopOf="@+id/username"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:tabs="@array/login_tabs" />
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/phoneNumber"
         android:layout_width="0dp"
         android:layout_height="42dp"
         android:layout_marginStart="17dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="17dp"
-        android:autofillHints="@string/prompt_email"
+        android:autofillHints="@string/prompt_phone"
         android:background="@drawable/bg_input_field"
         android:drawableStart="@drawable/phone_rotary_1"
         android:drawablePadding="11dp"
         android:elevation="4dp"
         android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
+        android:inputType="phone"
         android:paddingStart="18dp"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/segment_tabs" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
         android:id="@+id/password"
@@ -85,7 +69,29 @@
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
+
+    <EditText
+        android:id="@+id/repeatPassword"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="17dp"
+        android:autofillHints="Повторите пароль"
+        android:background="@drawable/bg_input_field"
+        android:drawableStart="@drawable/lock_1"
+        android:drawablePadding="11dp"
+        android:elevation="4dp"
+        android:hint="@string/prompt_password"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:paddingStart="18dp"
+        android:selectAllOnFocus="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login"
@@ -101,7 +107,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        app:layout_constraintTop_toBottomOf="@+id/repeatPassword" />
 
     <TextView
         android:id="@+id/textView4"
@@ -114,7 +120,7 @@
         app:layout_constraintEnd_toStartOf="@+id/login"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        app:layout_constraintTop_toBottomOf="@+id/repeatPassword" />
 
     <TextView
         android:id="@+id/textView5"
