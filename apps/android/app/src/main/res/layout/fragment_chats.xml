@@ -64,55 +64,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fav_tv" />
 
-    <LinearLayout
-        android:id="@+id/tabs_container"
+    <ru.flux.android.ui.SegmentTabsView
+        android:id="@+id/segment_tabs"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="11dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_segment_container"
-        android:orientation="horizontal"
-        android:padding="4dp"
+        app:tabs="@array/chats_tabs"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/favoritesRecycler">
-
-        <TextView
-            android:id="@+id/all_tab"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/bg_segment_selected"
-            android:gravity="center"
-            android:text="@string/all_tab"
-            android:textAppearance="@style/tabs"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/dms_tab"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/dms_tab"
-            android:textAppearance="@style/tabs"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/groups_tab"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/groups_tab"
-            android:textAppearance="@style/tabs"
-            android:clickable="true"
-            android:focusable="true" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/favoritesRecycler" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatsRecycler"
@@ -124,7 +86,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabs_container" />
+        app:layout_constraintTop_toBottomOf="@+id/segment_tabs" />
 
 
 
