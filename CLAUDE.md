@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL RULES
+- NEVER delete or overwrite working tests without explicit confirmation
+- NEVER delete files or folders without explicit confirmation
+- ALWAYS run tests after any code change
+- ALWAYS do git checkpoint before big changes
+- One task at a time. DON'T work on multiple things at once
+- Not sure – ask. Don't guess
+
 ## Commands
 
 ### Backend
@@ -65,3 +73,8 @@ jwt:
 HTTP client: Retrofit 3 + Gson, configured in `RetrofitClient`. API interface: `ApiService`. Entry point: `MainActivity`. Auth UI: `LoginActivity`.
 
 Cleartext HTTP traffic is enabled (`android:usesCleartextTraffic="true"`) for dev against the local backend.
+
+## Agents
+- Use `planner` agent for planning
+- Use `tester` agent after changes in source code
+- Use `code-reviewer` agent before committing
