@@ -28,3 +28,16 @@ jwt:
   secret: my-super-secure-secret-key-for-jwt-signing-12345
   expiration-ms: 900000
   refresh-expiration-ms: 604800000
+  registration-expiration-ms: 600000
+
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+  github:
+    client-id: ${GITHUB_CLIENT_ID:}
+    client-secret: ${GITHUB_CLIENT_SECRET:}
+
+webauthn:
+  rp-id: ${WEBAUTHN_RP_ID:localhost}
+  rp-name: Flux Messenger
+  origin: ${WEBAUTHN_ORIGIN:http://localhost:8080}
