@@ -17,6 +17,14 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "BACKEND_BASE_URL", "\"http://10.0.2.2:8080/\"")
+        buildConfigField("String", "OAUTH_CALLBACK_SCHEME", "\"flux\"")
+        buildConfigField("String", "OAUTH_CALLBACK_HOST", "\"auth\"")
+        buildConfigField("String", "OAUTH_CALLBACK_PATH", "\"/callback\"")
+        buildConfigField("String", "OAUTH_START_PATH_TEMPLATE", "\"api/auth/oauth/%s/start\"")
+        buildConfigField("String", "OAUTH_CODE_EXCHANGE_PATH", "\"api/auth/oauth/exchange\"")
+        buildConfigField("String", "PASSKEY_OPTIONS_PATH", "\"api/auth/passkey/authenticate/start\"")
+        buildConfigField("String", "PASSKEY_VERIFY_PATH", "\"api/auth/passkey/authenticate/finish\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,7 +44,22 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
+    }
+}
+
+tasks.register("adbReverse") {
+    description = "Forward host ports 80 and 8080 to the emulator via adb reverse"
+    doLast {
+        ProcessBuilder("adb", "reverse", "tcp:80", "tcp:80").inheritIO().start().waitFor()
+        ProcessBuilder("adb", "reverse", "tcp:8080", "tcp:8080").inheritIO().start().waitFor()
+    }
+}
+
+tasks.whenTaskAdded {
+    if (name == "installDebug") {
+        finalizedBy("adbReverse")
     }
 }
 
@@ -63,6 +86,9 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
 
     implementation(libs.security.crypto)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.browser)
 
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)

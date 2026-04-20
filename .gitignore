@@ -49,3 +49,5 @@ build/
 
 # OS / logs
 out/
+
+.env
