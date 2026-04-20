@@ -14,7 +14,7 @@ public class ApiClient {
     public static Retrofit getInstance(TokenManager tokenManager) {
         if (retrofit == null) {
             AuthApi bareAuthApi = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/")
+                    .baseUrl(BuildConfig.BACKEND_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .create(AuthApi.class);
@@ -24,7 +24,7 @@ public class ApiClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/")
+                    .baseUrl(BuildConfig.BACKEND_BASE_URL)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();

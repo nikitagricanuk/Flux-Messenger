@@ -3,6 +3,7 @@ package ru.flux.android.data;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 public interface AuthApi {
 
@@ -14,4 +15,13 @@ public interface AuthApi {
 
     @POST("api/auth/refresh")
     Call<AuthTokens> refreshToken(@Body RefreshTokenRequest request);
+
+    @POST
+    Call<PasskeyAssertionOptionsResponse> getPasskeyAssertionOptions(@Url String url);
+
+    @POST
+    Call<AuthTokens> verifyPasskeyAssertion(@Url String url, @Body PasskeyAssertionRequest request);
+
+    @POST
+    Call<AuthTokens> exchangeOAuthCode(@Url String url, @Body OAuthCodeExchangeRequest request);
 }

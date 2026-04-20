@@ -38,10 +38,14 @@ public class TokenManager {
     private static final long ACCESS_TOKEN_TTL_MS = 900_000L;
 
     public void saveTokens(AuthTokens tokens) {
+        saveTokens(tokens.getAccessToken(), tokens.getRefreshToken());
+    }
+
+    public void saveTokens(String accessToken, String refreshToken) {
         long expiresAt = System.currentTimeMillis() + ACCESS_TOKEN_TTL_MS;
         prefs.edit()
-                .putString(KEY_ACCESS,  tokens.getAccessToken())
-                .putString(KEY_REFRESH, tokens.getRefreshToken())
+                .putString(KEY_ACCESS, accessToken)
+                .putString(KEY_REFRESH, refreshToken)
                 .putLong(KEY_EXPIRES,   expiresAt)
                 .apply();
     }
