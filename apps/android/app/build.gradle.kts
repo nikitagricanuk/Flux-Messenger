@@ -64,6 +64,10 @@ dependencies {
 
     implementation(libs.security.crypto)
 
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+    implementation(libs.viewpager2)
+    implementation(libs.glide)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
