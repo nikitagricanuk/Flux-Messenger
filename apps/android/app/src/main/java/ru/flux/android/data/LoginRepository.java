@@ -23,14 +23,14 @@ public class LoginRepository {
     }
 
     // Run this off the main thread (Executor or LiveData + background thread)
-    public Result<String> login(String username, String password) {
+    public Result<String> login(String phone, String password) {
         try {
             Response<AuthTokens> response =
-                    authApi.login(new LoginRequest(username, password)).execute();
+                    authApi.login(new LoginRequest(phone, password)).execute();
 
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
-                return new Result.Success<>(username);
+                return new Result.Success<>(phone);
             } else {
                 return new Result.Error(new Exception("Login failed: " + response.code()));
             }

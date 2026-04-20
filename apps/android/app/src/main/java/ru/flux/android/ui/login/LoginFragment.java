@@ -23,9 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.flux.android.MainActivity;
-
+import ru.flux.android.ui.PhoneTextWatcher;
 import ru.flux.android.databinding.FragmentLoginBinding;
-
 import ru.flux.android.R;
 
 public class LoginFragment extends Fragment {
@@ -50,7 +49,7 @@ public class LoginFragment extends Fragment {
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory(requireContext()))
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = binding.phone;
+        final EditText phoneEditText = binding.phone;
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
 
@@ -61,8 +60,8 @@ public class LoginFragment extends Fragment {
                     return;
                 }
                 loginButton.setEnabled(loginFormState.isDataValid());
-                if (loginFormState.getUsernameError() != null) {
-                    usernameEditText.setError(getString(loginFormState.getUsernameError()));
+                if (loginFormState.getPhoneError() != null) {
+                    phoneEditText.setError(getString(loginFormState.getPhoneError()));
                 }
                 if (loginFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(loginFormState.getPasswordError()));
@@ -98,18 +97,21 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
+                loginViewModel.loginDataChanged(
+                        PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
                         passwordEditText.getText().toString());
             }
         };
-        usernameEditText.addTextChangedListener(afterTextChangedListener);
+        PhoneTextWatcher.setup(phoneEditText);
+        phoneEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
+                    loginViewModel.login(
+                            PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
                             passwordEditText.getText().toString());
                 }
                 return false;
@@ -117,7 +119,8 @@ public class LoginFragment extends Fragment {
         });
 
         loginButton.setOnClickListener(v ->
-                loginViewModel.login(usernameEditText.getText().toString(),
+                loginViewModel.login(
+                        PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
                         passwordEditText.getText().toString()));
 
         view.findViewById(R.id.textView5).setOnClickListener(v ->

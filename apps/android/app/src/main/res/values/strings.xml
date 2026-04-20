@@ -48,4 +48,5 @@
     <string name="invalid_username">Not a valid phone</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="auth_restore_password">Восстановить пароль</string>
 </resources>

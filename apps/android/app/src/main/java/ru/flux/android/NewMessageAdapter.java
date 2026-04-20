@@ -18,6 +18,11 @@ public class NewMessageAdapter extends RecyclerView.Adapter<NewMessageAdapter.Co
     public NewMessageAdapter(List<Contact> contacts) {
         this.contacts = contacts;
     }
+
+    public void setContacts(List<Contact> contacts) {
+        this.contacts = contacts;
+        notifyDataSetChanged();
+    }
     /**
      * @param parent   The ViewGroup into which the new View will be added after it is bound to
      *                 an adapter position.

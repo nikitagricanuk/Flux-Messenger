@@ -32,20 +32,20 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(String username, String password) {
-        // Run on background thread, post result to main
+    public void login(String phone, String password) {
+        // Run on the background thread, post a result to the main
         executor.execute(() -> {
-            Result<String> result = loginRepository.login(username, password);
+            Result<String> result = loginRepository.login(phone, password);
             if (result instanceof Result.Success) {
-                loginResult.postValue(new LoginResult(new LoggedInUserView(username)));
+                loginResult.postValue(new LoginResult(new LoggedInUserView(phone)));
             } else {
                 loginResult.postValue(new LoginResult(R.string.login_failed));
             }
         });
     }
 
-    public void loginDataChanged(String username, String password) {
-        if (!isUserNameValid(username)) {
+    public void loginDataChanged(String phone, String password) {
+        if (!isPhoneValid(phone)) {
             loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
         } else if (!isPasswordValid(password)) {
             loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
@@ -54,15 +54,17 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    // A placeholder username validation check
-    private boolean isUserNameValid(String username) {
-        if (username == null) {
+    // A placeholder phone validation check
+    private boolean isPhoneValid(String phone) {
+        if (phone == null) {
             return false;
         }
-        if (username.contains("@")) {
-            return Patterns.EMAIL_ADDRESS.matcher(username).matches();
-        } else {
-            return !username.trim().isEmpty();
+
+//        if (phone.contains("@")) {
+//            return Patterns.EMAIL_ADDRESS.matcher(phone).matches();
+//        }
+        else {
+            return !phone.trim().isEmpty();
         }
     }
 

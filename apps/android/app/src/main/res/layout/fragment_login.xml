@@ -57,13 +57,14 @@
         android:drawableStart="@drawable/phone_rotary_1"
         android:drawablePadding="11dp"
         android:elevation="4dp"
-        android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
+        android:hint="@string/prompt_phone"
+        android:inputType="phone"
         android:paddingStart="18dp"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/segment_tabs" />
+        app:layout_constraintTop_toBottomOf="@+id/segment_tabs"
+        tools:ignore="RtlSymmetry" />
 
     <EditText
         android:id="@+id/password"
@@ -85,7 +86,8 @@
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone" />
+        app:layout_constraintTop_toBottomOf="@+id/phone"
+        tools:ignore="RtlSymmetry" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login"
@@ -110,7 +112,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="5dp"
-        android:text="Восстановить пароль"
+        android:text="@string/auth_restore_password"
         app:layout_constraintEnd_toStartOf="@+id/login"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
