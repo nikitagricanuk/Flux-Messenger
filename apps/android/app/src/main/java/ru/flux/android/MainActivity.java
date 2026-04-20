@@ -2,6 +2,7 @@ package ru.flux.android;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -9,7 +10,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -20,13 +23,24 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout activeTab;
     private NavController navController;
 
+    public void setNavBarVisible(boolean visible) {
+        findViewById(R.id.blurNav).setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Blur setup
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.hide(WindowInsetsCompat.Type.navigationBars());
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
+
         BlurView blurNav = findViewById(R.id.blurNav);
         BlurView selectedTabBlur = findViewById(R.id.selectedTabBlur);
         ViewGroup rootView = findViewById(android.R.id.content);
@@ -40,24 +54,20 @@ public class MainActivity extends AppCompatActivity {
                 .setFrameClearDrawable(windowBackground)
                 .setBlurRadius(12f);
 
-        // Insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
-        // NavController из NavHostFragment
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container);
         navController = navHostFragment.getNavController();
 
-        // Табы
         FrameLayout navChats = findViewById(R.id.nav_chats);
         FrameLayout navContacts = findViewById(R.id.nav_contacts);
         FrameLayout navSettings = findViewById(R.id.nav_settings);
 
-        // Активный таб по умолчанию
         setActiveTab(navChats);
 
         navChats.setOnClickListener(v -> {

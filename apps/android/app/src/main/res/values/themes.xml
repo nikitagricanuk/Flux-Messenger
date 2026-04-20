@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.Flux" parent="Base.Theme.Flux" />
+
+    <style name="RoundedImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

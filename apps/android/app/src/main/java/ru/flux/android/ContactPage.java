@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,13 +33,17 @@ public class ContactPage extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         List<Contact> contacts = new ArrayList<>();
-        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144","email"));
-        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144","email"));
-        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144","email"));
-        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144","email"));
+        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144", "email"));
+        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144", "email"));
+        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144", "email"));
+        contacts.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", "", "+89149149144", "email"));
 
         RecyclerView recyclerView = view.findViewById(R.id.contactsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new ContactAdapter(contacts));
+
+        recyclerView.setAdapter(new ContactAdapter(contacts, contact -> {
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_contactPage_to_profileFragment);
+        }));
     }
 }

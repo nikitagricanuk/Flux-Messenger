@@ -43,6 +43,8 @@
         app:layout_constraintTop_toBottomOf="@id/contacts_page"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_scrollFlags="scroll|exitUntilCollapsed"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
