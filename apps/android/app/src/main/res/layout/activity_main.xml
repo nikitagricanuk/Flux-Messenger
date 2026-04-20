@@ -6,6 +6,8 @@
     android:background="@drawable/bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".MainActivity">
 
     <!-- Fragment content fills everything above the navbar -->
@@ -38,6 +40,7 @@
             android:baselineAligned="false"
             android:gravity="center"
             android:orientation="horizontal"
+            android:elevation="8dp"
             android:padding="6dp"
             android:weightSum="3">
 

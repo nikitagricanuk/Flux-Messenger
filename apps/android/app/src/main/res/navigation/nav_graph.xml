@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/chatsFragment">
+
+    <fragment
+        android:id="@+id/chatsFragment"
+        android:name="ru.flux.android.ChatsFragment" />
+
+    <fragment
+        android:id="@+id/contactPage"
+        android:name="ru.flux.android.ContactPage">
+
+        <action
+            android:id="@+id/action_contactPage_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ru.flux.android.Profile">
+        <action
+            android:id="@+id/action_profile_to_imageViewer"
+            app:destination="@id/imageViewerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/imageViewerFragment"
+        android:name="ru.flux.android.ImageViewerFragment">
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="ru.flux.android.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsProfileFragment"
+            app:destination="@id/settingsProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsProfileFragment"
+        android:name="ru.flux.android.SettingsProfileFragment"
+        android:label="fragment_settings_profile"
+        tools:layout="@layout/fragment_settings_profile" />
+
+
+</navigation>
