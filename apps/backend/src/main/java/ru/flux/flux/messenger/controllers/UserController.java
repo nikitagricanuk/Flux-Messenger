@@ -33,6 +33,11 @@ public class UserController {
         return service.getUserById(id);
     }
 
+    @GetMapping("/me")
+    public UserResponse getMe(@AuthenticationPrincipal User principal) {
+        return service.getUserById(principal.getId());
+    }
+
     @PostMapping
     public UserResponse createUser(@RequestBody CreateUserRequest request) {
         return service.createUser(request);
@@ -43,10 +48,21 @@ public class UserController {
         return service.updateUser(id, request);
     }
 
+    @PutMapping("/me")
+    public UserResponse updateMe(@AuthenticationPrincipal User principal, @RequestBody CreateUserRequest request) {
+        return service.updateUser(principal.getId(), request);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserById(@PathVariable UUID id) {
         service.deleteUserById(id);
+    }
+
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMe(@AuthenticationPrincipal User principal) {
+        service.deleteUserById(principal.getId());
     }
 
     @GetMapping("/me/contacts")
@@ -65,9 +81,21 @@ public class UserController {
         service.addContact(id, contactId);
     }
 
+    @PutMapping("/me/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addContactToMe(@PathVariable UUID contactId, @AuthenticationPrincipal User principal) {
+        service.addContact(principal.getId(), contactId);
+    }
+
     @DeleteMapping("/{id}/contacts/{contactId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeContact(@PathVariable UUID id, @PathVariable UUID contactId) {
         service.removeContact(id, contactId);
+    }
+
+    @DeleteMapping("/me/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeContactToMe(@PathVariable UUID contactId, @AuthenticationPrincipal User principal) {
+        service.removeContact(principal.getId(), contactId);
     }
 }

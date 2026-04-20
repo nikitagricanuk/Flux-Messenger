@@ -259,6 +259,7 @@
                         android:id="@+id/tvBirthDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:hint="12.11.2006"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 

@@ -2,6 +2,7 @@ package ru.flux.android;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,37 +11,99 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.AutoTransition;
 import androidx.transition.TransitionManager;
 
 import java.util.Calendar;
 
 import eightbitlab.com.blurview.BlurView;
+import ru.flux.android.data.TokenManager;
+import ru.flux.android.ui.login.LoginActivity;
 
 public class SettingsProfileFragment extends Fragment {
+
+    private SettingsViewModel viewModel;
 
     public SettingsProfileFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_settings_profile, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
 
         setupBlurViews(view);
-
-        view.findViewById(R.id.btnBack).setOnClickListener(v ->
-                requireActivity().getOnBackPressedDispatcher().onBackPressed());
-
         setupBirthDate(view);
         setupEditableRow(view, R.id.rowUsername, R.id.etUsername);
         setupEditableRow(view, R.id.rowPhone, R.id.etPhone);
         setupEditableRow(view, R.id.rowEmail, R.id.etEmail);
+
+        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            setField(view, R.id.etFirstName, user.firstName);
+            setField(view, R.id.etLastName, user.lastName);
+            setField(view, R.id.etUsername, user.nickname);
+            setField(view, R.id.etPhone, user.phone);
+            setField(view, R.id.etEmail, user.email);
+        });
+
+        viewModel.getError().observe(getViewLifecycleOwner(), err -> {
+            if (err != null) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show();
+        });
+
+        view.findViewById(R.id.btnBack).setOnClickListener(v -> saveAndGoBack(view));
+
+        view.findViewById(R.id.tvSignOut).setOnClickListener(v -> logout());
+
+        view.findViewById(R.id.tvDeleteAccount).setOnClickListener(v ->
+                viewModel.deleteAccount(() -> requireActivity().runOnUiThread(this::navigateToLogin)));
+    }
+
+    private void saveAndGoBack(View view) {
+        String firstName = getFieldText(view, R.id.etFirstName);
+        if (firstName.isEmpty()) {
+            Toast.makeText(requireContext(), "Имя обязательно", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        UserResponse current = viewModel.getUser().getValue();
+        viewModel.saveUser(new UpdateUserRequest(
+                firstName,
+                getFieldText(view, R.id.etLastName),
+                getFieldText(view, R.id.etUsername),
+                getFieldText(view, R.id.etPhone),
+                getFieldText(view, R.id.etEmail),
+                current != null ? current.notifications : null
+        ));
+        requireActivity().getOnBackPressedDispatcher().onBackPressed();
+    }
+
+    private void logout() {
+        try { new TokenManager(requireContext()).clearTokens(); } catch (Exception ignored) {}
+        navigateToLogin();
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void setField(View root, int id, String value) {
+        if (value == null) return;
+        ((EditText) root.findViewById(id)).setText(value);
+    }
+
+    private String getFieldText(View root, int id) {
+        CharSequence text = ((EditText) root.findViewById(id)).getText();
+        return text != null ? text.toString().trim() : "";
     }
 
     private void setupBlurViews(View root) {

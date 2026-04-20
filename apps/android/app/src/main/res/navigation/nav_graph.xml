@@ -41,12 +41,20 @@
         <action
             android:id="@+id/action_settingsFragment_to_settingsProfileFragment"
             app:destination="@id/settingsProfileFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsNotificationsFragment"
+            app:destination="@id/settingsNotificationsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsProfileFragment"
         android:name="ru.flux.android.SettingsProfileFragment"
         android:label="fragment_settings_profile"
         tools:layout="@layout/fragment_settings_profile" />
+    <fragment
+        android:id="@+id/settingsNotificationsFragment"
+        android:name="ru.flux.android.SettingsNotificationsFragment"
+        android:label="fragment_settings_notifications"
+        tools:layout="@layout/fragment_settings_notifications" />
 
 
 </navigation>
