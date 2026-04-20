@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.flux.flux.messenger.dto.JwtAuthenticationResponse;
+import ru.flux.flux.messenger.dto.RefreshTokenRequest;
 import ru.flux.flux.messenger.dto.SignInRequest;
 import ru.flux.flux.messenger.dto.SignUpRequest;
 import ru.flux.flux.messenger.services.AuthenticationService;
@@ -31,5 +32,11 @@ public class AuthController {
     @Operation(summary = "Sign In")
     public ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody @Valid SignInRequest request) {
         return ResponseEntity.ok(authenticationService.signIn(request));
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh access token")
+    public ResponseEntity<JwtAuthenticationResponse> refresh(@RequestBody @Valid RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refresh(request));
     }
 }

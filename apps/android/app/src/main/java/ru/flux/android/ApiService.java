@@ -7,4 +7,10 @@ import retrofit2.http.GET;
 public interface ApiService {
     @GET("chats")
     Call<List<ChatResponse>> getChats();
+
+    @GET("users")
+    Call<List<UserResponse>> getUsers();
+
+    @GET("users/me/contacts")
+    Call<List<ContactResponse>> getMyContacts();
 }

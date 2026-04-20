@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.JwtAuthenticationResponse;
+import ru.flux.flux.messenger.dto.RefreshTokenRequest;
 import ru.flux.flux.messenger.dto.SignInRequest;
 import ru.flux.flux.messenger.dto.SignUpRequest;
 
@@ -30,6 +31,12 @@ public class AuthenticationService {
 
         var user = (User) userService.userDetailsService().loadUserByUsername(request.getPhone());
 
+        return buildResponse(user);
+    }
+
+    public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
+        String phone = jwtService.extractSubject(request.getRefreshToken());
+        var user = (User) userService.userDetailsService().loadUserByUsername(phone);
         return buildResponse(user);
     }
 
