@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_auth"
+    app:startDestination="@id/welcomeAuthFragment">
+
+    <fragment
+        android:id="@+id/welcomeAuthFragment"
+        android:name="ru.flux.android.WelcomeAuthFragment"
+        android:label="WelcomeAuthFragment">
+        <action
+            android:id="@+id/action_welcome_to_login"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_welcome_to_signup"
+            app:destination="@id/signUpAuthFragment" />
+        <action
+            android:id="@+id/action_welcome_to_3rd_party"
+            app:destination="@id/signUpCompletion3rdPartyFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="ru.flux.android.ui.login.LoginFragment"
+        android:label="LoginFragment">
+        <action
+            android:id="@+id/action_login_to_signup"
+            app:destination="@id/signUpAuthFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signUpAuthFragment"
+        android:name="ru.flux.android.SignUpAuthFragment"
+        android:label="SignUpAuthFragment">
+        <action
+            android:id="@+id/action_signup_to_completion"
+            app:destination="@id/signUpCompletionInternalFragment" />
+        <action
+            android:id="@+id/action_signup_to_login"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signUpCompletionInternalFragment"
+        android:name="ru.flux.android.SignUpCompletionInternalFragment"
+        android:label="SignUpCompletionInternalFragment" />
+
+    <fragment
+        android:id="@+id/signUpCompletion3rdPartyFragment"
+        android:name="ru.flux.android.SignUpCompletion3rdPartyFragment"
+        android:label="SignUpCompletion3rdPartyFragment" />
+
+</navigation>

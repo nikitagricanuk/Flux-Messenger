@@ -28,13 +28,28 @@
     <string name="new_contact">Новый контакт</string>
     <string name="cancel">Отмена</string>
     <string name="send_message">Send message</string>
+    <string-array name="chats_tabs">
+        <item>Все</item>
+        <item>Чаты</item>
+        <item>Группы</item>
+    </string-array>
+
+    <string-array name="login_tabs">
+        <item>По телефону</item>
+        <item>По почте</item>
+    </string-array>
+
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="prompt_phone">Телефон</string>
+    <string name="prompt_password">Пароль</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="action_sign_up">Зарегистрироваться</string>
+    <string name="action_sign_in_short">Войти</string>
     <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_username">Not a valid phone</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="auth_restore_password">Восстановить пароль</string>
+    <string name="passwords_do_not_match">Пароли не совпадают</string>
 </resources>

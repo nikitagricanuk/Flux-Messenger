@@ -5,7 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+
+import ru.flux.android.ui.SegmentTabsView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +25,7 @@ import retrofit2.Response;
 
 public class ChatsFragment extends Fragment {
 
-    private TextView allTab, dmsTab, groupsTab;
+    private SegmentTabsView segmentTabs;
     private ChatAdapter adapter;
 
     @Nullable
@@ -47,9 +48,7 @@ public class ChatsFragment extends Fragment {
             sheet.show(getParentFragmentManager(), NewMessageBottomSheet.class.getSimpleName());
         });
 
-        allTab    = view.findViewById(R.id.all_tab);
-        dmsTab    = view.findViewById(R.id.dms_tab);
-        groupsTab = view.findViewById(R.id.groups_tab);
+        segmentTabs = view.findViewById(R.id.segment_tabs);
 
         RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
         chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -58,11 +57,11 @@ public class ChatsFragment extends Fragment {
 
         loadChats();
 
-        allTab.setOnClickListener(v -> setActiveTab("all"));
-        dmsTab.setOnClickListener(v -> setActiveTab("dm"));
-        groupsTab.setOnClickListener(v -> setActiveTab("group"));
-
-        setActiveTab("all");
+        String[] filters = {"all", "dm", "group"};
+        segmentTabs.setOnTabSelectedListener(index -> {
+            if (index < filters.length) adapter.setFilter(filters[index]);
+        });
+        adapter.setFilter("all");
     }
 
     private static final String TAG = "ChatsFragment";
@@ -105,17 +104,4 @@ public class ChatsFragment extends Fragment {
         return new Chat(cr.id, cr.name, cr.lastMessage, cr.profilePicture, time, type);
     }
 
-    private void setActiveTab(String filter) {
-        allTab.setBackgroundResource(0);
-        dmsTab.setBackgroundResource(0);
-        groupsTab.setBackgroundResource(0);
-
-        switch (filter) {
-            case "all":   allTab.setBackgroundResource(R.drawable.bg_segment_selected);   break;
-            case "dm":    dmsTab.setBackgroundResource(R.drawable.bg_segment_selected);    break;
-            case "group": groupsTab.setBackgroundResource(R.drawable.bg_segment_selected); break;
-        }
-
-        adapter.setFilter(filter);
-    }
 }

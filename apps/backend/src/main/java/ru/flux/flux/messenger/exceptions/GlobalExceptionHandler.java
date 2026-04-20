@@ -1,5 +1,6 @@
 package ru.flux.flux.messenger.exceptions;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +13,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, Object> handleJwtException(JwtException ex) {
+        return Map.of("status", 401, "message", "Invalid or expired token");
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -44,5 +51,23 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleNotFound(RuntimeException ex) {
         return Map.of("status", 404, "message", ex.getMessage());
+    }
+
+    @ExceptionHandler({OAuthVerificationException.class, PasskeyVerificationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleAuthVerification(RuntimeException ex) {
+        return Map.of("status", 400, "message", ex.getMessage());
+    }
+
+    @ExceptionHandler(RegistrationTokenExpiredException.class)
+    @ResponseStatus(HttpStatus.GONE)
+    public Map<String, Object> handleRegistrationTokenExpired(RegistrationTokenExpiredException ex) {
+        return Map.of("status", 410, "message", ex.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> handleAlreadyExists(UserAlreadyExistsException ex) {
+        return Map.of("status", 409, "message", ex.getMessage());
     }
 }

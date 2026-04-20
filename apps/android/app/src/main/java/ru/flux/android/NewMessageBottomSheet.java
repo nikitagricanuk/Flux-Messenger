@@ -1,6 +1,7 @@
 package ru.flux.android;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,16 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import ru.flux.android.data.TokenManager;
 
 public class NewMessageBottomSheet extends BottomSheetDialogFragment {
 
@@ -51,7 +59,10 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         RecyclerView recycler = view.findViewById(R.id.contactsRecycler);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setNestedScrollingEnabled(true);
-        recycler.setAdapter(new NewMessageAdapter(buildPlaceholderItems()));
+
+        NewMessageAdapter adapter = new NewMessageAdapter(new ArrayList<>());
+        recycler.setAdapter(adapter);
+        loadContacts(adapter);
     }
 
     @Override
@@ -75,16 +86,34 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    // ── Placeholder data (replace with real contacts API when available) ──────
+    private static final String TAG = "NewMessageBottomSheet";
 
-    private List<Contact> buildPlaceholderItems() {
-        List<Contact> items = new ArrayList<>();
+    private void loadContacts(NewMessageAdapter adapter) {
+        try {
+            TokenManager tokenManager = new TokenManager(requireContext());
+            ApiService apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);
+            apiService.getMyContacts().enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<List<ContactResponse>> call,
+                                       @NonNull Response<List<ContactResponse>> response) {
+                    if (!response.isSuccessful() || response.body() == null) {
+                        Log.e(TAG, "getMyContacts failed: " + response.code());
+                        return;
+                    }
+                    List<Contact> contacts = new ArrayList<>();
+                    for (ContactResponse cr : response.body()) {
+                        contacts.add(new Contact(UUID.fromString(cr.id), cr.name, cr.avatarUrl, cr.contact, null));
+                    }
+                    adapter.setContacts(contacts);
+                }
 
-        items.add(new Contact(UUID.randomUUID(), "Анатолий Крутой",  null, "+7-888-888-80-88", null));
-        items.add(new Contact(UUID.randomUUID(), "Борис Сафонов",  null, "+7-888-888-80-89", null));
-        items.add(new Contact(UUID.randomUUID(), "Володя Сафонов", null, "+7-888-888-80-90", null));
-        items.add(new Contact(UUID.randomUUID(), "Евгений Сафонов", null, "+7-888-888-80-91", null));
-
-        return items;
+                @Override
+                public void onFailure(@NonNull Call<List<ContactResponse>> call, @NonNull Throwable t) {
+                    Log.e(TAG, "getMyContacts error: " + t.getMessage());
+                }
+            });
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "TokenManager init failed: " + e.getMessage());
+        }
     }
 }
