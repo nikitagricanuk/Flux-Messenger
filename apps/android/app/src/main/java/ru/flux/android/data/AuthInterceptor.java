@@ -58,7 +58,7 @@ public class AuthInterceptor implements Interceptor {
         if (refreshToken == null) return null;
 
         try {
-            retrofit2.Response<AuthTokens> response = authApi.refreshToken(refreshToken).execute();
+            retrofit2.Response<AuthTokens> response = authApi.refreshToken(new RefreshTokenRequest(refreshToken)).execute();
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
                 return response.body().getAccessToken();

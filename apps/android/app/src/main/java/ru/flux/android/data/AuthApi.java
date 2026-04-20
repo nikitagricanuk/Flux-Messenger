@@ -9,7 +9,9 @@ public interface AuthApi {
     @POST("api/auth/sign-in")
     Call<AuthTokens> login(@Body LoginRequest request);
 
-    // TODO: add @POST("api/auth/refresh") once backend implements the endpoint
+    @POST("api/auth/sign-up")
+    Call<AuthTokens> signUp(@Body SignUpRequest request);
+
     @POST("api/auth/refresh")
-    Call<AuthTokens> refreshToken(@Body String refreshToken);
+    Call<AuthTokens> refreshToken(@Body RefreshTokenRequest request);
 }

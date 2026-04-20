@@ -17,6 +17,7 @@ public class LoginViewModel extends ViewModel {
 
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    private final MutableLiveData<LoginResult> signUpResult = new MutableLiveData<>();
     private final Executor executor = Executors.newSingleThreadExecutor();
     private LoginRepository loginRepository;
 
@@ -28,8 +29,12 @@ public class LoginViewModel extends ViewModel {
         return loginFormState;
     }
 
-    LiveData<LoginResult> getLoginResult() {
+    public LiveData<LoginResult> getLoginResult() {
         return loginResult;
+    }
+
+    public LiveData<LoginResult> getSignUpResult() {
+        return signUpResult;
     }
 
     public void login(String phone, String password) {
@@ -40,6 +45,18 @@ public class LoginViewModel extends ViewModel {
                 loginResult.postValue(new LoginResult(new LoggedInUserView(phone)));
             } else {
                 loginResult.postValue(new LoginResult(R.string.login_failed));
+            }
+        });
+    }
+
+    public void signUp(String firstName, String lastName, String username,
+                       String phone, String password) {
+        executor.execute(() -> {
+            Result<String> result = loginRepository.signUp(firstName, lastName, username, phone, password);
+            if (result instanceof Result.Success) {
+                signUpResult.postValue(new LoginResult(new LoggedInUserView(phone)));
+            } else {
+                signUpResult.postValue(new LoginResult(R.string.login_failed));
             }
         });
     }

@@ -49,4 +49,5 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="auth_restore_password">Восстановить пароль</string>
+    <string name="passwords_do_not_match">Пароли не совпадают</string>
 </resources>

@@ -1,73 +1,92 @@
 package ru.flux.android;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignUpAuthFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import ru.flux.android.databinding.FragmentSignUpAuthBinding;
+import ru.flux.android.ui.PhoneTextWatcher;
+
 public class SignUpAuthFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String ARG_PHONE = "phone";
+    public static final String ARG_PASSWORD = "password";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private FragmentSignUpAuthBinding binding;
 
-    public SignUpAuthFragment() {
-        // Required empty public constructor
-    }
+    public SignUpAuthFragment() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignUpAuthFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignUpAuthFragment newInstance(String param1, String param2) {
-        SignUpAuthFragment fragment = new SignUpAuthFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = FragmentSignUpAuthBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_sign_up_auth, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.login).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.action_signup_to_completion));
-        view.findViewById(R.id.textView5).setOnClickListener(v ->
+        EditText phoneEditText = binding.phoneNumber;
+        EditText passwordEditText = binding.password;
+        EditText repeatPasswordEditText = binding.repeatPassword;
+        Button signUpButton = binding.login;
+
+        PhoneTextWatcher.setup(phoneEditText);
+
+        TextWatcher validationWatcher = new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String phone = PhoneTextWatcher.normalize(phoneEditText.getText().toString());
+                String password = passwordEditText.getText().toString();
+                String repeat = repeatPasswordEditText.getText().toString();
+
+                boolean phoneValid = phone.length() >= 11;
+                boolean passwordValid = password.length() > 5;
+                boolean passwordsMatch = password.equals(repeat);
+
+                if (!repeat.isEmpty() && !passwordsMatch) {
+                    repeatPasswordEditText.setError(getString(R.string.passwords_do_not_match));
+                } else {
+                    repeatPasswordEditText.setError(null);
+                }
+
+                signUpButton.setEnabled(phoneValid && passwordValid && passwordsMatch);
+            }
+        };
+
+        phoneEditText.addTextChangedListener(validationWatcher);
+        passwordEditText.addTextChangedListener(validationWatcher);
+        repeatPasswordEditText.addTextChangedListener(validationWatcher);
+
+        signUpButton.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString(ARG_PHONE, PhoneTextWatcher.normalize(phoneEditText.getText().toString()));
+            args.putString(ARG_PASSWORD, passwordEditText.getText().toString());
+            Navigation.findNavController(v).navigate(R.id.action_signup_to_completion, args);
+        });
+
+        binding.textView5.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_signup_to_login));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

@@ -39,6 +39,23 @@ public class LoginRepository {
         }
     }
 
+    public Result<String> signUp(String firstName, String lastName, String username,
+                                  String phone, String password) {
+        try {
+            Response<AuthTokens> response =
+                    authApi.signUp(new SignUpRequest(firstName, lastName, username, phone, password))
+                            .execute();
+            if (response.isSuccessful() && response.body() != null) {
+                tokenManager.saveTokens(response.body());
+                return new Result.Success<>(phone);
+            } else {
+                return new Result.Error(new Exception("Sign up failed: " + response.code()));
+            }
+        } catch (IOException e) {
+            return new Result.Error(e);
+        }
+    }
+
     public void logout() {
         tokenManager.clearTokens();
     }

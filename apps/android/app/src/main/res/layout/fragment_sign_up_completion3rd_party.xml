@@ -7,7 +7,7 @@
     android:elevation="3dp"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/fragment_horizontal_margin"
     android:paddingTop="@dimen/fragment_vertical_margin"
@@ -314,9 +314,9 @@
 
                 <EditText
                     android:id="@+id/etOtp"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:gravity="end"
                     android:background="@null"
                     android:hint="123-456"
                     android:includeFontPadding="false"
