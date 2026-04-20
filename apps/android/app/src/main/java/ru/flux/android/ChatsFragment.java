@@ -16,12 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.flux.android.data.TokenManager;
 
 public class ChatsFragment extends Fragment {
 
@@ -68,27 +71,33 @@ public class ChatsFragment extends Fragment {
 
     private void loadChats() {
         Log.d(TAG, "loadChats: making request to /chats");
-        RetrofitClient.getInstance().getApiService().getChats().enqueue(new Callback<List<ChatResponse>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<ChatResponse>> call,
-                                   @NonNull Response<List<ChatResponse>> response) {
-                Log.d(TAG, "onResponse: code=" + response.code());
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Chat> chats = new ArrayList<>();
-                    for (ChatResponse cr : response.body()) {
-                        chats.add(toChat(cr));
+        try {
+            TokenManager tokenManager = new TokenManager(requireContext());
+            ApiService apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);
+            apiService.getChats().enqueue(new Callback<List<ChatResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<ChatResponse>> call,
+                                       @NonNull Response<List<ChatResponse>> response) {
+                    Log.d(TAG, "onResponse: code=" + response.code());
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Chat> chats = new ArrayList<>();
+                        for (ChatResponse cr : response.body()) {
+                            chats.add(toChat(cr));
+                        }
+                        adapter.setChats(chats);
+                    } else {
+                        Log.e(TAG, "onResponse: unsuccessful, code=" + response.code());
                     }
-                    adapter.setChats(chats);
-                } else {
-                    Log.e(TAG, "onResponse: unsuccessful, code=" + response.code());
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<List<ChatResponse>> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getClass().getName() + ": " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<List<ChatResponse>> call, @NonNull Throwable t) {
+                    Log.e(TAG, "onFailure: " + t.getClass().getName() + ": " + t.getMessage());
+                }
+            });
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "loadChats: TokenManager init failed: " + e.getMessage());
+        }
     }
 
     private Chat toChat(ChatResponse cr) {
