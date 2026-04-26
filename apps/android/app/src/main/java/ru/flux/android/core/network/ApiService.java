@@ -7,6 +7,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
 public interface ApiService {
     @GET("chats")
@@ -29,4 +30,7 @@ public interface ApiService {
 
     @POST("chats")
     Call<ChatResponse> createChat(@Body CreateChatRequest request);
+
+    @DELETE("chats/{id}")
+    Call<Void> deleteChat(@Path("id") String id);
 }

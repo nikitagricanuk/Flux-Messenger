@@ -48,6 +48,7 @@ public class ChatsFragment extends Fragment {
         RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
         chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ChatAdapter();
+        adapter.setOnChatActionListener(viewModel::deleteChat);
         chatsRecycler.setAdapter(adapter);
 
         viewModel.getChats().observe(getViewLifecycleOwner(), adapter::setChats);

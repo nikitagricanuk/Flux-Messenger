@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private List<Chat> allChats = new ArrayList<>();
     private List<Chat> filteredChats = new ArrayList<>();
     private String activeFilter = "all";
+
+    public interface OnChatActionListener {
+        void onDeleteChat(Chat chat);
+    }
+
+    private OnChatActionListener listener;
+
+    public void setOnChatActionListener(OnChatActionListener listener) {
+        this.listener = listener;
+    }
 
     public void setChats(List<Chat> chats) {
         allChats = chats;
@@ -68,7 +79,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         holder.name.setText(chat.name);
         holder.lastMessage.setText(chat.lastMessage);
         holder.time.setText(chat.time);
-        // TODO: when Glide is added → Glide.with(holder.itemView).load(chat.avatarUrl).into(holder.avatar);
+
+        holder.itemView.setOnLongClickListener(v -> {
+            PopupMenu popup = new PopupMenu(v.getContext(), v);
+            popup.getMenu().add(0, 0, 0, "Delete");
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == 0 && listener != null) {
+                    listener.onDeleteChat(chat);
+                }
+                return true;
+            });
+            popup.show();
+            return true;
+        });
     }
 
     @Override

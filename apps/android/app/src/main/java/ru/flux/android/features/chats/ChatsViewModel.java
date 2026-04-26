@@ -50,6 +50,26 @@ public class ChatsViewModel extends AndroidViewModel {
         });
     }
 
+    public void deleteChat(Chat chat) {
+        executor.execute(() -> {
+            try {
+                Response<Void> response = ApiClient.api(getApplication()).deleteChat(chat.id).execute();
+                if (response.isSuccessful()) {
+                    List<Chat> current = chats.getValue();
+                    if (current != null) {
+                        List<Chat> updated = new ArrayList<>(current);
+                        updated.remove(chat);
+                        chats.postValue(updated);
+                    }
+                } else {
+                    error.postValue("Не удалось удалить чат");
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                error.postValue(e.getMessage());
+            }
+        });
+    }
+
     private Chat toChat(ChatResponse cr) {
         String type = "DIRECT".equals(cr.type) ? "dm" : "group";
         String time = "";
