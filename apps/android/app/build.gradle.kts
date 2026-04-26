@@ -90,6 +90,10 @@ dependencies {
     implementation(libs.credentials.play.services.auth)
     implementation(libs.browser)
 
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+    implementation(libs.viewpager2)
+    implementation(libs.glide)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
