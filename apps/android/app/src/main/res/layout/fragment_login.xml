@@ -13,7 +13,7 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".ui.login.LoginFragment">
+    tools:context=".features.login.ui.LoginFragment">
 
     <TextView
         android:id="@+id/textView"
@@ -31,7 +31,7 @@
         app:layout_constraintVertical_bias="1.0"
         tools:text="Войти" />
 
-    <ru.flux.android.ui.SegmentTabsView
+    <ru.flux.android.core.ui.SegmentTabsView
         android:id="@+id/segment_tabs"
         android:layout_width="0dp"
         android:layout_height="34dp"

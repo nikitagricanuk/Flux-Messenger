@@ -8,7 +8,7 @@
     android:paddingStart="16dp"
     android:paddingTop="16dp"
     android:paddingEnd="16dp"
-    tools:context=".SettingsNotificationsFragment">
+    tools:context=".features.settings.ui.SettingsNotificationsFragment">
 
     <!-- Header: back button + title -->
     <LinearLayout

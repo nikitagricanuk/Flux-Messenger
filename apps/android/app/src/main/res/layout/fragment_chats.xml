@@ -27,12 +27,12 @@
         android:clickable="true"
         android:contentDescription="@string/search_icon"
         android:focusable="true"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintEnd_toStartOf="@+id/newChat"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/fi_rr_search" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/newChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
@@ -64,7 +64,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fav_tv" />
 
-    <ru.flux.android.ui.SegmentTabsView
+    <ru.flux.android.core.ui.SegmentTabsView
         android:id="@+id/segment_tabs"
         android:layout_width="0dp"
         android:layout_height="48dp"

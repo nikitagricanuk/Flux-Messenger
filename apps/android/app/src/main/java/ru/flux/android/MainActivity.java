@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.chatsFragment);
         });
 
-        navContacts.setOnClickListener(v -> {
-            setActiveTab(navContacts);
-            navController.navigate(R.id.contactPage);
-        });
+//        navContacts.setOnClickListener(v -> {
+//            setActiveTab(navContacts);
+//            navController.navigate(R.id.contactPage);
+//        });
 
         navSettings.setOnClickListener(v -> {
             setActiveTab(navSettings);
