@@ -21,6 +21,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private List<Chat> filteredChats = new ArrayList<>();
     private String activeFilter = "all";
 
+    public interface OnChatClickListener {
+    void onChatClick(Chat chat);
+}
+
+private final OnChatClickListener listener;
+
+public ChatAdapter(OnChatClickListener listener) {
+    this.listener = listener;
+}
+
+
     public void setChats(List<Chat> chats) {
         allChats = chats;
         applyFilter();
@@ -50,13 +61,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-        Chat chat = filteredChats.get(position);
-        holder.name.setText(chat.name);
-        holder.lastMessage.setText(chat.lastMessage);
-        holder.time.setText(chat.time);
-        // TODO: when Glide is added → Glide.with(holder.itemView).load(chat.avatarUrl).into(holder.avatar);
-    }
+public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+    Chat chat = filteredChats.get(position);
+    holder.name.setText(chat.name);
+    holder.lastMessage.setText(chat.lastMessage);
+    holder.time.setText(chat.time);
+
+    holder.itemView.setOnClickListener(v -> listener.onChatClick(chat));
+}
+
 
     @Override
     public int getItemCount() {

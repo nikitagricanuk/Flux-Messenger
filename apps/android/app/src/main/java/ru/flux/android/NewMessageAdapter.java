@@ -13,22 +13,23 @@ import java.util.List;
 
 public class NewMessageAdapter extends RecyclerView.Adapter<NewMessageAdapter.ContactViewHolder> {
 
-    private List<Contact> contacts;
+    public interface OnContactClickListener {
+        void onContactClick(Contact contact);
+    }
 
-    public NewMessageAdapter(List<Contact> contacts) {
+    private List<Contact> contacts;
+    private final OnContactClickListener listener;
+
+    public NewMessageAdapter(List<Contact> contacts, OnContactClickListener listener) {
         this.contacts = contacts;
+        this.listener = listener;
     }
 
     public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
         notifyDataSetChanged();
     }
-    /**
-     * @param parent   The ViewGroup into which the new View will be added after it is bound to
-     *                 an adapter position.
-     * @param viewType The view type of the new View.
-     * @return
-     */
+
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,22 +38,14 @@ public class NewMessageAdapter extends RecyclerView.Adapter<NewMessageAdapter.Co
         return new ContactViewHolder(view);
     }
 
-    /**
-     * @param holder   The ViewHolder which should be updated to represent the contents of the
-     *                 item at the given position in the data set.
-     * @param position The position of the item within the adapter's data set.
-     */
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         Contact contact = contacts.get(position);
         holder.name.setText(contact.name);
         holder.phoneOrEmail.setText(contact.phoneNumber);
+        holder.itemView.setOnClickListener(v -> listener.onContactClick(contact));
     }
 
-
-    /**
-     * @return
-     */
     @Override
     public int getItemCount() {
         return contacts.size();

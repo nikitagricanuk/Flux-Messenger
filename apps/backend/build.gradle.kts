@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation(project(":shared:api-contract"))
     implementation(project(":shared:core"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

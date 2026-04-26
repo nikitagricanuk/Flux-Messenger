@@ -121,6 +121,20 @@
         </LinearLayout>
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_segment_container"
+        android:hint="Поиск"
+        android:inputType="text"
+        android:padding="12dp"
+        android:singleLine="true" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contactsRecycler"
         android:layout_width="match_parent"

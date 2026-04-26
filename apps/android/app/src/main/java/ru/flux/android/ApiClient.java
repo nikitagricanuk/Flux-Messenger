@@ -5,11 +5,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.flux.android.data.AuthApi;
 import ru.flux.android.data.AuthInterceptor;
+import ru.flux.android.data.MessagingApi;
 import ru.flux.android.data.TokenManager;
 
 public class ApiClient {
 
     private static Retrofit retrofit;
+    private static MessagingApi messagingApi;
 
     public static Retrofit getInstance(TokenManager tokenManager) {
         if (retrofit == null) {
@@ -30,5 +32,12 @@ public class ApiClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static MessagingApi getMessagingApi(TokenManager tokenManager) {
+        if (messagingApi == null) {
+            messagingApi = getInstance(tokenManager).create(MessagingApi.class);
+        }
+        return messagingApi;
     }
 }

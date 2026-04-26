@@ -20,6 +20,17 @@ public class TokenManager {
 
     private final SharedPreferences prefs;
 
+    private static final String KEY_USER_ID = "user_id";
+
+    public void saveUserId(String userId) {
+        prefs.edit().putString(KEY_USER_ID, userId).apply();
+    }
+
+    @Nullable
+    public String getUserId() {
+        return prefs.getString(KEY_USER_ID, null);
+    }
+
     public TokenManager(Context context) throws GeneralSecurityException, IOException {
         MasterKey masterKey = new MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)

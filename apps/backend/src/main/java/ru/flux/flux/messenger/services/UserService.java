@@ -259,4 +259,12 @@ public class UserService {
                 user.isNotifications()
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> search(String query, UUID currentUserId) {
+    return repository.searchByUsernameOrPhone(query).stream()
+            .filter(u -> !u.getId().equals(currentUserId))
+            .map(this::toResponse)
+            .toList();
+}
 }

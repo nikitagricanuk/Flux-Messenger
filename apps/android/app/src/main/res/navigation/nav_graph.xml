@@ -6,7 +6,11 @@
 
     <fragment
         android:id="@+id/chatsFragment"
-        android:name="ru.flux.android.ChatsFragment" />
+        android:name="ru.flux.android.ChatsFragment">
+        <action
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
@@ -45,6 +49,10 @@
             android:name="isGroup"
             app:argType="boolean"
             android:defaultValue="false" />
+        <argument
+            android:name="chatId"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
 </navigation>

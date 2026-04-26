@@ -2,6 +2,7 @@ package ru.flux.flux.messenger.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.User;
@@ -69,5 +70,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeContact(@PathVariable UUID id, @PathVariable UUID contactId) {
         service.removeContact(id, contactId);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponse>> search(
+        @RequestParam String query,
+        @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(service.search(query, currentUser.getId()));
     }
 }

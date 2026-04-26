@@ -70,4 +70,11 @@ public class GlobalExceptionHandler {
     public Map<String, Object> handleAlreadyExists(UserAlreadyExistsException ex) {
         return Map.of("status", 409, "message", ex.getMessage());
     }
+
+    @ExceptionHandler(SecurityException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, Object> handleForbidden(SecurityException ex) {
+        return Map.of("status", 403, "message", ex.getMessage());
+    }
+
 }

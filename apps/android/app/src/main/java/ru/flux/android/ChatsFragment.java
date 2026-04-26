@@ -1,20 +1,18 @@
 package ru.flux.android;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import ru.flux.android.ui.SegmentTabsView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -25,8 +23,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.flux.android.data.TokenManager;
+import ru.flux.android.ui.SegmentTabsView;
 
 public class ChatsFragment extends Fragment {
+
+    private static final String TAG = "ChatsFragment";
 
     private SegmentTabsView segmentTabs;
     private ChatAdapter adapter;
@@ -55,19 +56,33 @@ public class ChatsFragment extends Fragment {
 
         RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
         chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ChatAdapter();
+        adapter = new ChatAdapter(chat -> {
+            if (chat.id == null || chat.id.isBlank()) {
+                Log.e(TAG, "Cannot open chat: empty chat id");
+                return;
+            }
+
+            Bundle args = new Bundle();
+            args.putString("chatId", chat.id);
+            args.putString("chatName",
+                    chat.name != null && !chat.name.isBlank() ? chat.name : "Чат");
+            args.putBoolean("isGroup", "group".equals(chat.type));
+
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_chatsFragment_to_chatFragment, args);
+        });
         chatsRecycler.setAdapter(adapter);
 
         loadChats();
 
         String[] filters = {"all", "dm", "group"};
         segmentTabs.setOnTabSelectedListener(index -> {
-            if (index < filters.length) adapter.setFilter(filters[index]);
+            if (index < filters.length) {
+                adapter.setFilter(filters[index]);
+            }
         });
         adapter.setFilter("all");
     }
-
-    private static final String TAG = "ChatsFragment";
 
     private void loadChats() {
         Log.d(TAG, "loadChats: making request to /chats");
@@ -102,15 +117,19 @@ public class ChatsFragment extends Fragment {
 
     private Chat toChat(ChatResponse cr) {
         String type = "DIRECT".equals(cr.type) ? "dm" : "group";
+        String name = cr.name != null && !cr.name.isBlank()
+                ? cr.name
+                : ("dm".equals(type) ? "Личный чат" : "Чат");
+        String lastMessage = cr.lastMessage != null ? cr.lastMessage : "";
         String time = "";
-        // lastMessageAt is ISO-8601: "2026-04-12T14:19:23" — grab HH:mm after the T
+
         if (cr.lastMessageAt != null) {
             int tIndex = cr.lastMessageAt.indexOf('T');
             if (tIndex >= 0 && cr.lastMessageAt.length() >= tIndex + 6) {
-                time = cr.lastMessageAt.substring(tIndex + 1, tIndex + 6); // "HH:mm"
+                time = cr.lastMessageAt.substring(tIndex + 1, tIndex + 6);
             }
         }
-        return new Chat(cr.id, cr.name, cr.lastMessage, cr.profilePicture, time, type);
-    }
 
+        return new Chat(cr.id, name, lastMessage, cr.profilePicture, time, type);
+    }
 }
