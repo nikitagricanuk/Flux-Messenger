@@ -9,15 +9,6 @@
         android:name="ru.flux.android.ChatsFragment" />
 
     <fragment
-        android:id="@+id/contactPage"
-        android:name="ru.flux.android.ContactPage">
-
-        <action
-            android:id="@+id/action_contactPage_to_profileFragment"
-            app:destination="@id/profileFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/profileFragment"
         android:name="ru.flux.android.Profile">
         <action
@@ -33,6 +24,27 @@
             app:argType="string" />
     </fragment>
 
+    <fragment
+        android:id="@+id/contactPage"
+        android:name="ru.flux.android.ContactPage">
+        <action
+            android:id="@+id/action_contactPage_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="ru.flux.android.ChatFragment">
+        <action
+            android:id="@+id/action_chatFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <argument
+            android:name="chatName"
+            app:argType="string" />
+        <argument
+            android:name="isGroup"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
 
 </navigation>

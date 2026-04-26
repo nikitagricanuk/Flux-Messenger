@@ -42,8 +42,11 @@ public class ContactPage extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         recyclerView.setAdapter(new ContactAdapter(contacts, contact -> {
+            Bundle args = new Bundle();
+            args.putString("chatName", contact.name);
+            args.putBoolean("isGroup", false);
             NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_contactPage_to_profileFragment);
+                    .navigate(R.id.action_contactPage_to_chatFragment, args);
         }));
     }
 }

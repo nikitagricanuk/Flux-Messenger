@@ -84,13 +84,25 @@ public class MainActivity extends AppCompatActivity {
 //            setActiveTab(navSettings);
 //            navController.navigate(R.id.settingsFragment);
 //        });
+
+        navController.addOnDestinationChangedListener((NavController, destination, arguments) -> {
+            if (destination.getId() == R.id.chatFragment
+                    || destination.getId() == R.id.imageViewerFragment) {
+                setNavBarVisible(false);
+            } else {
+                setNavBarVisible(true);
+            }
+        });
+        navController = navHostFragment.getNavController();
     }
 
     private void setActiveTab(FrameLayout selected) {
         if (activeTab != null) {
             activeTab.setBackgroundResource(0);
+
         }
         selected.setBackgroundResource(R.drawable.bg_selected_tab);
         activeTab = selected;
+
     }
 }
