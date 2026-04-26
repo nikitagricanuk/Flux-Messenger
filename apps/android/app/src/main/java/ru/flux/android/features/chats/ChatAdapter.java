@@ -34,6 +34,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private List<Chat> allChats = new ArrayList<>();
     private List<Chat> filteredChats = new ArrayList<>();
     private String activeFilter = "all";
+    private String searchQuery = "";
 
     public interface OnChatActionListener {
         void onDeleteChat(Chat chat);
@@ -55,10 +56,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         applyFilter();
     }
 
+    public void setSearchQuery(String query) {
+        searchQuery = query == null ? "" : query.toLowerCase().trim();
+        applyFilter();
+    }
+
     private void applyFilter() {
         filteredChats = new ArrayList<>();
         for (Chat chat : allChats) {
-            if (activeFilter.equals("all") || chat.type.equals(activeFilter)) {
+            boolean matchesType = activeFilter.equals("all") || chat.type.equals(activeFilter);
+            boolean matchesQuery = searchQuery.isEmpty()
+                    || chat.name.toLowerCase().contains(searchQuery)
+                    || (chat.lastMessage != null && chat.lastMessage.toLowerCase().contains(searchQuery));
+            if (matchesType && matchesQuery) {
                 filteredChats.add(chat);
             }
         }

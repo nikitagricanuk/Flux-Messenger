@@ -15,6 +15,8 @@
             Группы
     </string>
     <string name="search_icon">Search Icon</string>
+    <string name="search_hint">Поиск...</string>
+    <string name="close_search">Close search</string>
     <string name="contacts">Contacts</string>
     <string name="chats">Chats</string>
     <string name="settings">Settings</string>
