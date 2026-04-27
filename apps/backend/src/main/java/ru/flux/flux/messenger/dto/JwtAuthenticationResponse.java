@@ -17,4 +17,7 @@ public class JwtAuthenticationResponse {
 
     @Schema(description = "Refresh Token")
     private String refreshToken;
+
+    @Schema(description = "User ID")
+    private String userId;
 }

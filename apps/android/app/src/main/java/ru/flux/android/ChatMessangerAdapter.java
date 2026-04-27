@@ -21,9 +21,17 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
     private final List<Message> messages;
     private final boolean isGroupChat;
 
-    public ChatMessangerAdapter(List<Message> messages, boolean isGroupChat) {
+    public interface OnMessageLongClickListener {
+        void onLongClick(Message message);
+    }
+
+    private final OnMessageLongClickListener longClickListener;
+
+    public ChatMessangerAdapter(List<Message> messages, boolean isGroupChat,
+                                OnMessageLongClickListener longClickListener) {
         this.messages = messages;
         this.isGroupChat = isGroupChat;
+        this.longClickListener = longClickListener;
     }
 
     @Override
@@ -53,11 +61,19 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
             OutViewHolder h = (OutViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
+            h.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) longClickListener.onLongClick(message);
+                return true;
+            });
 
         } else if (holder instanceof InViewHolder) {
             InViewHolder h = (InViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
+            h.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) longClickListener.onLongClick(message);
+                return true;
+            });
 
             if (isGroupChat) {
                 h.senderName.setVisibility(View.VISIBLE);
@@ -81,6 +97,7 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     static class OutViewHolder extends RecyclerView.ViewHolder {
         TextView text, time;
+
         OutViewHolder(View view) {
             super(view);
             text = view.findViewById(R.id.messageText);
@@ -91,6 +108,7 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
     static class InViewHolder extends RecyclerView.ViewHolder {
         TextView text, time, senderName;
         ShapeableImageView avatar;
+
         InViewHolder(View view) {
             super(view);
             text = view.findViewById(R.id.messageText);

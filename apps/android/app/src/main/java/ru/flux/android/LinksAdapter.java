@@ -41,7 +41,6 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
         holder.name.setText(link.name);
         holder.url.setText(link.url);
 
-        // Загружаем картинку
         Glide.with(holder.avatar.getContext())
                 .load(link.pictureLink)
                 .centerCrop()

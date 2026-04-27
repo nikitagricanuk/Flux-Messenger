@@ -31,4 +31,12 @@ public class WebSocketService {
                 update
         );
     }
+
+    public void sendDeleteEvent(UUID chatId, UUID messageId) {
+        MessageStatusUpdate update = new MessageStatusUpdate(chatId, messageId, null);
+        messagingTemplate.convertAndSend(
+                "/topic/chat/" + chatId + "/delete",
+                update
+        );
+    }
 }

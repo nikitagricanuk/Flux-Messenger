@@ -74,8 +74,8 @@ public class UserController {
 
     @GetMapping("/search")
     public ResponseEntity<List<UserResponse>> search(
-        @RequestParam String query,
-        @AuthenticationPrincipal User currentUser) {
+            @RequestParam String query,
+            @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(service.search(query, currentUser.getId()));
     }
 }

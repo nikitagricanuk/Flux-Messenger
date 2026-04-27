@@ -22,14 +22,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private String activeFilter = "all";
 
     public interface OnChatClickListener {
-    void onChatClick(Chat chat);
-}
+        void onChatClick(Chat chat);
+    }
 
-private final OnChatClickListener listener;
+    private final OnChatClickListener listener;
 
-public ChatAdapter(OnChatClickListener listener) {
-    this.listener = listener;
-}
+    public ChatAdapter(OnChatClickListener listener) {
+        this.listener = listener;
+    }
 
 
     public void setChats(List<Chat> chats) {
@@ -61,14 +61,14 @@ public ChatAdapter(OnChatClickListener listener) {
     }
 
     @Override
-public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-    Chat chat = filteredChats.get(position);
-    holder.name.setText(chat.name);
-    holder.lastMessage.setText(chat.lastMessage);
-    holder.time.setText(chat.time);
+    public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+        Chat chat = filteredChats.get(position);
+        holder.name.setText(chat.name);
+        holder.lastMessage.setText(chat.lastMessage);
+        holder.time.setText(chat.time);
 
-    holder.itemView.setOnClickListener(v -> listener.onChatClick(chat));
-}
+        holder.itemView.setOnClickListener(v -> listener.onChatClick(chat));
+    }
 
 
     @Override

@@ -54,33 +54,64 @@ public class MessageService {
     }
 
     @Transactional(readOnly = true)
-public List<MessageResponse> getMessages(UUID chatId, UUID userId, int page, int size) {
-    requireChatMember(chatId, userId);
+    public List<MessageResponse> getMessages(UUID chatId, UUID userId, int page, int size) {
+        requireChatMember(chatId, userId);
 
-    Page<Message> messages = messageRepository
-            .findByChatIdOrderByCreatedAtAsc(chatId, PageRequest.of(page, size));
+        Page<Message> messages = messageRepository
+                .findByChatIdOrderByCreatedAtAsc(chatId, PageRequest.of(page, size));
 
-    return messages.stream()
-            .map(MessageResponse::from)
-            .toList();
-}
-
-    @Transactional
-public void markAsRead(UUID chatId, UUID userId) {
-    requireChatMember(chatId, userId);
-    messageRepository.updateStatusForChat(chatId, userId, MessageStatus.READ);
-    webSocketService.sendReadStatus(chatId, userId);
-}
-
-private Chat requireChatMember(UUID chatId, UUID userId) {
-    Chat chat = chatRepository.findById(chatId)
-            .orElseThrow(() -> new ChatNotFoundException(chatId));
-
-    if (!chat.getMemberIds().contains(userId)) {
-        throw new SecurityException("User is not a member of this chat");
+        return messages.stream()
+                .map(MessageResponse::from)
+                .toList();
     }
 
-    return chat;
-}
+    @Transactional
+    public void markAsRead(UUID chatId, UUID userId) {
+        requireChatMember(chatId, userId);
+        messageRepository.updateStatusForChat(chatId, userId, MessageStatus.READ);
+        webSocketService.sendReadStatus(chatId, userId);
+    }
 
+    private Chat requireChatMember(UUID chatId, UUID userId) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+
+        if (!chat.getMemberIds().contains(userId)) {
+            throw new SecurityException("User is not a member of this chat");
+        }
+
+        return chat;
+    }
+
+    @Transactional
+    public MessageResponse editMessage(UUID messageId, String newText, UUID userId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        if (!message.getSender().getId().equals(userId)) {
+            throw new SecurityException("Cannot edit someone else's message");
+        }
+
+        message.setText(newText);
+        message = messageRepository.save(message);
+
+        webSocketService.sendToChat(message.getChat().getId(), MessageResponse.from(message));
+
+        return MessageResponse.from(message);
+    }
+
+    @Transactional
+    public void deleteMessage(UUID messageId, UUID userId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        if (!message.getSender().getId().equals(userId)) {
+            throw new SecurityException("Cannot delete someone else's message");
+        }
+
+        UUID chatId = message.getChat().getId();
+        messageRepository.delete(message);
+
+        webSocketService.sendDeleteEvent(chatId, messageId);
+    }
 }

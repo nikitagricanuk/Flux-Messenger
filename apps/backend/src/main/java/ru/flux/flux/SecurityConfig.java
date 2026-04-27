@@ -53,25 +53,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/passkey/register/**").authenticated()
-                    .requestMatchers(
-        "/api/auth/sign-up",
-        "/api/auth/sign-in",
-        "/api/auth/oauth/**",
-        "/api/auth/passkey/authenticate/**",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/ws",
-        "/ws/**"
-).permitAll()
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/passkey/register/**").authenticated()
+                        .requestMatchers(
+                                "/api/auth/sign-up",
+                                "/api/auth/sign-in",
+                                "/api/auth/oauth/**",
+                                "/api/auth/passkey/authenticate/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/ws",
+                                "/ws/**"
+                        ).permitAll()
 
-                    .anyRequest().authenticated()
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

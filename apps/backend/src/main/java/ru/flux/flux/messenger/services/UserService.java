@@ -74,11 +74,9 @@ public class UserService {
     public UserResponse createUser(CreateUserRequest request) {
         if (repository.existsByEmail(request.email())) {
             throw new UserAlreadyExistsException("User with email " + request.email() + " already exists");
-        }
-        else if (repository.existsByPhone(request.phone())) {
+        } else if (repository.existsByPhone(request.phone())) {
             throw new UserAlreadyExistsException("User with phone " + request.phone() + " already exists");
-        }
-        else if (repository.existsByUsername(request.nickname())) {
+        } else if (repository.existsByUsername(request.nickname())) {
             throw new UserAlreadyExistsException("User with username " + request.nickname() + " already exists");
         }
         User user = new User();
@@ -262,9 +260,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserResponse> search(String query, UUID currentUserId) {
-    return repository.searchByUsernameOrPhone(query).stream()
-            .filter(u -> !u.getId().equals(currentUserId))
-            .map(this::toResponse)
-            .toList();
-}
+        return repository.searchByUsernameOrPhone(query).stream()
+                .filter(u -> !u.getId().equals(currentUserId))
+                .map(this::toResponse)
+                .toList();
+    }
 }

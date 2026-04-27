@@ -33,6 +33,7 @@ public class LoginRepository {
 
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
+                tokenManager.saveUserId(response.body().getUserId());
                 return new Result.Success<>(phone);
             } else {
                 return new Result.Error(new Exception("Login failed: " + response.code()));
@@ -50,6 +51,7 @@ public class LoginRepository {
                             .execute();
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
+                tokenManager.saveUserId(response.body().getUserId());
                 return new Result.Success<>(phone);
             } else {
                 return new Result.Error(new Exception("Sign up failed: " + response.code()));
@@ -95,6 +97,7 @@ public class LoginRepository {
                             .execute();
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
+                tokenManager.saveUserId(response.body().getUserId());
                 return new Result.Success<>("passkey");
             } else {
                 return new Result.Error(new Exception("Passkey login failed: " + response.code()));
@@ -113,6 +116,7 @@ public class LoginRepository {
             Response<AuthTokens> response = authApi.exchangeOAuthCode(url, request).execute();
             if (response.isSuccessful() && response.body() != null) {
                 tokenManager.saveTokens(response.body());
+                tokenManager.saveUserId(response.body().getUserId());
                 return new Result.Success<>(provider);
             } else {
                 return new Result.Error(new Exception("OAuth exchange failed: " + response.code()));

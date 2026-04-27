@@ -12,6 +12,7 @@ import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompHeader;
 import ru.flux.android.BuildConfig;
 import ru.flux.android.MessageResponse;
+import ru.flux.android.data.MessageStatusUpdate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,7 @@ public class WebSocketManager {
     //private static final String WS_URL = "ws://10.0.2.2:8080/ws";
 
     private static final String WS_URL =
-        BuildConfig.BACKEND_BASE_URL.replaceFirst("^http", "ws").replaceAll("/$", "") + "/ws";
+            BuildConfig.BACKEND_BASE_URL.replaceFirst("^http", "ws").replaceAll("/$", "") + "/ws";
 
 
     private StompClient stompClient;
@@ -31,6 +32,10 @@ public class WebSocketManager {
 
     public interface MessageListener {
         void onMessage(MessageResponse message);
+    }
+
+    public interface DeleteListener {
+        void onDelete(UUID messageId);
     }
 
     public void connect(String jwtToken) {
@@ -59,9 +64,10 @@ public class WebSocketManager {
     }
 
     public interface SendCallback {
-    void onSuccess();
-    void onError(Throwable throwable);
-}
+        void onSuccess();
+
+        void onError(Throwable throwable);
+    }
 
     public void subscribeTo(UUID chatId, MessageListener listener) {
         disposables.add(
@@ -76,22 +82,37 @@ public class WebSocketManager {
         );
     }
 
-    public void sendMessage(UUID chatId, String text, SendCallback callback) {
-    String payload = gson.toJson(new SendMessageRequest(chatId, text));
-    Log.d(TAG, "Sending payload: " + payload);
+    public void subscribeToDelete(UUID chatId, DeleteListener listener) {
+        disposables.add(
+                stompClient.topic("/topic/chat/" + chatId + "/delete")
+                        .subscribe(stompMessage -> {
+                            MessageStatusUpdate update = gson.fromJson(
+                                    stompMessage.getPayload(),
+                                    MessageStatusUpdate.class
+                            );
+                            if (update.getMessageId() != null) {
+                                listener.onDelete(update.getMessageId());
+                            }
+                        }, throwable -> Log.e(TAG, "Subscribe delete error", throwable))
+        );
+    }
 
-    stompClient.send("/app/chat.send", payload)
-            .subscribe(
-                    () -> {
-                        Log.d(TAG, "SEND completed");
-                        if (callback != null) callback.onSuccess();
-                    },
-                    throwable -> {
-                        Log.e(TAG, "SEND failed", throwable);
-                        if (callback != null) callback.onError(throwable);
-                    }
-            );
-}
+    public void sendMessage(UUID chatId, String text, SendCallback callback) {
+        String payload = gson.toJson(new SendMessageRequest(chatId, text));
+        Log.d(TAG, "Sending payload: " + payload);
+
+        stompClient.send("/app/chat.send", payload)
+                .subscribe(
+                        () -> {
+                            Log.d(TAG, "SEND completed");
+                            if (callback != null) callback.onSuccess();
+                        },
+                        throwable -> {
+                            Log.e(TAG, "SEND failed", throwable);
+                            if (callback != null) callback.onError(throwable);
+                        }
+                );
+    }
 
     public void disconnect() {
         disposables.clear();

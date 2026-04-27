@@ -23,7 +23,7 @@ public class WebSocketController {
             Principal principal) {
 
         if (!(principal instanceof Authentication authentication) ||
-            !(authentication.getPrincipal() instanceof User user)) {
+                !(authentication.getPrincipal() instanceof User user)) {
             throw new SecurityException("Unauthenticated WebSocket user");
         }
 

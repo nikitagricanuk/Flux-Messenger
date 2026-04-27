@@ -20,7 +20,8 @@ import java.util.UUID;
 
 public class ContactPage extends Fragment {
 
-    public ContactPage() {}
+    public ContactPage() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,7 +47,7 @@ public class ContactPage extends Fragment {
             args.putString("chatName", contact.name);
             args.putBoolean("isGroup", false);
             NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_contactPage_to_chatFragment, args);
+                    .navigate(R.id.action_contactPage_to_profileFragment, args);
         }));
     }
 }

@@ -24,7 +24,8 @@ public class SignUpAuthFragment extends Fragment {
 
     private FragmentSignUpAuthBinding binding;
 
-    public SignUpAuthFragment() {}
+    public SignUpAuthFragment() {
+    }
 
     @Nullable
     @Override
@@ -46,8 +47,13 @@ public class SignUpAuthFragment extends Fragment {
         PhoneTextWatcher.setup(phoneEditText);
 
         TextWatcher validationWatcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {

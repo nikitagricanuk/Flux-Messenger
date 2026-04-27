@@ -2,6 +2,7 @@ package ru.flux.flux.messenger;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.Instant;
 import java.util.UUID;
 

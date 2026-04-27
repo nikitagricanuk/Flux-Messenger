@@ -24,18 +24,16 @@ public class ChatController {
     }
 
     @GetMapping
-public List<ChatResponse> getAllChats(@AuthenticationPrincipal User currentUser) {
-    return chatService.getAllChats(currentUser.getId());
-}
+    public List<ChatResponse> getAllChats(@AuthenticationPrincipal User currentUser) {
+        return chatService.getAllChats(currentUser.getId());
+    }
 
-@GetMapping("/{id}")
-public ChatResponse getChatById(
-        @PathVariable UUID id,
-        @AuthenticationPrincipal User currentUser) {
-    return chatService.getChatById(id, currentUser.getId());
-}
-
-
+    @GetMapping("/{id}")
+    public ChatResponse getChatById(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+        return chatService.getChatById(id, currentUser.getId());
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -47,8 +45,8 @@ public ChatResponse getChatById(
 
     @PostMapping
     public ChatResponse createChat(
-        @Valid @RequestBody CreateChatRequest request,
-        @AuthenticationPrincipal User currentUser) {
-    return chatService.createOrGetDirect(request, currentUser.getId());
+            @Valid @RequestBody CreateChatRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return chatService.createOrGetDirect(request, currentUser.getId());
     }
 }

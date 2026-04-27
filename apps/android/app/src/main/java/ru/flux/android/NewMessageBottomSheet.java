@@ -57,7 +57,6 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Инициализация
         try {
             tokenManager = new TokenManager(requireContext());
             apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);
@@ -88,10 +87,12 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         EditText searchInput = view.findViewById(R.id.searchInput);
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -118,7 +119,7 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
                 for (UserResponse u : response.body()) {
                     String name = u.firstName + (u.lastName != null ? " " + u.lastName : "");
                     contacts.add(new Contact(
-                            UUID.fromString(u.id), 
+                            UUID.fromString(u.id),
                             name,
                             u.avatarUrl,
                             u.phone,
