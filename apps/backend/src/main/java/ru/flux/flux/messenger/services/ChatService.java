@@ -51,11 +51,12 @@ public class ChatService {
             }
         }
 
-        Chat chat = new Chat(request.type(), request.name(), request.memberIds());
+        Chat chat = new Chat();
+        chat.setType(request.type());
+        chat.setName(request.name());
         chat.setAvatarUrl(request.avatarUrl());
-
-        Chat saved = repository.save(chat);
-        return toResponse(saved, currentUserId);
+        request.memberIds().forEach(memberId -> userRepository.findById(memberId).ifPresent(chat::addMember));
+        return toResponse(repository.save(chat), currentUserId);
     }
 
     @Transactional
