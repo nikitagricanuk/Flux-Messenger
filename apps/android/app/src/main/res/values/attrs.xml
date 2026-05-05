@@ -6,6 +6,10 @@
     <declare-styleable name="BaseIconInputView">
         <attr name="inputIcon" format="reference" />
     </declare-styleable>
+    <declare-styleable name="BaseDoubleInputView">
+        <attr name="firstHint" format="string" />
+        <attr name="secondHint" format="string" />
+    </declare-styleable>
 
     <attr name="exampleColor" format="color" />
     <attr name="exampleString" format="string" />

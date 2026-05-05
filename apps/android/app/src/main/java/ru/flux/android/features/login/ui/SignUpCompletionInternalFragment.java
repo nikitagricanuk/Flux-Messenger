@@ -66,7 +66,7 @@ public class SignUpCompletionInternalFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                String firstName = binding.etFirstName.getText().toString().trim();
+                String firstName = binding.avatarInput.getFirstText().toString().trim();
                 String username = binding.etUsername.getText().toString().trim();
                 boolean valid = !firstName.isEmpty()
                         && username.length() >= 3
@@ -75,7 +75,7 @@ public class SignUpCompletionInternalFragment extends Fragment {
             }
         };
 
-        binding.etFirstName.addTextChangedListener(validationWatcher);
+        binding.avatarInput.addFirstTextChangedListener(validationWatcher);
         binding.etUsername.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -92,8 +92,8 @@ public class SignUpCompletionInternalFragment extends Fragment {
         });
 
         binding.btnDone.setOnClickListener(v -> {
-            String firstName = binding.etFirstName.getText().toString().trim();
-            String lastName = binding.etLastName.getText().toString().trim();
+            String firstName = binding.avatarInput.getFirstText().toString().trim();
+            String lastName = binding.avatarInput.getSecondText().toString().trim();
             String username = binding.etUsername.getText().toString().trim();
             binding.btnDone.setEnabled(false);
             loginViewModel.signUp(firstName, lastName, username, phone, password);
