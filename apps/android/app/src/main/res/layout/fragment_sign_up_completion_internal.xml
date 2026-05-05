@@ -219,30 +219,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
-    <com.google.android.material.card.MaterialCardView
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/btnDone"
+        style="@style/Widget.App.Button.Action"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="43dp"
         android:layout_marginStart="17dp"
         android:layout_marginTop="17dp"
         android:layout_marginEnd="17dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        android:enabled="false"
+        android:text="Готово"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsernameCaptionLabel">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:text="Готово"
-            android:textColor="#FF000000"
-            android:textSize="16sp" />
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toBottomOf="@+id/tvUsernameCaptionLabel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

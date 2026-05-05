@@ -12,14 +12,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.flux.android.MainActivity;
@@ -28,7 +25,8 @@ import ru.flux.android.features.login.LoginFormState;
 import ru.flux.android.features.login.LoginResult;
 import ru.flux.android.features.login.LoginViewModel;
 import ru.flux.android.features.login.LoginViewModelFactory;
-import ru.flux.android.core.ui.PhoneTextWatcher;
+import ru.flux.android.core.views.input.PasswordInputView;
+import ru.flux.android.core.views.input.PhoneInputView;
 import ru.flux.android.databinding.FragmentLoginBinding;
 import ru.flux.android.R;
 
@@ -54,8 +52,8 @@ public class LoginFragment extends Fragment {
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory(requireContext()))
                 .get(LoginViewModel.class);
 
-        final EditText phoneEditText = binding.phone;
-        final EditText passwordEditText = binding.password;
+        final PhoneInputView phoneInputView = binding.phone;
+        final PasswordInputView passwordInputView = binding.password;
         final Button loginButton = binding.login;
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
@@ -66,10 +64,10 @@ public class LoginFragment extends Fragment {
                 }
                 loginButton.setEnabled(loginFormState.isDataValid());
                 if (loginFormState.getPhoneError() != null) {
-                    phoneEditText.setError(getString(loginFormState.getPhoneError()));
+                    phoneInputView.setError(getString(loginFormState.getPhoneError()));
                 }
                 if (loginFormState.getPasswordError() != null) {
-                    passwordEditText.setError(getString(loginFormState.getPasswordError()));
+                    passwordInputView.setError(getString(loginFormState.getPasswordError()));
                 }
             }
         });
@@ -91,42 +89,33 @@ public class LoginFragment extends Fragment {
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // ignore
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // ignore
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
                 loginViewModel.loginDataChanged(
-                        PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
-                        passwordEditText.getText().toString());
+                        phoneInputView.getPhone(),
+                        passwordInputView.getText().toString());
             }
         };
-        PhoneTextWatcher.setup(phoneEditText);
-        phoneEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(
-                            PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
-                            passwordEditText.getText().toString());
-                }
-                return false;
+        phoneInputView.addTextChangedListener(afterTextChangedListener);
+        passwordInputView.addTextChangedListener(afterTextChangedListener);
+        passwordInputView.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                loginViewModel.login(
+                        phoneInputView.getPhone(),
+                        passwordInputView.getText().toString());
             }
+            return false;
         });
 
         loginButton.setOnClickListener(v ->
                 loginViewModel.login(
-                        PhoneTextWatcher.normalize(phoneEditText.getText().toString()),
-                        passwordEditText.getText().toString()));
+                        phoneInputView.getPhone(),
+                        passwordInputView.getText().toString()));
 
         view.findViewById(R.id.textView5).setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_login_to_signup));

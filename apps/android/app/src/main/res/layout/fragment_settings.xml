@@ -106,7 +106,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/profileButton"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"
@@ -124,7 +124,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/notificationsButton"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"
@@ -142,7 +142,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutButton"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"

@@ -45,61 +45,37 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:tabs="@array/login_tabs" />
 
-    <EditText
+    <ru.flux.android.core.views.input.PhoneInputView
         android:id="@+id/phone"
         android:layout_width="0dp"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="17dp"
-        android:autofillHints="@string/prompt_email"
-        android:background="@drawable/bg_input_field"
-        android:drawableStart="@drawable/phone_rotary_1"
-        android:drawablePadding="11dp"
-        android:elevation="4dp"
-        android:hint="@string/prompt_phone"
-        android:inputType="phone"
-        android:paddingStart="18dp"
-        android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/segment_tabs"
-        tools:ignore="RtlSymmetry" />
+        app:layout_constraintTop_toBottomOf="@+id/segment_tabs" />
 
-    <EditText
+    <ru.flux.android.core.views.input.PasswordInputView
         android:id="@+id/password"
         android:layout_width="0dp"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="17dp"
-        android:autofillHints="@string/prompt_password"
-        android:background="@drawable/bg_input_field"
-        android:drawableStart="@drawable/lock_1"
-        android:drawablePadding="11dp"
-        android:elevation="4dp"
-        android:hint="@string/prompt_password"
-        android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        android:paddingStart="18dp"
-        android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone"
-        tools:ignore="RtlSymmetry" />
+        app:layout_constraintTop_toBottomOf="@+id/phone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.Action"
         android:layout_width="101dp"
         android:layout_height="43dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="17dp"
         android:enabled="false"
         android:text="@string/action_sign_in"
-        app:strokeColor="@color/btn_login_stroke"
-        app:strokeWidth="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"

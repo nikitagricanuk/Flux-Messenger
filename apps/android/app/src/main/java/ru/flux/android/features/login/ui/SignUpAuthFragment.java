@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import ru.flux.android.R;
+import ru.flux.android.core.views.input.PasswordInputView;
+import ru.flux.android.core.views.input.PhoneInputView;
 import ru.flux.android.databinding.FragmentSignUpAuthBinding;
-import ru.flux.android.core.ui.PhoneTextWatcher;
 
 public class SignUpAuthFragment extends Fragment {
 
@@ -39,12 +39,10 @@ public class SignUpAuthFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        EditText phoneEditText = binding.phoneNumber;
-        EditText passwordEditText = binding.password;
-        EditText repeatPasswordEditText = binding.repeatPassword;
+        PhoneInputView phoneInputView = binding.phoneNumber;
+        PasswordInputView passwordInputView = binding.password;
+        PasswordInputView repeatPasswordInputView = binding.repeatPassword;
         Button signUpButton = binding.login;
-
-        PhoneTextWatcher.setup(phoneEditText);
 
         TextWatcher validationWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -52,32 +50,32 @@ public class SignUpAuthFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                String phone = PhoneTextWatcher.normalize(phoneEditText.getText().toString());
-                String password = passwordEditText.getText().toString();
-                String repeat = repeatPasswordEditText.getText().toString();
+                String phone = phoneInputView.getPhone();
+                String password = passwordInputView.getText().toString();
+                String repeat = repeatPasswordInputView.getText().toString();
 
                 boolean phoneValid = phone.length() >= 11;
                 boolean passwordValid = password.length() > 5;
                 boolean passwordsMatch = password.equals(repeat);
 
                 if (!repeat.isEmpty() && !passwordsMatch) {
-                    repeatPasswordEditText.setError(getString(R.string.passwords_do_not_match));
+                    repeatPasswordInputView.setError(getString(R.string.passwords_do_not_match));
                 } else {
-                    repeatPasswordEditText.setError(null);
+                    repeatPasswordInputView.setError(null);
                 }
 
                 signUpButton.setEnabled(phoneValid && passwordValid && passwordsMatch);
             }
         };
 
-        phoneEditText.addTextChangedListener(validationWatcher);
-        passwordEditText.addTextChangedListener(validationWatcher);
-        repeatPasswordEditText.addTextChangedListener(validationWatcher);
+        phoneInputView.addTextChangedListener(validationWatcher);
+        passwordInputView.addTextChangedListener(validationWatcher);
+        repeatPasswordInputView.addTextChangedListener(validationWatcher);
 
         signUpButton.setOnClickListener(v -> {
             Bundle args = new Bundle();
-            args.putString(ARG_PHONE, PhoneTextWatcher.normalize(phoneEditText.getText().toString()));
-            args.putString(ARG_PASSWORD, passwordEditText.getText().toString());
+            args.putString(ARG_PHONE, phoneInputView.getPhone());
+            args.putString(ARG_PASSWORD, passwordInputView.getText().toString());
             Navigation.findNavController(v).navigate(R.id.action_signup_to_completion, args);
         });
 

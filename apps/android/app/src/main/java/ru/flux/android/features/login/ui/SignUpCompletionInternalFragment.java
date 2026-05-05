@@ -51,7 +51,7 @@ public class SignUpCompletionInternalFragment extends Fragment {
             if (result == null) return;
             if (result.getError() != null) {
                 Toast.makeText(requireContext(), result.getError(), Toast.LENGTH_LONG).show();
-                binding.btnDone.setClickable(true);
+                binding.btnDone.setEnabled(true);
             }
             if (result.getSuccess() != null) {
                 Intent intent = new Intent(requireActivity(), MainActivity.class);
@@ -71,8 +71,7 @@ public class SignUpCompletionInternalFragment extends Fragment {
                 boolean valid = !firstName.isEmpty()
                         && username.length() >= 3
                         && username.matches("[a-zA-Z0-9_]+");
-                binding.btnDone.setAlpha(valid ? 1f : 0.5f);
-                binding.btnDone.setClickable(valid);
+                binding.btnDone.setEnabled(valid);
             }
         };
 
@@ -83,7 +82,7 @@ public class SignUpCompletionInternalFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 binding.tvAtSign.setTextColor(
-                        s.length() > 0 ? Color.BLACK : Color.parseColor("#FF9E9E9E"));
+                        s.length() > 0 ? Color.BLACK : 0xFF9E9E9E);
             }
 
             @Override
@@ -92,13 +91,11 @@ public class SignUpCompletionInternalFragment extends Fragment {
             }
         });
 
-        binding.btnDone.setAlpha(0.5f);
-        binding.btnDone.setClickable(false);
         binding.btnDone.setOnClickListener(v -> {
             String firstName = binding.etFirstName.getText().toString().trim();
             String lastName = binding.etLastName.getText().toString().trim();
             String username = binding.etUsername.getText().toString().trim();
-            binding.btnDone.setClickable(false);
+            binding.btnDone.setEnabled(false);
             loginViewModel.signUp(firstName, lastName, username, phone, password);
         });
     }
