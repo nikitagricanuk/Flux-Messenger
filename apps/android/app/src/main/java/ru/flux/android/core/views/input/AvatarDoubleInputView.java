@@ -6,7 +6,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,22 +21,24 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
     public AvatarDoubleInputView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         restructure(context);
-        applyCardStyle(context);
+        // Apply white card fallback only when no android:background was set in XML.
+        // Settings uses bg_blur_card, sign-up fragments omit background → fallback applies.
+        if (getBackground() == null) applyWhiteCardStyle(context);
     }
 
     private void restructure(Context context) {
-        // Grab the 3 children inflated by super: [tilFirst, divider, tilSecond]
-        View tilFirst = getChildAt(0);
-        View divider = getChildAt(1);
-        View tilSecond = getChildAt(2);
+        // super() inflated base_double_input_view.xml: one LinearLayout child (fieldsContainer)
+        LinearLayout fieldsContainer = (LinearLayout) getChildAt(0);
         removeAllViews();
 
-        setOrientation(HORIZONTAL);
-        setGravity(Gravity.CENTER_VERTICAL);
+        // Horizontal wrapper — the single BlurView child
+        LinearLayout content = new LinearLayout(context);
+        content.setOrientation(LinearLayout.HORIZONTAL);
+        content.setGravity(Gravity.CENTER_VERTICAL);
         int p = dp(context, 12);
-        setPadding(p, p, p, p);
+        content.setPadding(p, p, p, p);
 
-        // Avatar container
+        // Avatar
         int avatarSize = dp(context, 64);
         avatarView = new ImageView(context);
         avatarView.setBackground(AppCompatResources.getDrawable(context, R.drawable.bg_circle_gray));
@@ -49,24 +50,21 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
         FrameLayout avatarContainer = new FrameLayout(context);
         avatarContainer.addView(avatarView, new FrameLayout.LayoutParams(avatarSize, avatarSize));
 
-        LinearLayout.LayoutParams containerLP = new LinearLayout.LayoutParams(avatarSize, avatarSize);
-        containerLP.setMarginEnd(dp(context, 12));
-        addView(avatarContainer, containerLP);
+        LinearLayout.LayoutParams avatarLP = new LinearLayout.LayoutParams(avatarSize, avatarSize);
+        avatarLP.setMarginEnd(dp(context, 12));
+        content.addView(avatarContainer, avatarLP);
 
-        // Fields container — rewraps the inherited children in a new vertical layout
-        LinearLayout fieldsContainer = new LinearLayout(context);
-        fieldsContainer.setOrientation(VERTICAL);
-        fieldsContainer.addView(tilFirst);
-        fieldsContainer.addView(divider);
-        fieldsContainer.addView(tilSecond);
-
+        // Fields — the LinearLayout from super, gravity-centered in the row
         LinearLayout.LayoutParams fieldsLP =
                 new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         fieldsLP.gravity = Gravity.CENTER_VERTICAL;
-        addView(fieldsContainer, fieldsLP);
+        content.addView(fieldsContainer, fieldsLP);
+
+        addView(content, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, dp(context, 92)));
     }
 
-    private void applyCardStyle(Context context) {
+    private void applyWhiteCardStyle(Context context) {
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(Color.WHITE);
         bg.setCornerRadius(dp(context, 16));

@@ -23,6 +23,7 @@ import java.util.Calendar;
 
 import eightbitlab.com.blurview.BlurView;
 import ru.flux.android.R;
+import ru.flux.android.core.views.input.AvatarDoubleInputView;
 import ru.flux.android.core.network.UpdateUserRequest;
 import ru.flux.android.core.network.UserResponse;
 import ru.flux.android.core.auth.TokenManager;
@@ -32,6 +33,7 @@ import ru.flux.android.features.login.LoginActivity;
 public class SettingsProfileFragment extends Fragment {
 
     private SettingsViewModel viewModel;
+    private AvatarDoubleInputView avatarInput;
 
     public SettingsProfileFragment() {}
 
@@ -45,6 +47,7 @@ public class SettingsProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
 
+        avatarInput = view.findViewById(R.id.blurCardName);
         setupBlurViews(view);
         setupBirthDate(view);
         setupEditableRow(view, R.id.rowUsername, R.id.etUsername);
@@ -52,8 +55,8 @@ public class SettingsProfileFragment extends Fragment {
         setupEditableRow(view, R.id.rowEmail, R.id.etEmail);
 
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            setField(view, R.id.etFirstName, user.firstName);
-            setField(view, R.id.etLastName, user.lastName);
+            avatarInput.setFirstText(user.firstName);
+            avatarInput.setSecondText(user.lastName);
             setField(view, R.id.etUsername, user.nickname);
             setField(view, R.id.etPhone, user.phone);
             setField(view, R.id.etEmail, user.email);
@@ -72,7 +75,7 @@ public class SettingsProfileFragment extends Fragment {
     }
 
     private void saveAndGoBack(View view) {
-        String firstName = getFieldText(view, R.id.etFirstName);
+        String firstName = avatarInput.getFirstText().toString().trim();
         if (firstName.isEmpty()) {
             Toast.makeText(requireContext(), "Имя обязательно", Toast.LENGTH_SHORT).show();
             return;
@@ -80,7 +83,7 @@ public class SettingsProfileFragment extends Fragment {
         UserResponse current = viewModel.getUser().getValue();
         viewModel.saveUser(new UpdateUserRequest(
                 firstName,
-                getFieldText(view, R.id.etLastName),
+                avatarInput.getSecondText().toString().trim(),
                 getFieldText(view, R.id.etUsername),
                 getFieldText(view, R.id.etPhone),
                 getFieldText(view, R.id.etEmail),

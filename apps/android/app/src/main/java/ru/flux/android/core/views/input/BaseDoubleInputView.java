@@ -6,19 +6,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import eightbitlab.com.blurview.BlurView;
 import ru.flux.android.R;
 import ru.flux.android.databinding.BaseDoubleInputViewBinding;
 
-public class BaseDoubleInputView extends LinearLayout {
+public class BaseDoubleInputView extends BlurView {
     protected BaseDoubleInputViewBinding binding;
 
     public BaseDoubleInputView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        setOrientation(VERTICAL);
         binding = BaseDoubleInputViewBinding.inflate(LayoutInflater.from(context), this);
 
         if (attrs != null) {
@@ -37,6 +36,22 @@ public class BaseDoubleInputView extends LinearLayout {
 
     public Editable getSecondText() {
         return binding.etSecond.getText();
+    }
+
+    public void setFirstText(CharSequence text) {
+        binding.etFirst.setText(text);
+    }
+
+    public void setSecondText(CharSequence text) {
+        binding.etSecond.setText(text);
+    }
+
+    public void setFirstHint(CharSequence hint) {
+        binding.etFirst.setHint(hint);
+    }
+
+    public void setSecondHint(CharSequence hint) {
+        binding.etSecond.setHint(hint);
     }
 
     public void addFirstTextChangedListener(TextWatcher watcher) {
