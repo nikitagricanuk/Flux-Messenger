@@ -1,9 +1,7 @@
 package ru.flux.android;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -15,8 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-
-import eightbitlab.com.blurview.BlurView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,19 +36,6 @@ public class MainActivity extends AppCompatActivity {
         controller.setSystemBarsBehavior(
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         );
-
-        BlurView blurNav = findViewById(R.id.blurNav);
-        BlurView selectedTabBlur = findViewById(R.id.selectedTabBlur);
-        ViewGroup rootView = findViewById(android.R.id.content);
-        Drawable windowBackground = getWindow().getDecorView().getBackground();
-
-        blurNav.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(25f);
-
-        selectedTabBlur.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(15f);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

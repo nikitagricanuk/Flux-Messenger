@@ -3,7 +3,6 @@ package ru.flux.android.features.settings.ui;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import androidx.transition.TransitionManager;
 
 import java.util.Calendar;
 
-import eightbitlab.com.blurview.BlurView;
 import ru.flux.android.R;
 import ru.flux.android.core.views.input.AvatarDoubleInputView;
 import ru.flux.android.core.network.UpdateUserRequest;
@@ -48,7 +46,6 @@ public class SettingsProfileFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
 
         avatarInput = view.findViewById(R.id.blurCardName);
-        setupBlurViews(view);
         setupBirthDate(view);
         setupEditableRow(view, R.id.rowUsername, R.id.etUsername);
         setupEditableRow(view, R.id.rowPhone, R.id.etPhone);
@@ -113,24 +110,8 @@ public class SettingsProfileFragment extends Fragment {
         return text != null ? text.toString().trim() : "";
     }
 
-    private void setupBlurViews(View root) {
-        ViewGroup rootView = requireActivity().findViewById(android.R.id.content);
-        Drawable windowBackground = requireActivity().getWindow().getDecorView().getBackground();
-
-        int[] ids = { R.id.blurCardName, R.id.blurCardBio, R.id.cardBirthDate,
-                      R.id.cardAccountInfo, R.id.cardActions };
-        for (int id : ids) {
-            BlurView bv = root.findViewById(id);
-            if (bv == null) continue;
-            bv.setClipToOutline(true);
-            bv.setupWith(rootView)
-                    .setFrameClearDrawable(windowBackground)
-                    .setBlurRadius(20f);
-        }
-    }
-
     private void setupBirthDate(View root) {
-        BlurView card = root.findViewById(R.id.cardBirthDate);
+        ViewGroup card = root.findViewById(R.id.cardBirthDate);
         TextView tvBirthDate = root.findViewById(R.id.tvBirthDate);
         View divider = root.findViewById(R.id.birthDateDivider);
         TextView tvDelete = root.findViewById(R.id.tvDeleteBirthDate);

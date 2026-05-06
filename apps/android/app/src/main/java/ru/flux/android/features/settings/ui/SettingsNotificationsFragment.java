@@ -1,6 +1,5 @@
 package ru.flux.android.features.settings.ui;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 
-import eightbitlab.com.blurview.BlurView;
 import ru.flux.android.R;
 import ru.flux.android.core.network.UpdateUserRequest;
 import ru.flux.android.core.network.UserResponse;
@@ -30,8 +28,6 @@ public class SettingsNotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        setupBlurView(view);
 
         SettingsViewModel viewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
         MaterialSwitch sw = view.findViewById(R.id.switchNotifications);
@@ -55,15 +51,5 @@ public class SettingsNotificationsFragment extends Fragment {
 
         view.findViewById(R.id.btnBack).setOnClickListener(v ->
                 requireActivity().getOnBackPressedDispatcher().onBackPressed());
-    }
-
-    private void setupBlurView(View root) {
-        BlurView bv = root.findViewById(R.id.blurCardNotifications);
-        ViewGroup rootView = requireActivity().findViewById(android.R.id.content);
-        Drawable windowBackground = requireActivity().getWindow().getDecorView().getBackground();
-        bv.setClipToOutline(true);
-        bv.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(20f);
     }
 }

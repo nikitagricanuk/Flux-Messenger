@@ -65,6 +65,7 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_blur_card"
             android:elevation="4dp"
+            app:blurRadius="20dp"
             app:firstHint="Имя"
             app:secondHint="Фамилия" />
 
@@ -88,14 +89,14 @@
             android:textColor="@color/black"
             android:textSize="16sp" />
 
-        <eightbitlab.com.blurview.BlurView
+        <ru.flux.android.core.views.BaseBlurView
             android:id="@+id/blurCardBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:background="@drawable/bg_blur_card"
-
-            android:elevation="4dp">
+            android:elevation="4dp"
+            app:blurRadius="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -119,7 +120,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-        </eightbitlab.com.blurview.BlurView>
+        </ru.flux.android.core.views.BaseBlurView>
 
         <TextView
             android:id="@+id/tvBioCaption"
@@ -132,14 +133,14 @@
             android:textSize="13sp" />
 
         <!-- Date of birth card -->
-        <eightbitlab.com.blurview.BlurView
+        <ru.flux.android.core.views.BaseBlurView
             android:id="@+id/cardBirthDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_blur_card"
-
-            android:elevation="4dp">
+            android:elevation="4dp"
+            app:blurRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -200,17 +201,17 @@
 
             </LinearLayout>
 
-        </eightbitlab.com.blurview.BlurView>
+        </ru.flux.android.core.views.BaseBlurView>
 
         <!-- Account info card -->
-        <eightbitlab.com.blurview.BlurView
+        <ru.flux.android.core.views.BaseBlurView
             android:id="@+id/cardAccountInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_blur_card"
-
-            android:elevation="4dp">
+            android:elevation="4dp"
+            app:blurRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -338,17 +339,17 @@
 
             </LinearLayout>
 
-        </eightbitlab.com.blurview.BlurView>
+        </ru.flux.android.core.views.BaseBlurView>
 
         <!-- Actions card -->
-        <eightbitlab.com.blurview.BlurView
+        <ru.flux.android.core.views.BaseBlurView
             android:id="@+id/cardActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_blur_card"
-
-            android:elevation="4dp">
+            android:elevation="4dp"
+            app:blurRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -390,7 +391,7 @@
 
             </LinearLayout>
 
-        </eightbitlab.com.blurview.BlurView>
+        </ru.flux.android.core.views.BaseBlurView>
 
     </LinearLayout>
 

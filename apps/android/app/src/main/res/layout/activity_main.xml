@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Blur navbar -->
-    <eightbitlab.com.blurview.BlurView
+    <ru.flux.android.core.views.BaseBlurView
         android:id="@+id/blurNav"
         android:layout_width="0dp"
         android:layout_height="72dp"
@@ -32,6 +32,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         android:elevation="16dp"
+        app:blurRadius="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -71,11 +72,12 @@
                 android:layout_weight="1"
                 android:padding="2dp">
 
-                <eightbitlab.com.blurview.BlurView
+                <ru.flux.android.core.views.BaseBlurView
                     android:id="@+id/selectedTabBlur"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:elevation="4dp">
+                    android:elevation="4dp"
+                    app:blurRadius="15dp">
 
                     <FrameLayout
                         android:id="@+id/nav_chats"
@@ -94,7 +96,7 @@
 
                     </FrameLayout>
 
-                </eightbitlab.com.blurview.BlurView>
+                </ru.flux.android.core.views.BaseBlurView>
             </FrameLayout>
 
             <!-- Settings tab -->
@@ -116,6 +118,6 @@
 
         </LinearLayout>
 
-    </eightbitlab.com.blurview.BlurView>
+    </ru.flux.android.core.views.BaseBlurView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

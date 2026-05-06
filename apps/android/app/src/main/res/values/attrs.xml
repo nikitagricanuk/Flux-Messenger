@@ -11,6 +11,11 @@
         <attr name="secondHint" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="BaseBlurView">
+        <attr name="blurRadius" format="dimension" />
+        <attr name="blurClipToOutline" format="boolean" />
+    </declare-styleable>
+
     <attr name="exampleColor" format="color" />
     <attr name="exampleString" format="string" />
     <attr name="exampleDimension" format="dimension" />

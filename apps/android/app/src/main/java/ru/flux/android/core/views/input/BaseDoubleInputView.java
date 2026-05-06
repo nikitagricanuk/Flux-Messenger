@@ -9,11 +9,11 @@ import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
 
-import eightbitlab.com.blurview.BlurView;
 import ru.flux.android.R;
+import ru.flux.android.core.views.BaseBlurView;
 import ru.flux.android.databinding.BaseDoubleInputViewBinding;
 
-public class BaseDoubleInputView extends BlurView {
+public class BaseDoubleInputView extends BaseBlurView {
     protected BaseDoubleInputViewBinding binding;
 
     public BaseDoubleInputView(Context context, @Nullable AttributeSet attrs) {
