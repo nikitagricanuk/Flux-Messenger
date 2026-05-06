@@ -36,6 +36,7 @@
         android:layout_marginStart="17dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="17dp"
+        app:blurRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -47,6 +48,7 @@
         android:layout_marginStart="17dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="17dp"
+        app:blurRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
@@ -58,6 +60,7 @@
         android:layout_marginStart="17dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="17dp"
+        app:blurRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />

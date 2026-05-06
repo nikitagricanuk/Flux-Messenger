@@ -20,13 +20,15 @@ public class BaseBlurView extends BlurView {
 
     public BaseBlurView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        blurRadius = dpToPx(20f);
-        clipToOutline = true;
+        blurRadius = 0f;
+        clipToOutline = false;
+        setClipChildren(false);
+        setClipToPadding(false);
 
         if (attrs != null) {
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BaseBlurView);
             blurRadius = a.getDimension(R.styleable.BaseBlurView_blurRadius, blurRadius);
-            clipToOutline = a.getBoolean(R.styleable.BaseBlurView_blurClipToOutline, true);
+            clipToOutline = a.getBoolean(R.styleable.BaseBlurView_blurClipToOutline, false);
             a.recycle();
         }
 
@@ -51,7 +53,7 @@ public class BaseBlurView extends BlurView {
     }
 
     private void setupBlurIfNeeded() {
-        if (blurConfigured) return;
+        if (blurConfigured || blurRadius <= 0f) return;
 
         View root = getRootView();
         if (!(root instanceof ViewGroup)) {
@@ -73,9 +75,5 @@ public class BaseBlurView extends BlurView {
                 .setBlurRadius(blurRadius);
 
         blurConfigured = true;
-    }
-
-    private float dpToPx(float value) {
-        return value * getResources().getDisplayMetrics().density;
     }
 }

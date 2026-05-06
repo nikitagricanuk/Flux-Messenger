@@ -5,14 +5,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import ru.flux.android.core.views.BaseBlurView;
 import ru.flux.android.databinding.BaseInputViewBinding;
 
-public class BaseInputView extends LinearLayout {
+public class BaseInputView extends BaseBlurView {
     protected BaseInputViewBinding binding;
 
     public BaseInputView(Context context, @Nullable AttributeSet attrs) {
