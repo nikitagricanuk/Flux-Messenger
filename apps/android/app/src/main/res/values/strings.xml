@@ -45,4 +45,10 @@
     <string name="oauth_error">OAuth вход не удался</string>
     <string name="oauth_missing_callback_data">OAuth callback не содержит данных входа</string>
     <string name="passkey_cancelled">Вход с Passkey отменен</string>
+    <string name="phone_input_confirm">подтвердить</string>
+    <string name="phone_input_otp_label">Код подтверждения</string>
+    <string name="phone_input_otp_hint">123-456</string>
+    <string name="name_hint">Имя</string>
+    <string name="surname_hint">Фамилия</string>
+    <string name="username_hint">Имя пользователя</string>
 </resources>

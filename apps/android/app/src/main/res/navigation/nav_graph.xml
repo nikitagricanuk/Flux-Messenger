@@ -12,7 +12,11 @@
     <dialog
         android:id="@+id/newMessageBottomSheet"
         android:name="ru.flux.android.features.chats.ui.NewMessageBottomSheet"
-        tools:layout="@layout/bottom_sheet_new_message" />
+        tools:layout="@layout/bottom_sheet_new_message" >
+        <action
+            android:id="@+id/action_newMessageBottomSheet_to_newContactFragment"
+            app:destination="@id/newContactFragment" />
+    </dialog>
 
 <!--    <fragment-->
 <!--        android:id="@+id/contactPage"-->
@@ -60,6 +64,10 @@
         android:name="ru.flux.android.features.settings.ui.SettingsNotificationsFragment"
         android:label="fragment_settings_notifications"
         tools:layout="@layout/fragment_settings_notifications" />
+    <fragment
+        android:id="@+id/newContactFragment"
+        android:name="ru.flux.android.features.chats.ui.NewContactFragment"
+        android:label="NewContactFragment" />
 
 
 </navigation>

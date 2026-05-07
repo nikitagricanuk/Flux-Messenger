@@ -9,6 +9,8 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,11 +31,13 @@ import ru.flux.android.core.data.Contact;
 import ru.flux.android.core.network.ChatResponse;
 import ru.flux.android.core.network.ContactResponse;
 import ru.flux.android.core.network.CreateChatRequest;
+import ru.flux.android.databinding.BottomSheetNewMessageBinding;
 import ru.flux.android.features.chats.NewMessageAdapter;
 import ru.flux.android.R;
 import ru.flux.android.core.network.ApiClient;
 
 public class NewMessageBottomSheet extends BottomSheetDialogFragment {
+    BottomSheetNewMessageBinding binding;
 
     @Override
     public int getTheme() {
@@ -45,24 +49,27 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.bottom_sheet_new_message, container, false);
+        binding = BottomSheetNewMessageBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.cancelButton).setOnClickListener(v -> dismiss());
+        NavController navController = NavHostFragment.findNavController(this);
 
-        view.findViewById(R.id.newGroupButton).setOnClickListener(v -> {
+        binding.cancelButton.setOnClickListener(v -> dismiss());
+
+        binding.newGroupButton.setOnClickListener(v -> {
             // TODO: open new group flow
         });
 
-        view.findViewById(R.id.newContactButton).setOnClickListener(v -> {
-            // TODO: open new contact flow
+        binding.newContactButton.setOnClickListener(v -> {
+            navController.navigate(R.id.newContactFragment);
         });
 
-        RecyclerView recycler = view.findViewById(R.id.contactsRecycler);
+        RecyclerView recycler = binding.contactsRecycler;
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setNestedScrollingEnabled(true);
 

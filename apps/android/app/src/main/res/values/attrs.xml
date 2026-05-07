@@ -11,6 +11,14 @@
         <attr name="secondHint" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="PhoneOtpInvertedInput">
+        <attr name="phoneLabel" format="string" />
+        <attr name="phoneHint" format="string" />
+        <attr name="confirmText" format="string" />
+        <attr name="otpLabel" format="string" />
+        <attr name="otpHint" format="string" />
+    </declare-styleable>
+
     <declare-styleable name="BaseBlurView">
         <attr name="blurRadius" format="dimension" />
         <attr name="blurClipToOutline" format="boolean" />

@@ -8,17 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.transition.AutoTransition;
-import androidx.transition.TransitionManager;
-
-import com.google.android.material.card.MaterialCardView;
 
 import ru.flux.android.R;
-import ru.flux.android.core.ui.PhoneTextWatcher;
 
 public class SignUpCompletion3rdPartyFragment extends Fragment {
 
@@ -46,28 +40,6 @@ public class SignUpCompletion3rdPartyFragment extends Fragment {
                 tvAtSign.setTextColor(s.length() > 0 ? Color.BLACK : Color.parseColor("#FF9E9E9E"));
             }
             @Override public void afterTextChanged(Editable s) {}
-        });
-
-        MaterialCardView phoneCard = view.findViewById(R.id.materialCardView3);
-        TextView tvPhoneLabel = view.findViewById(R.id.tvPhoneLabel);
-        EditText etPhone = view.findViewById(R.id.etPhone);
-        PhoneTextWatcher.setup(etPhone);
-        TextView tvConfirm = view.findViewById(R.id.tvConfirm);
-        View phoneDivider = view.findViewById(R.id.phoneDivider);
-        LinearLayout otpRow = view.findViewById(R.id.otpRow);
-
-        etPhone.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && tvPhoneLabel.getVisibility() == View.VISIBLE) {
-                TransitionManager.beginDelayedTransition(phoneCard, new AutoTransition());
-                tvPhoneLabel.setVisibility(View.GONE);
-                tvConfirm.setVisibility(View.VISIBLE);
-            }
-        });
-
-        tvConfirm.setOnClickListener(v -> {
-            TransitionManager.beginDelayedTransition(phoneCard, new AutoTransition());
-            phoneDivider.setVisibility(View.VISIBLE);
-            otpRow.setVisibility(View.VISIBLE);
         });
     }
 }

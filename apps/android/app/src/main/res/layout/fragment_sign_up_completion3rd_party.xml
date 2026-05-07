@@ -137,110 +137,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
-    <!-- Phone card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView3"
+    <ru.flux.android.core.views.input.PhoneOtpInvertedInput
+        android:id="@+id/phoneInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
         android:layout_marginTop="17dp"
         android:layout_marginEnd="17dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        android:background="@drawable/bg_inverted_input_card"
+        android:elevation="4dp"
+        app:blurRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsernameCaptionLabel">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Phone row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
-
-                <TextView
-                    android:id="@+id/tvPhoneLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Телефон"
-                    android:textColor="#FF000000"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/etPhone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="+7"
-                    android:includeFontPadding="false"
-                    android:inputType="phone"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/tvConfirm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="подтвердить"
-                    android:textColor="#FF5B8EF4"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-            <!-- Divider — hidden until OTP revealed -->
-            <View
-                android:id="@+id/phoneDivider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#FFE0E0E0"
-                android:visibility="gone" />
-
-            <!-- OTP row — hidden until confirm tapped -->
-            <LinearLayout
-                android:id="@+id/otpRow"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Код подтверждения"
-                    android:textColor="#FF000000"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/etOtp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:background="@null"
-                    android:hint="123-456"
-                    android:includeFontPadding="false"
-                    android:inputType="number"
-                    android:maxLength="6"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toBottomOf="@+id/tvUsernameCaptionLabel" />
 
     <!-- Caption below phone -->
     <TextView
@@ -253,7 +162,7 @@
         android:textColor="#FF9E9E9E"
         android:textSize="13sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialCardView3" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneInput" />
 
     <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/login"

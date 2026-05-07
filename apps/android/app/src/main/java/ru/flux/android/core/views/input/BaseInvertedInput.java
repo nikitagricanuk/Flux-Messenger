@@ -5,10 +5,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
+import ru.flux.android.R;
 import ru.flux.android.core.views.BaseBlurView;
 import ru.flux.android.databinding.BaseInvertedInputViewBinding;
 
