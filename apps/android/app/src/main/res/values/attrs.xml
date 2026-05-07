@@ -3,4 +3,29 @@
     <declare-styleable name="SegmentTabsView">
         <attr name="tabs" format="reference" />
     </declare-styleable>
+    <declare-styleable name="BaseIconInputView">
+        <attr name="inputIcon" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="BaseDoubleInputView">
+        <attr name="firstHint" format="string" />
+        <attr name="secondHint" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="PhoneOtpInvertedInput">
+        <attr name="phoneLabel" format="string" />
+        <attr name="phoneHint" format="string" />
+        <attr name="confirmText" format="string" />
+        <attr name="otpLabel" format="string" />
+        <attr name="otpHint" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="BaseBlurView">
+        <attr name="blurRadius" format="dimension" />
+        <attr name="blurClipToOutline" format="boolean" />
+    </declare-styleable>
+
+    <attr name="exampleColor" format="color" />
+    <attr name="exampleString" format="string" />
+    <attr name="exampleDimension" format="dimension" />
+    <attr name="exampleDrawable" format="color|reference" />
 </resources>

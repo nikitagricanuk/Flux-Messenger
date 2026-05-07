@@ -91,6 +91,10 @@ dependencies {
     implementation(libs.browser)
 
 
+
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

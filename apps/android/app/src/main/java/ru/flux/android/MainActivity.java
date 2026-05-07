@@ -1,19 +1,27 @@
 package ru.flux.android;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.ViewGroup;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-
-import eightbitlab.com.blurview.BlurView;
+import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    private FrameLayout activeTab;
+    private NavController navController;
+
+    public void setNavBarVisible(boolean visible) {
+        findViewById(R.id.blurNav).setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,43 +29,51 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Blur setup
-        BlurView blurNav = findViewById(R.id.blurNav);
-        BlurView selectedTabBlur = findViewById(R.id.selectedTabBlur);
-        ViewGroup rootView = findViewById(android.R.id.content);
-        Drawable windowBackground = getWindow().getDecorView().getBackground();
-
-        blurNav.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(15f);
-
-        selectedTabBlur.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(12f);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.hide(WindowInsetsCompat.Type.navigationBars());
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
-        // Load ChatsFragment on first launch only (not after rotation)
-        if (savedInstanceState == null) {
-            navigateTo(new ChatsFragment());
-        }
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_container);
+        navController = navHostFragment.getNavController();
 
-        // Navbar click listeners
-        findViewById(R.id.nav_chats).setOnClickListener(v -> navigateTo(new ChatsFragment()));
+        FrameLayout navChats = findViewById(R.id.nav_chats);
+        FrameLayout navContacts = findViewById(R.id.nav_contacts);
+        FrameLayout navSettings = findViewById(R.id.nav_settings);
 
-        // TODO: replace with real fragments when you create them
-        // findViewById(R.id.nav_contacts).setOnClickListener(v -> navigateTo(new ContactsFragment()));
-        // findViewById(R.id.nav_settings).setOnClickListener(v -> navigateTo(new SettingsFragment()));
+        setActiveTab(navChats);
+
+        navChats.setOnClickListener(v -> {
+            setActiveTab(navChats);
+            navController.navigate(R.id.chatsFragment);
+        });
+
+//        navContacts.setOnClickListener(v -> {
+//            setActiveTab(navContacts);
+//            navController.navigate(R.id.contactPage);
+//        });
+
+        navSettings.setOnClickListener(v -> {
+            setActiveTab(navSettings);
+            navController.navigate(R.id.settingsFragment);
+        });
     }
 
-    private void navigateTo(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+    private void setActiveTab(FrameLayout selected) {
+        if (activeTab != null) {
+            activeTab.setBackgroundResource(0);
+        }
+        selected.setBackgroundResource(R.drawable.bg_selected_tab);
+        activeTab = selected;
     }
 }

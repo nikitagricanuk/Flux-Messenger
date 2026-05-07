@@ -13,7 +13,7 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".WelcomeAuthFragment">
+    tools:context=".features.login.ui.WelcomeAuthFragment">
 
     <TextView
         android:id="@+id/textView"
@@ -29,9 +29,9 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/flux" />
 
-    <com.google.android.material.button.MaterialButton
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/login"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="17dp"
@@ -44,9 +44,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <com.google.android.material.button.MaterialButton
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/signup"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="17dp"
@@ -94,9 +94,9 @@
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/materialButton"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"
@@ -110,9 +110,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <com.google.android.material.button.MaterialButton
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/materialButton3"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"
@@ -126,9 +126,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialButton" />
 
-    <com.google.android.material.button.MaterialButton
+    <ru.flux.android.core.views.button.BaseButton
         android:id="@+id/materialButton2"
-        style="@style/Widget.App.Button.FluxButton"
+        style="@style/Widget.App.Button.WithIcon"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="17dp"

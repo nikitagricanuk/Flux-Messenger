@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <!-- Header: cancel button + centred title -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
+
+        <ru.flux.android.core.views.button.BaseButton
+            android:id="@+id/cancelButton"
+            style="@style/Widget.App.Button.Icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@null"
+            app:icon="@drawable/cross"
+            app:iconTint="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/nunito_sans"
+            android:text="@string/new_contact"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <ru.flux.android.core.views.button.BaseButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@null"
+            app:icon="@drawable/ic_check"
+            app:iconTint="@null" />
+
+    </RelativeLayout>
+
+    <ru.flux.android.core.views.input.BaseDoubleInputView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/bg_input_field"
+        app:firstHint="@string/name_hint"
+        app:secondHint="@string/surname_hint"
+        app:blurRadius="0dp"
+        android:paddingVertical="15dp"
+        android:paddingHorizontal="19dp"/>
+
+    <ru.flux.android.core.views.input.PhoneInvertedInput
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        />
+
+</LinearLayout>
