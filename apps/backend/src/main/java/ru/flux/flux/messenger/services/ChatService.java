@@ -1,5 +1,7 @@
 package ru.flux.flux.messenger.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.flux.flux.messenger.Chat;
@@ -7,6 +9,7 @@ import ru.flux.flux.messenger.ChatType;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
+import ru.flux.flux.messenger.exceptions.ChatAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
@@ -17,6 +20,7 @@ import java.util.UUID;
 
 @Service
 public class ChatService {
+    Logger log = LoggerFactory.getLogger(this.getClass());
     private final ChatRepository repository;
     private final UserRepository userRepository;
 
@@ -43,12 +47,18 @@ public class ChatService {
     @Transactional
     public ChatResponse createChat(CreateChatRequest request, UUID currentUserId) {
         if (request.type() == ChatType.DIRECT) {
-            boolean exists = !repository.findByTypeAndExactMembers(
-                    ChatType.DIRECT.name(), request.memberIds(), request.memberIds().size()
+            boolean exists = !repository.findDirectChatWithExactMembers(
+                    request.memberIds(), request.memberIds().size()
             ).isEmpty();
             if (exists) {
-                throw new IllegalStateException("A direct chat between these users already exists");
+                throw new ChatAlreadyExistsException("A direct chat between these users already exists");
             }
+        }
+
+        if (request.memberIds().size() != 2 ||
+                request.memberIds().get(0).equals(request.memberIds().get(1))) {
+            log.debug("Direct chat requires exactly 2 distinct members");
+            throw new IllegalArgumentException("Direct chat requires exactly 2 distinct members");
         }
 
         Chat chat = new Chat();
@@ -65,6 +75,7 @@ public class ChatService {
             throw new ChatNotFoundException(id);
         }
         repository.deleteById(id);
+        log.debug("Deleted user with ID = {}", id);
     }
 
     private ChatResponse toResponse(Chat chat, UUID currentUserId) {

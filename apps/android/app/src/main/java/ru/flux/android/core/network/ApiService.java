@@ -33,4 +33,9 @@ public interface ApiService {
 
     @DELETE("chats/{id}")
     Call<Void> deleteChat(@Path("id") String id);
+
+    @POST("users/me/contacts")
+    Call<Void> addContact(@Body AddContactRequest request);
+
+
 }

@@ -13,9 +13,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.http.HttpStatus;
 import ru.flux.flux.messenger.components.JwtAuthenticationFilter;
 import ru.flux.flux.messenger.services.UserService;
 
@@ -60,12 +63,17 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/sign-up",
                                 "/api/auth/sign-in",
+                                "/api/auth/refresh",
                                 "/api/auth/oauth/**",
                                 "/api/auth/passkey/authenticate/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

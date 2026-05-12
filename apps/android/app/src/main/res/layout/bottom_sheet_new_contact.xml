@@ -36,6 +36,8 @@
             android:textSize="20sp" />
 
         <ru.flux.android.core.views.button.BaseButton
+            android:id="@+id/okButton"
+            style="@style/Widget.App.Button.Icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
@@ -47,7 +49,8 @@
     </RelativeLayout>
 
     <ru.flux.android.core.views.input.BaseDoubleInputView
-        android:layout_width="wrap_content"
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:background="@drawable/bg_input_field"
@@ -58,9 +61,10 @@
         android:paddingHorizontal="19dp"/>
 
     <ru.flux.android.core.views.input.PhoneInvertedInput
+        android:id="@+id/phoneInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        />
+        android:background="@drawable/bg_input_field" />
 
 </LinearLayout>

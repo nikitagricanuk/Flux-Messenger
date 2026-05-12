@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import ru.flux.android.R;
+import ru.flux.android.core.ui.ErrorDialog;
 import ru.flux.android.core.ui.SegmentTabsView;
 import ru.flux.android.databinding.FragmentChatsBinding;
 import ru.flux.android.features.chats.ChatAdapter;
@@ -45,7 +46,7 @@ public class ChatsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ChatsViewModel viewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
+        ChatsViewModel viewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
 
         binding.newChat.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.newMessageBottomSheet));
@@ -59,6 +60,12 @@ public class ChatsFragment extends Fragment {
         chatsRecycler.setAdapter(adapter);
 
         viewModel.getChats().observe(getViewLifecycleOwner(), adapter::setChats);
+        viewModel.getError().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null) {
+                ErrorDialog.display(getChildFragmentManager(), msg);
+                viewModel.clearError();
+            }
+        });
         viewModel.loadChats();
 
         String[] filters = {"all", "dm", "group"};

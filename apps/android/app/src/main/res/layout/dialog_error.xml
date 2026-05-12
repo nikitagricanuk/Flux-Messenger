@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ru.flux.android.core.views.BaseBlurView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/blur_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_rounded"
+    app:blurRadius="13dp"
+    app:blurClipToOutline="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_exclamation"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/tv_error_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/nunito_sans"
+            android:text="Что то пошло не так"
+            android:textColor="#FF000000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/nunito_sans"
+            android:gravity="center"
+            android:textColor="#99000000"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_continue"
+            style="@style/Widget.App.Button.Rounded"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:text="Продолжить" />
+
+    </LinearLayout>
+
+</ru.flux.android.core.views.BaseBlurView>

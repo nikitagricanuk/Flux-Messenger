@@ -1,5 +1,6 @@
 package ru.flux.android.features.chats;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         applyFilter();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void applyFilter() {
         filteredChats = new ArrayList<>();
         for (Chat chat : allChats) {

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.User;
+import ru.flux.flux.messenger.dto.AddContactRequest;
 import ru.flux.flux.messenger.dto.ContactResponse;
 import ru.flux.flux.messenger.dto.CreateUserRequest;
 import ru.flux.flux.messenger.dto.UserResponse;
@@ -81,10 +82,10 @@ public class UserController {
         service.addContact(id, contactId);
     }
 
-    @PutMapping("/me/contacts/{contactId}")
+    @PostMapping("/me/contacts")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addContactToMe(@PathVariable UUID contactId, @AuthenticationPrincipal User principal) {
-        service.addContact(principal.getId(), contactId);
+    public void addContactToMe(@RequestBody AddContactRequest request, @AuthenticationPrincipal User principal) {
+        service.addContact(principal.getId(), request);
     }
 
     @DeleteMapping("/{id}/contacts/{contactId}")

@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,10 +29,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.flux.android.core.data.Contact;
-import ru.flux.android.core.network.ChatResponse;
 import ru.flux.android.core.network.ContactResponse;
-import ru.flux.android.core.network.CreateChatRequest;
 import ru.flux.android.databinding.BottomSheetNewMessageBinding;
+import ru.flux.android.features.chats.ChatsViewModel;
 import ru.flux.android.features.chats.NewMessageAdapter;
 import ru.flux.android.R;
 import ru.flux.android.core.network.ApiClient;
@@ -58,6 +58,7 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         NavController navController = NavHostFragment.findNavController(this);
+        ChatsViewModel viewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
 
         binding.cancelButton.setOnClickListener(v -> dismiss());
 
@@ -74,29 +75,10 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         recycler.setNestedScrollingEnabled(true);
 
         NewMessageAdapter adapter = new NewMessageAdapter(new ArrayList<>(), contact -> {
-            try {
-                ApiClient.api(requireContext()).createChat(new CreateChatRequest(
-                        "DIRECT",
-                        new String[]{ contact.getId().toString() }
-                )).enqueue(new Callback<>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ChatResponse> call,
-                                           @NonNull Response<ChatResponse> response) {
-                        if (!response.isSuccessful()) {
-                            Log.e(TAG, "createChat failed: " + response.code());
-                            return;
-                        }
-                        dismiss();
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<ChatResponse> call, @NonNull Throwable t) {
-                        Log.e(TAG, "createChat error: " + t.getMessage());
-                    }
-                });
-            } catch (GeneralSecurityException | IOException e) {
-                Log.e(TAG, "TokenManager init failed: " + e.getMessage());
-            }
+            String myId = viewModel.getCurrentUserId().getValue();
+            if (myId == null) return;
+            viewModel.createChat(null, "DIRECT", new String[]{myId, contact.getId().toString()});
+            dismiss();
         });
         recycler.setAdapter(adapter);
         loadContacts(adapter);
