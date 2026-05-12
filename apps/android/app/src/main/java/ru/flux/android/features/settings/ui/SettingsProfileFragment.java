@@ -18,8 +18,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.AutoTransition;
 import androidx.transition.TransitionManager;
 
+import com.bumptech.glide.Glide;
+
 import java.util.Calendar;
 
+import ru.flux.android.R;
 import ru.flux.android.core.auth.TokenManager;
 import ru.flux.android.core.network.UpdateUserRequest;
 import ru.flux.android.core.network.UserResponse;
@@ -65,6 +68,11 @@ public class SettingsProfileFragment extends Fragment {
                 TransitionManager.beginDelayedTransition(binding.cardBirthDate, new AutoTransition());
                 binding.birthDateDivider.setVisibility(View.VISIBLE);
                 binding.tvDeleteBirthDate.setVisibility(View.VISIBLE);
+            }
+            if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
+                Glide.with(this).load(user.avatarUrl)
+                                .placeholder(R.drawable.bg_avatar_placeholder)
+                                .into(binding.blurCardName.getAvatar());
             }
         });
 
