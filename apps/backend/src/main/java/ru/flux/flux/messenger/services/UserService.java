@@ -4,6 +4,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.OAuthProvider;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.UserOAuthIdentity;
@@ -23,13 +24,16 @@ public class UserService {
     private final UserRepository repository;
     private final ChatRepository chatRepository;
     private final UserOAuthIdentityRepository oauthIdentityRepository;
+    private final StorageService storageService;
 
     public UserService(UserRepository repository,
                        ChatRepository chatRepository,
-                       UserOAuthIdentityRepository oauthIdentityRepository) {
+                       UserOAuthIdentityRepository oauthIdentityRepository,
+                       StorageService storageService) {
         this.repository = repository;
         this.chatRepository = chatRepository;
         this.oauthIdentityRepository = oauthIdentityRepository;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -182,6 +186,21 @@ public class UserService {
         user.removeContact(contact);
 
         repository.save(user);
+    }
+
+    @Transactional
+    public UserResponse uploadAvatar(UUID userId, MultipartFile file) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        try {
+            String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
+            String objectName = userId + (ext != null ? "." + ext : "");
+            String url = storageService.upload(objectName, file.getInputStream(), file.getSize(), file.getContentType());
+            user.setAvatarUrl(url);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload avatar", e);
+        }
+        return toResponse(repository.save(user));
     }
 
     private void applyRequest(User user, CreateUserRequest request) {
