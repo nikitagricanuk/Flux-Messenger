@@ -52,4 +52,5 @@
     <string name="surname_hint">Фамилия</string>
     <string name="username_hint">Имя пользователя</string>
     <string name="add">Добавить</string>
+    <string name="select_chat">Выберите чат</string>
 </resources>

@@ -18,7 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import ru.flux.android.R;
+import ru.flux.android.core.data.DisplayItem;
 import ru.flux.android.core.ui.ErrorDialog;
 import ru.flux.android.databinding.FragmentChatsBinding;
 import ru.flux.android.core.data.Chat;
@@ -92,6 +97,17 @@ public class ChatsFragment extends Fragment {
                 adapter.setSearchQuery(s.toString());
             }
             @Override public void afterTextChanged(Editable s) {}
+        });
+
+        binding.addFavoriteBtn.setOnClickListener(v -> {
+            List<DisplayItem> items = new ArrayList<>();
+            for (Chat chat : Objects.requireNonNull(viewModel.getChats().getValue())) {
+                items.add(
+                        new DisplayItem(chat.name, chat.lastMessage, chat.avatarUrl, () ->
+                            viewModel.addFavorite(chat))
+                );
+            }
+            ChatListFragment.newInstance(items).show(getChildFragmentManager(), null);
         });
     }
 

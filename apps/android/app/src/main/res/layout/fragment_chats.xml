@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/flux" />
 
     <ru.flux.android.core.views.button.BaseButton
-        android:id="@+id/baseButton"
+        android:id="@+id/addFavoriteBtn"
         style="@style/Widget.App.Button.FavoriteAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="9dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/baseButton"
+        app:layout_constraintStart_toEndOf="@+id/addFavoriteBtn"
         app:layout_constraintTop_toBottomOf="@+id/fav_tv" />
 
     <ru.flux.android.core.ui.SegmentTabsView

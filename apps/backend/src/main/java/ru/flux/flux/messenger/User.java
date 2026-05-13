@@ -64,9 +64,16 @@ public class User implements UserDetails {
     private List<UserContact> contacts = new ArrayList<>();
 
     @ManyToMany
+    @JoinTable(
+            name = "user_favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "favorite_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "favorite_id"})
+    )
     private List<User> favorites = new ArrayList<>();
 
     public void addFavorite(User favorite) {
+        if (favorites.contains(favorite)) throw new IllegalStateException("User is already in favorites");
         favorites.add(favorite);
     }
 

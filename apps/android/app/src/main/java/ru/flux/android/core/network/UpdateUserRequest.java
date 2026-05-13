@@ -13,7 +13,7 @@ public class UpdateUserRequest {
 
     public UpdateUserRequest(String firstName, String lastName, String nickname,
                              String dateOfBirth, String phone, String email,
-                             Boolean notifications, String bio) {
+                             Boolean notifications, String bio, String avatarUrl) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.nickname = nickname;
@@ -22,5 +22,6 @@ public class UpdateUserRequest {
         this.email = email;
         this.notifications = notifications;
         this.bio = bio;
+        this.avatarUrl = avatarUrl;
     }
 }

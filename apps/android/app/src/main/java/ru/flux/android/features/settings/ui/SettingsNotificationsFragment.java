@@ -46,7 +46,8 @@ public class SettingsNotificationsFragment extends Fragment {
                         current.phone,
                         current.email,
                         checked,
-                        current.bio
+                        current.bio,
+                        current.avatarUrl
                 ));
             });
         });

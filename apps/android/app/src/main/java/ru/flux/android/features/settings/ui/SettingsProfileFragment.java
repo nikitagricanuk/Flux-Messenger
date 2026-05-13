@@ -140,7 +140,8 @@ public class SettingsProfileFragment extends Fragment {
                 phone,
                 email.isEmpty() ? null : email,
                 current != null ? current.notifications : null,
-                bio.isEmpty() ? null : bio
+                bio.isEmpty() ? null : bio,
+                current != null ? current.avatarUrl : null
         ));
         requireActivity().getOnBackPressedDispatcher().onBackPressed();
     }

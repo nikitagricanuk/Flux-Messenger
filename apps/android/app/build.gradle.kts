@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.credentials.play.services.auth)
     implementation(libs.browser)
     implementation(libs.glide)
+    implementation(libs.legacy.support.v4)
 
 
 
