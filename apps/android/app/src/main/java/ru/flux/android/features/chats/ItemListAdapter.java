@@ -18,11 +18,32 @@ import ru.flux.android.databinding.ItemNewMessageContactBinding;
 
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
 
-    private List<DisplayItem> items = new ArrayList<>();
+    private List<DisplayItem> allItems = new ArrayList<>();
+    private List<DisplayItem> filteredItems = new ArrayList<>();
+    private String searchQuery = "";
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setItems(List<DisplayItem> items) {
-        this.items = items;
+    public void setItems(List<DisplayItem> allItems) {
+        this.allItems = allItems;
+        applyFilter();
+    }
+
+    public void setSearchQuery(String query) {
+        searchQuery = query == null ? "" : query.toLowerCase().trim();
+        applyFilter();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void applyFilter() {
+        filteredItems = new ArrayList<>();
+        for (DisplayItem item : allItems) {
+            boolean matchesQuery = searchQuery.isEmpty()
+                    || item.name.toLowerCase().contains(searchQuery)
+                    || (item.subtitle != null && item.subtitle.toLowerCase().contains(searchQuery));
+            if (matchesQuery) {
+                filteredItems.add(item);
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -36,7 +57,7 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DisplayItem item = items.get(position);
+        DisplayItem item = filteredItems.get(position);
         holder.binding.contactName.setText(item.name);
         holder.binding.contactPhone.setText(item.subtitle);
         Glide.with(holder.itemView.getContext())
@@ -50,7 +71,7 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return filteredItems.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

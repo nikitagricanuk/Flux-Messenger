@@ -1,6 +1,8 @@
 package ru.flux.android.features.chats.ui;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +61,14 @@ public class ChatListFragment extends BottomSheetDialogFragment {
             }
             adapter.setItems(wrapped);
         }
+
+        binding.searchBar.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.setSearchQuery(s.toString());
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override

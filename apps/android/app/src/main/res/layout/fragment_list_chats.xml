@@ -39,6 +39,17 @@
 
     <!-- Scrollable body: action rows + alphabetical contacts -->
 
+    <ru.flux.android.core.views.input.BaseInputView
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp"
+        android:hint="@string/search_hint"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:singleLine="true" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contactsRecycler"
         android:layout_width="match_parent"
