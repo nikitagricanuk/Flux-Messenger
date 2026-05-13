@@ -39,6 +39,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     public interface OnChatActionListener {
         void onDeleteChat(Chat chat);
+        void onAddFavorite(Chat chat);
     }
 
     private OnChatActionListener listener;
@@ -94,10 +95,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
         holder.itemView.setOnLongClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
-            popup.getMenu().add(0, 0, 0, "Delete");
+            popup.getMenu().add(0, 0, 0, "Удалить");
+            popup.getMenu().add(0, 1, 1, "В избранное");
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 0 && listener != null) {
                     listener.onDeleteChat(chat);
+                } else if (item.getItemId() == 1 && listener != null) {
+                    listener.onAddFavorite(chat);
                 }
                 return true;
             });

@@ -111,7 +111,30 @@ public class ChatService {
         );
     }
 
-    public FavoriteResponse addFavorite(AddFavoriteRequest request, UUID userId) {
+    @Transactional(readOnly = true)
+    public List<FavoriteResponse> getFavorites(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return user.getFavorites().stream()
+                .map(this::toFavoriteResponse)
+                .toList();
+    }
 
+    @Transactional
+    public FavoriteResponse addFavorite(AddFavoriteRequest request, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User target = userRepository.findById(request.id())
+                .orElseThrow(() -> new IllegalArgumentException("Target user not found"));
+        user.addFavorite(target);
+        userRepository.save(user);
+        return toFavoriteResponse(target);
+    }
+
+    private FavoriteResponse toFavoriteResponse(User user) {
+        String name = user.getLastName() != null
+                ? user.getFirstName() + " " + user.getLastName()
+                : user.getFirstName();
+        return new FavoriteResponse(user.getId(), name, user.getAvatarUrl());
     }
 }

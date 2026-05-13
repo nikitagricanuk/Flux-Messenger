@@ -15,7 +15,7 @@ import ru.flux.android.R;
 import ru.flux.android.core.data.Chat;
 import ru.flux.android.databinding.ItemFavoriteBinding;
 
-public class FavoriteAdapter extends RecyclerView.Adapter {
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
     private List<Chat> favorites = new ArrayList<>();
 
     /**
@@ -26,7 +26,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter {
      */
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavoriteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemFavoriteBinding binding = ItemFavoriteBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new FavoriteViewHolder(binding);
     }
@@ -37,7 +37,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter {
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
         Chat chat = favorites.get(position);
         FavoriteViewHolder vh = (FavoriteViewHolder) holder;
         vh.binding.name.setText(chat.name);

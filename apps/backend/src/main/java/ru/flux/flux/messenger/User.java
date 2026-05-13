@@ -63,6 +63,17 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserContact> contacts = new ArrayList<>();
 
+    @ManyToMany
+    private List<User> favorites = new ArrayList<>();
+
+    public void addFavorite(User favorite) {
+        favorites.add(favorite);
+    }
+
+    public void removeFavorite(User favorite) {
+        favorites.remove(favorite);
+    }
+
     public void addContact(User contact) {
         UserContact uc = new UserContact();
         uc.setUser(this);
@@ -86,6 +97,12 @@ public class User implements UserDetails {
     public List<UUID> getContactIds() {
         return contacts.stream()
                 .map(uc -> uc.getContact().getId())
+                .toList();
+    }
+
+    public List<UUID> getFavoriteIds() {
+        return favorites.stream()
+                .map(User::getId)
                 .toList();
     }
 

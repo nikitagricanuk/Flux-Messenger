@@ -1,5 +1,8 @@
 package ru.flux.android.core.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Chat {
     public String id;
     public String name;
@@ -7,6 +10,7 @@ public class Chat {
     public String avatarUrl;
     public String time;
     public String type; // "dm" or "group"
+    public List<String> memberIds = new ArrayList<>();
 
     public Chat(String id, String name, String lastMessage, String avatarUrl, String time, String type) {
         this.id = id;

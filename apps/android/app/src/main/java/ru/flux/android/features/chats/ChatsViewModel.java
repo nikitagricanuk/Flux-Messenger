@@ -18,14 +18,17 @@ import java.util.concurrent.Executors;
 import retrofit2.Response;
 import ru.flux.android.core.data.Chat;
 import ru.flux.android.core.data.Contact;
+import ru.flux.android.core.network.AddFavoriteRequest;
 import ru.flux.android.core.network.ApiClient;
 import ru.flux.android.core.network.ChatResponse;
 import ru.flux.android.core.network.CreateChatRequest;
+import ru.flux.android.core.network.FavoriteResponse;
 import ru.flux.android.core.network.UserResponse;
 
 public class ChatsViewModel extends AndroidViewModel {
     private static final String TAG = "ChatsViewModel";
     private final MutableLiveData<List<Chat>> chats = new MutableLiveData<>();
+    private final MutableLiveData<List<Chat>> favorites = new MutableLiveData<>();
     private final MutableLiveData<List<Contact>> contacts = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<Boolean> chatCreated = new MutableLiveData<>();
@@ -39,6 +42,7 @@ public class ChatsViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Chat>> getChats() { return chats; }
+    public LiveData<List<Chat>> getFavorites() { return favorites; }
     public LiveData<List<Contact>> getContacts() { return contacts; }
     public LiveData<String> getError() { return error; }
     public LiveData<Boolean> getChatCreated() { return chatCreated; }
@@ -82,6 +86,59 @@ public class ChatsViewModel extends AndroidViewModel {
     public void loadChats() {
         if (chats.getValue() != null) return;
         fetchChats();
+    }
+
+    public void loadFavorites() {
+        if (favorites.getValue() != null) return;
+        fetchFavorites();
+    }
+
+    private void fetchFavorites() {
+        executor.execute(() -> {
+            try {
+                Response<List<FavoriteResponse>> response = ApiClient.api(getApplication()).getFavorites().execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Chat> mapped = new ArrayList<>();
+                    for (FavoriteResponse fr : response.body())
+                        mapped.add(new Chat(fr.id, fr.name, null, fr.profilePicture, null, null));
+                    favorites.postValue(mapped);
+                } else {
+                    error.postValue("Не удалось загрузить избранное");
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e(TAG, "fetchFavorites: exception", e);
+                error.postValue(e.getMessage());
+            }
+        });
+    }
+
+    public void addFavorite(Chat chat) {
+        String myId = currentUserId.getValue();
+        String targetId = null;
+        for (String memberId : chat.memberIds) {
+            if (!memberId.equals(myId)) { targetId = memberId; break; }
+        }
+        if (targetId == null) {
+            error.postValue("Не удалось определить пользователя для добавления в избранное");
+            return;
+        }
+        Log.d(TAG, "addFavorite: targetUserId=" + targetId);
+        String finalTargetId = targetId;
+        executor.execute(() -> {
+            try {
+                Response<FavoriteResponse> response = ApiClient.api(getApplication())
+                        .addFavorite(new AddFavoriteRequest(finalTargetId)).execute();
+                if (response.isSuccessful()) {
+                    fetchFavorites();
+                } else {
+                    Log.e(TAG, "addFavorite: failed, code=" + response.code());
+                    error.postValue("Не удалось добавить в избранное");
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e(TAG, "addFavorite: exception", e);
+                error.postValue(e.getMessage());
+            }
+        });
     }
 
     private void fetchChats() {
@@ -136,6 +193,8 @@ public class ChatsViewModel extends AndroidViewModel {
             if (t >= 0 && cr.lastMessageAt.length() >= t + 6)
                 time = cr.lastMessageAt.substring(t + 1, t + 6);
         }
-        return new Chat(cr.id, cr.name, cr.lastMessage, cr.profilePicture, time, type);
+        Chat chat = new Chat(cr.id, cr.name, cr.lastMessage, cr.profilePicture, time, type);
+        if (cr.memberIds != null) chat.memberIds = cr.memberIds;
+        return chat;
     }
 }

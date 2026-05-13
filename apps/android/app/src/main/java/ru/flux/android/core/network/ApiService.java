@@ -17,6 +17,12 @@ public interface ApiService {
     @GET("chats")
     Call<List<ChatResponse>> getChats();
 
+    @GET("chats/favorites")
+    Call<List<FavoriteResponse>> getFavorites();
+
+    @POST("chats/favorites")
+    Call<FavoriteResponse> addFavorite(@Body AddFavoriteRequest request);
+
     @GET("users")
     Call<List<UserResponse>> getUsers();
 
