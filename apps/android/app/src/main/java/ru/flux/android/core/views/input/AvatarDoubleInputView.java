@@ -44,8 +44,6 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
         avatarView.setBackground(AppCompatResources.getDrawable(context, R.drawable.bg_circle_gray));
         avatarView.setScaleType(ImageView.ScaleType.CENTER);
         avatarView.setImageResource(R.drawable.ic_camera_placeholder);
-        int avatarPad = dp(context, 20);
-        avatarView.setPadding(avatarPad, avatarPad, avatarPad, avatarPad);
         avatarView.setId(R.id.avatar);
 
         FrameLayout avatarContainer = new FrameLayout(context);

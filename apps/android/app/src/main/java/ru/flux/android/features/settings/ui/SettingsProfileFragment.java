@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -36,10 +39,18 @@ public class SettingsProfileFragment extends Fragment {
     private FragmentSettingsProfileBinding binding;
     private SettingsViewModel viewModel;
 
+    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+
     public SettingsProfileFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri == null) return;
+            Glide.with(this).load(uri).circleCrop()
+                    .into(binding.blurCardName.getAvatar());
+            viewModel.uploadAvatar(uri);
+        });
         binding = FragmentSettingsProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -53,6 +64,8 @@ public class SettingsProfileFragment extends Fragment {
         setupEditableRow(binding.rowUsername, binding.etUsername);
         setupEditableRow(binding.rowPhone, binding.etPhone);
         setupEditableRow(binding.rowEmail, binding.etEmail);
+
+        viewModel.loadUser();
 
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             binding.blurCardName.setFirstText(user.firstName);
@@ -70,8 +83,10 @@ public class SettingsProfileFragment extends Fragment {
                 binding.tvDeleteBirthDate.setVisibility(View.VISIBLE);
             }
             if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
-                Glide.with(this).load(user.avatarUrl)
+                Glide.with(requireContext()).load(user.avatarUrl)
                                 .placeholder(R.drawable.bg_avatar_placeholder)
+                                .error(R.drawable.bg_avatar_placeholder)
+                                .circleCrop()
                                 .into(binding.blurCardName.getAvatar());
             }
         });
@@ -84,6 +99,12 @@ public class SettingsProfileFragment extends Fragment {
         binding.tvSignOut.setOnClickListener(v -> logout());
         binding.tvDeleteAccount.setOnClickListener(v ->
                 viewModel.deleteAccount(() -> requireActivity().runOnUiThread(this::navigateToLogin)));
+
+        binding.blurCardName.getAvatar().setOnClickListener(v -> {
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
     }
 
     private void saveAndGoBack() {

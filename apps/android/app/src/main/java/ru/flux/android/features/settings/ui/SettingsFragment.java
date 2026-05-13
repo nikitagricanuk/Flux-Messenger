@@ -53,8 +53,10 @@ public class SettingsFragment extends Fragment {
             binding.profileBio.setVisibility(hasBio ? View.VISIBLE : View.GONE);
             if (hasBio) binding.profileBio.setText(user.bio);
             if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
-                Glide.with(this).load(user.avatarUrl)
+                Glide.with(requireContext()).load(user.avatarUrl)
+                        .circleCrop()
                         .placeholder(R.drawable.bg_avatar_placeholder)
+                        .error(R.drawable.bg_avatar_placeholder)
                         .into(binding.profileAvatar);
             }
         });

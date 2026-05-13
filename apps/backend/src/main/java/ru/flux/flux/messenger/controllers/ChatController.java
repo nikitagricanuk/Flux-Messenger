@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.flux.flux.messenger.User;
+import ru.flux.flux.messenger.dto.AddFavoriteRequest;
+import ru.flux.flux.messenger.dto.FavoriteResponse;
 import ru.flux.flux.messenger.services.ChatService;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
@@ -28,6 +30,11 @@ public class ChatController {
         return chatService.getAllChats(currentUser.getId());
     }
 
+    @GetMapping("/favorites")
+    public List<FavoriteResponse> getFavorites(@AuthenticationPrincipal User currentUser) {
+        return chatService.getFavorites(currentUser.getId());
+    }
+
     @GetMapping("/{id}")
     public ChatResponse getChatById(@PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
         return chatService.getChatById(id, currentUser.getId());
@@ -36,6 +43,11 @@ public class ChatController {
     @PostMapping
     public ChatResponse createChat(@Valid @RequestBody CreateChatRequest request, @AuthenticationPrincipal User currentUser) {
         return chatService.createChat(request, currentUser.getId());
+    }
+
+    @PostMapping("/favorites")
+    public FavoriteResponse createFavorite(@RequestBody AddFavoriteRequest request, @AuthenticationPrincipal User currentUser) {
+        return chatService.addFavorite(request, currentUser.getId());
     }
 
     @DeleteMapping("/{id}")

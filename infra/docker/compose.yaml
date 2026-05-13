@@ -17,7 +17,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio
+    image: mirror.gcr.io/minio/minio
     container_name: flux-minio
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -44,6 +44,7 @@ services:
       SPRING_DATASOURCE_USERNAME: flux
       SPRING_DATASOURCE_PASSWORD: flux
       MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_URL: http://10.0.2.2:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: avatars

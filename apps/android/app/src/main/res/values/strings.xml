@@ -51,4 +51,5 @@
     <string name="name_hint">Имя</string>
     <string name="surname_hint">Фамилия</string>
     <string name="username_hint">Имя пользователя</string>
+    <string name="add">Добавить</string>
 </resources>

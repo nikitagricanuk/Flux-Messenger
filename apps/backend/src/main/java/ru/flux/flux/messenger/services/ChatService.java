@@ -1,5 +1,6 @@
 package ru.flux.flux.messenger.services;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -7,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.ChatType;
 import ru.flux.flux.messenger.User;
+import ru.flux.flux.messenger.dto.AddFavoriteRequest;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
+import ru.flux.flux.messenger.dto.FavoriteResponse;
 import ru.flux.flux.messenger.exceptions.ChatAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
@@ -106,5 +109,9 @@ public class ChatService {
                 "Hey, how are you?",
                 LocalDateTime.now().minusHours(1)
         );
+    }
+
+    public FavoriteResponse addFavorite(AddFavoriteRequest request, UUID userId) {
+
     }
 }

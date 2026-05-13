@@ -1,6 +1,7 @@
 package ru.flux.android.features.settings;
 
 import android.app.Application;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -92,6 +93,36 @@ public class SettingsViewModel extends AndroidViewModel {
                 }
             } catch (GeneralSecurityException | IOException e) {
                 Log.e(TAG, "deleteAccount: exception", e);
+                error.postValue(e.getMessage());
+            }
+        });
+    }
+
+    public void uploadAvatar(Uri uri) {
+        Log.d(TAG, "uploadAvatar");
+        executor.execute(() -> {
+            try {
+                byte[] bytes;
+                try (java.io.InputStream is = getApplication().getContentResolver().openInputStream(uri);
+                     java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+                    if (is == null) { error.postValue("Не удалось открыть файл"); return; }
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = is.read(buf)) != -1) baos.write(buf, 0, n);
+                    bytes = baos.toByteArray();
+                }
+                okhttp3.RequestBody body = okhttp3.RequestBody.create(bytes, okhttp3.MediaType.parse("image/*"));
+                okhttp3.MultipartBody.Part part = okhttp3.MultipartBody.Part.createFormData("file", "avatar.jpg", body);
+                Response<UserResponse> response = buildApi().uploadAvatar(part).execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "uploadAvatar: success");
+                    user.postValue(response.body());
+                } else {
+                    Log.e(TAG, "uploadAvatar: failed, code=" + response.code());
+                    error.postValue("Не удалось загрузить фото");
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e(TAG, "uploadAvatar: exception", e);
                 error.postValue(e.getMessage());
             }
         });

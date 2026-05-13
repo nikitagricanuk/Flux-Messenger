@@ -11,14 +11,15 @@ import java.io.InputStream;
 public class StorageService {
     private final MinioClient minio;
     private final String bucket;
-    private final String endpoint;
+    private final String publicUrl;
 
     public StorageService(
             @Value("${storage.minio.endpoint}") String endpoint,
+            @Value("${storage.minio.public-url}") String publicUrl,
             @Value("${storage.minio.access-key}") String accessKey,
             @Value("${storage.minio.secret-key}") String secretKey,
             @Value("${storage.minio.bucket}") String bucket) {
-        this.endpoint = endpoint;
+        this.publicUrl = publicUrl.stripTrailing().replaceAll("/+$", "");
         this.bucket = bucket;
         this.minio = MinioClient.builder()
                 .endpoint(endpoint)
@@ -46,6 +47,6 @@ public class StorageService {
                 .stream(stream, size, -1)
                 .contentType(contentType)
                 .build());
-        return endpoint + "/" + bucket + "/" + objectName;
+        return publicUrl + "/" + bucket + "/" + objectName;
     }
 }
