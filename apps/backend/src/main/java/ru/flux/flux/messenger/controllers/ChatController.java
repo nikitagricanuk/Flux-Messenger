@@ -35,7 +35,7 @@ public class ChatController {
 
     @PostMapping
     public ChatResponse createChat(@Valid @RequestBody CreateChatRequest request, @AuthenticationPrincipal User currentUser) {
-        return chatService.createChat(request, currentUser.getId());
+        return chatService.createOrGetDirect(request, currentUser.getId());
     }
 
     @DeleteMapping("/{id}")

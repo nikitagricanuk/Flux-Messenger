@@ -4,14 +4,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.ChatType;
+import ru.flux.flux.messenger.Message;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
+import ru.flux.flux.messenger.repositories.MessageRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,35 +23,55 @@ import java.util.UUID;
 public class ChatService {
     private final ChatRepository repository;
     private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
 
-    public ChatService(ChatRepository repository, UserRepository userRepository) {
+    public ChatService(ChatRepository repository,
+                       UserRepository userRepository,
+                       MessageRepository messageRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
     }
 
     @Transactional(readOnly = true)
     public List<ChatResponse> getAllChats(UUID currentUserId) {
         return repository.findAll()
                 .stream()
+                .filter(chat -> chat.getMemberIds().contains(currentUserId))
                 .map(chat -> toResponse(chat, currentUserId))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public ChatResponse getChatById(UUID id, UUID currentUserId) {
-        Chat chat = repository.findById(id)
-                .orElseThrow(() -> new ChatNotFoundException(id));
+        Chat chat = requireChatMember(id, currentUserId);
         return toResponse(chat, currentUserId);
     }
 
+    private Chat requireChatMember(UUID chatId, UUID userId) {
+        Chat chat = repository.findById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+
+        if (!chat.getMemberIds().contains(userId)) {
+            throw new SecurityException("User is not a member of this chat");
+        }
+
+        return chat;
+    }
+
     @Transactional
-    public ChatResponse createChat(CreateChatRequest request, UUID currentUserId) {
+    public ChatResponse createOrGetDirect(CreateChatRequest request, UUID currentUserId) {
+        List<UUID> members = new ArrayList<>(request.memberIds());
+        if (!members.contains(currentUserId)) {
+            members.add(currentUserId);
+        }
+
         if (request.type() == ChatType.DIRECT) {
-            boolean exists = !repository.findByTypeAndExactMembers(
-                    ChatType.DIRECT.name(), request.memberIds(), request.memberIds().size()
-            ).isEmpty();
-            if (exists) {
-                throw new IllegalStateException("A direct chat between these users already exists");
+            List<Chat> existing = repository.findByTypeAndExactMembers(
+                    ChatType.DIRECT.name(), members, members.size()
+            );
+            if (!existing.isEmpty()) {
+                return toResponse(existing.get(0), currentUserId);
             }
         }
 
@@ -55,7 +79,7 @@ public class ChatService {
         chat.setType(request.type());
         chat.setName(request.name());
         chat.setAvatarUrl(request.avatarUrl());
-        request.memberIds().forEach(memberId -> userRepository.findById(memberId).ifPresent(chat::addMember));
+        members.forEach(memberId -> userRepository.findById(memberId).ifPresent(chat::addMember));
         return toResponse(repository.save(chat), currentUserId);
     }
 
@@ -68,32 +92,45 @@ public class ChatService {
     }
 
     private ChatResponse toResponse(Chat chat, UUID currentUserId) {
-        String chatName = chat.getName();
-        String avatarUrl = chat.getAvatarUrl();
+        String name = chat.getName();
+        String profilePicture = chat.getAvatarUrl();
 
         if (chat.getType() == ChatType.DIRECT) {
-            UUID opponentId = chat.getMemberIds().stream()
-                    .filter(id -> !id.equals(currentUserId))
+            UUID peerId = chat.getMemberIds().stream()
+                    .filter(memberId -> !memberId.equals(currentUserId))
                     .findFirst()
-                    .orElse(currentUserId);
+                    .orElse(null);
 
-            User opponent = userRepository.findById(opponentId).orElse(null);
-            if (opponent != null) {
-                chatName = opponent.getLastName() != null
-                        ? opponent.getFirstName() + " " + opponent.getLastName()
-                        : opponent.getFirstName();
-                avatarUrl = opponent.getAvatarUrl();
+            if (peerId != null) {
+                User peer = userRepository.findById(peerId).orElse(null);
+                if (peer != null) {
+                    String lastName = peer.getLastName();
+                    name = (lastName != null && !lastName.isBlank())
+                            ? peer.getFirstName() + " " + lastName
+                            : peer.getFirstName();
+                    profilePicture = peer.getAvatarUrl();
+                }
+            }
+
+            if (name == null || name.isBlank()) {
+                name = "Личный чат";
             }
         }
 
+        Message lastMessageEntity = messageRepository.findTopByChatIdOrderByCreatedAtDesc(chat.getId());
+        String lastMessage = lastMessageEntity != null ? lastMessageEntity.getText() : "";
+        LocalDateTime lastMessageAt = lastMessageEntity != null
+                ? LocalDateTime.ofInstant(lastMessageEntity.getCreatedAt(), ZoneId.systemDefault())
+                : null;
+
         return new ChatResponse(
                 chat.getId(),
-                chatName,
-                avatarUrl,
+                name,
+                profilePicture,
                 chat.getType(),
                 List.copyOf(chat.getMemberIds()),
-                "Hey, how are you?",
-                LocalDateTime.now().minusHours(1)
+                lastMessage,
+                lastMessageAt
         );
     }
 }
