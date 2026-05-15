@@ -47,7 +47,7 @@ public class SettingsViewModel extends AndroidViewModel {
                     Log.d(TAG, "loadUser: success, id=" + response.body().id);
                     user.postValue(response.body());
                 } else {
-                    Log.e(TAG, "loadUser: failed, code=" + response.code());
+                    Log.e(TAG, "loadUser: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось загрузить профиль");
                 }
             } catch (GeneralSecurityException | IOException e) {
@@ -67,7 +67,7 @@ public class SettingsViewModel extends AndroidViewModel {
                     Log.d(TAG, "saveUser: success");
                     user.postValue(response.body());
                 } else {
-                    Log.e(TAG, "saveUser: failed, code=" + response.code());
+                    Log.e(TAG, "saveUser: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось сохранить профиль");
                 }
             } catch (GeneralSecurityException | IOException e) {
@@ -88,7 +88,7 @@ public class SettingsViewModel extends AndroidViewModel {
                     tm.clearTokens();
                     onSuccess.run();
                 } else {
-                    Log.e(TAG, "deleteAccount: failed, code=" + response.code());
+                    Log.e(TAG, "deleteAccount: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось удалить аккаунт");
                 }
             } catch (GeneralSecurityException | IOException e) {
@@ -118,7 +118,7 @@ public class SettingsViewModel extends AndroidViewModel {
                     Log.d(TAG, "uploadAvatar: success");
                     user.postValue(response.body());
                 } else {
-                    Log.e(TAG, "uploadAvatar: failed, code=" + response.code());
+                    Log.e(TAG, "uploadAvatar: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось загрузить фото");
                 }
             } catch (GeneralSecurityException | IOException e) {

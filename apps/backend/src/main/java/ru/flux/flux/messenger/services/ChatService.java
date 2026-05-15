@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.ChatType;
 import ru.flux.flux.messenger.User;
@@ -26,10 +28,15 @@ public class ChatService {
     Logger log = LoggerFactory.getLogger(this.getClass());
     private final ChatRepository repository;
     private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
+    private final StorageService storageService;
 
-    public ChatService(ChatRepository repository, UserRepository userRepository) {
+    public ChatService(ChatRepository repository, UserRepository userRepository,
+                       ChatRepository chatRepository, StorageService storageService) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.chatRepository = chatRepository;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -58,8 +65,9 @@ public class ChatService {
             }
         }
 
-        if (request.memberIds().size() != 2 ||
-                request.memberIds().get(0).equals(request.memberIds().get(1))) {
+        if (request.type() == ChatType.DIRECT &&
+                (request.memberIds().size() != 2 ||
+                request.memberIds().get(0).equals(request.memberIds().get(1)))) {
             log.debug("Direct chat requires exactly 2 distinct members");
             throw new IllegalArgumentException("Direct chat requires exactly 2 distinct members");
         }
@@ -69,6 +77,27 @@ public class ChatService {
         chat.setName(request.name());
         chat.setAvatarUrl(request.avatarUrl());
         request.memberIds().forEach(memberId -> userRepository.findById(memberId).ifPresent(chat::addMember));
+        return toResponse(repository.save(chat), currentUserId);
+    }
+
+    @Transactional
+    public ChatResponse createGroupChat(String name, List<UUID> memberIds, MultipartFile avatar, UUID currentUserId) {
+        Chat chat = new Chat();
+        chat.setType(ChatType.GROUP);
+        chat.setName(name);
+        memberIds.forEach(id -> userRepository.findById(id).ifPresent(chat::addMember));
+
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                String ext = StringUtils.getFilenameExtension(avatar.getOriginalFilename());
+                String objectName = "chat-" + UUID.randomUUID() + (ext != null ? "." + ext : "");
+                String url = storageService.upload(objectName, avatar.getInputStream(), avatar.getSize(), avatar.getContentType());
+                chat.setAvatarUrl(url);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload chat avatar", e);
+            }
+        }
+
         return toResponse(repository.save(chat), currentUserId);
     }
 
@@ -116,7 +145,7 @@ public class ChatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return user.getFavorites().stream()
-                .map(this::toFavoriteResponse)
+                .map(chat -> toFavoriteResponse(chat, userId))
                 .toList();
     }
 
@@ -124,17 +153,15 @@ public class ChatService {
     public FavoriteResponse addFavorite(AddFavoriteRequest request, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User target = userRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("Target user not found"));
+        Chat target = chatRepository.findById(request.id())
+                .orElseThrow(() -> new IllegalArgumentException("Target chat not found"));
         user.addFavorite(target);
         userRepository.save(user);
-        return toFavoriteResponse(target);
+        return toFavoriteResponse(target, userId);
     }
 
-    private FavoriteResponse toFavoriteResponse(User user) {
-        String name = user.getLastName() != null
-                ? user.getFirstName() + " " + user.getLastName()
-                : user.getFirstName();
-        return new FavoriteResponse(user.getId(), name, user.getAvatarUrl());
+    private FavoriteResponse toFavoriteResponse(Chat chat, UUID currentUserId) {
+        ChatResponse r = toResponse(chat, currentUserId);
+        return new FavoriteResponse(r.id(), r.name(), r.profilePicture());
     }
 }

@@ -38,8 +38,15 @@ public interface ApiService {
     @GET("users/me/contacts")
     Call<List<ContactResponse>> getMyContacts();
 
-    @POST("chats")
-    Call<ChatResponse> createChat(@Body CreateChatRequest request);
+    @POST("chats/direct")
+    Call<ChatResponse> createDirectChat(@Body CreateChatRequest request);
+
+    @Multipart
+    @POST("chats/group")
+    Call<ChatResponse> createGroupChat(
+            @Part("name") okhttp3.RequestBody name,
+            @Part List<MultipartBody.Part> memberIds,
+            @Part MultipartBody.Part avatar);
 
     @DELETE("chats/{id}")
     Call<Void> deleteChat(@Path("id") String id);

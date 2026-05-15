@@ -2,6 +2,7 @@ package ru.flux.android.features.chats.ui;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.widget.Toast;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.flux.android.R;
 import ru.flux.android.core.data.Contact;
 import ru.flux.android.core.data.DisplayItem;
 import ru.flux.android.databinding.BottomSheetNewGroupSelectMembersBinding;
+import ru.flux.android.features.chats.ChatsViewModel;
 import ru.flux.android.features.chats.ContactsViewModel;
 import ru.flux.android.features.chats.ItemListAdapter;
 
@@ -37,10 +41,12 @@ public class NewGroupSelectMembersFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
         ContactsViewModel viewModel = new ViewModelProvider(requireActivity()).get(ContactsViewModel.class);
 
-        binding.cancelButton.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-        binding.okButton.setOnClickListener(v -> onConfirm());
+        binding.cancelButton.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).popBackStack());
+        binding.okButton.setOnClickListener(v -> onConfirm(chatsViewModel));
 
         adapter = new ItemListAdapter();
         adapter.setSelectable(true);
@@ -66,14 +72,20 @@ public class NewGroupSelectMembersFragment extends Fragment {
         viewModel.loadContacts();
     }
 
-    private void onConfirm() {
+    private void onConfirm(ChatsViewModel chatsViewModel) {
         List<Contact> selected = new ArrayList<>();
         for (DisplayItem item : adapter.getSelected()) {
             if (item.payload instanceof Contact) {
                 selected.add((Contact) item.payload);
             }
         }
-        // TODO: pass selected contacts to next step (e.g. set group name screen)
+        if (selected.isEmpty()) {
+            Toast.makeText(requireContext(), "Выберите хотя бы одного участника", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        chatsViewModel.setSelectedGroupMembers(selected);
+        NavHostFragment.findNavController(this)
+                .navigate(R.id.action_newGroupSelectMembersFragment_to_newGroupSetupFragment);
     }
 
     @Override

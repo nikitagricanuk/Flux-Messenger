@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.AddFavoriteRequest;
 import ru.flux.flux.messenger.dto.FavoriteResponse;
@@ -40,9 +41,18 @@ public class ChatController {
         return chatService.getChatById(id, currentUser.getId());
     }
 
-    @PostMapping
-    public ChatResponse createChat(@Valid @RequestBody CreateChatRequest request, @AuthenticationPrincipal User currentUser) {
+    @PostMapping("/direct")
+    public ChatResponse createDirectChat(@Valid @RequestBody CreateChatRequest request, @AuthenticationPrincipal User currentUser) {
         return chatService.createChat(request, currentUser.getId());
+    }
+
+    @PostMapping("/group")
+    public ChatResponse createGroupChat(
+            @RequestParam String name,
+            @RequestParam List<UUID> memberIds,
+            @RequestParam(required = false) MultipartFile avatar,
+            @AuthenticationPrincipal User currentUser) {
+        return chatService.createGroupChat(name, memberIds, avatar, currentUser.getId());
     }
 
     @PostMapping("/favorites")

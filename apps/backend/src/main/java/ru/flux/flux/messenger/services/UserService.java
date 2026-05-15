@@ -101,10 +101,10 @@ public class UserService {
 
     @Transactional
     public void deleteUserById(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
-        repository.deleteById(id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        chatRepository.findByMemberId(id).forEach(chat -> chat.removeMember(user));
+        repository.delete(user);
     }
 
     @Transactional(readOnly = true)

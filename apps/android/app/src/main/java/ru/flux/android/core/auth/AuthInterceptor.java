@@ -64,6 +64,10 @@ public class AuthInterceptor implements Interceptor {
 
     @Nullable
     private String getValidToken() {
+        if (tokenManager.isAccessTokenExpired()) {
+            String refreshed = refreshTokens();
+            if (refreshed != null) return refreshed;
+        }
         return tokenManager.getAccessToken();
     }
 

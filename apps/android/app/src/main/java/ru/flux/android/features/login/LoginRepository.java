@@ -52,7 +52,8 @@ public class LoginRepository {
                 tokenManager.saveTokens(response.body());
                 return new Result.Success<>(phone);
             } else {
-                Log.e(TAG, "login: failed, code=" + response.code());
+                String loginErr = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "login: failed, code=" + response.code() + " body=" + loginErr);
                 return new Result.Error(new Exception("Login failed: " + response.code()));
             }
         } catch (IOException e) {
@@ -73,7 +74,8 @@ public class LoginRepository {
                 tokenManager.saveTokens(response.body());
                 return new Result.Success<>(phone);
             } else {
-                Log.e(TAG, "signUp: failed, code=" + response.code());
+                String signUpErr = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "signUp: failed, code=" + response.code() + " body=" + signUpErr);
                 return new Result.Error(new Exception("Sign up failed: " + response.code()));
             }
         } catch (IOException e) {
@@ -94,7 +96,8 @@ public class LoginRepository {
                 Log.d(TAG, "getPasskeyAssertionOptions: success");
                 return new Result.Success<>(response.body());
             } else {
-                Log.e(TAG, "getPasskeyAssertionOptions: failed, code=" + response.code());
+                String passkeyOptErr = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "getPasskeyAssertionOptions: failed, code=" + response.code() + " body=" + passkeyOptErr);
                 return new Result.Error(new Exception("Passkey options failed: " + response.code()));
             }
         } catch (IOException e) {
@@ -127,7 +130,8 @@ public class LoginRepository {
                 tokenManager.saveTokens(response.body());
                 return new Result.Success<>("passkey");
             } else {
-                Log.e(TAG, "signInWithPasskey: failed, code=" + response.code());
+                String passkeyErr = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "signInWithPasskey: failed, code=" + response.code() + " body=" + passkeyErr);
                 return new Result.Error(new Exception("Passkey login failed: " + response.code()));
             }
         } catch (IOException e) {
@@ -149,7 +153,8 @@ public class LoginRepository {
                 tokenManager.saveTokens(response.body());
                 return new Result.Success<>(provider);
             } else {
-                Log.e(TAG, "exchangeOAuthCode: failed, code=" + response.code());
+                String oauthErr = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "exchangeOAuthCode: failed, code=" + response.code() + " body=" + oauthErr);
                 return new Result.Error(new Exception("OAuth exchange failed: " + response.code()));
             }
         } catch (IOException e) {

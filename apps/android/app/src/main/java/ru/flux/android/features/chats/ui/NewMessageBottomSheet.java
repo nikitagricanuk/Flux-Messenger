@@ -53,7 +53,8 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         ContactsViewModel contactsViewModel = new ViewModelProvider(requireActivity()).get(ContactsViewModel.class);
 
         binding.cancelButton.setOnClickListener(v -> dismiss());
-        binding.newGroupButton.setOnClickListener(v -> { /* TODO: open new group flow */ });
+        binding.newGroupButton.setOnClickListener(v ->
+                navController.navigate(R.id.action_newMessageBottomSheet_to_newGroupSelectMembersFragment));
         binding.newContactButton.setOnClickListener(v -> navController.navigate(R.id.newContactFragment));
 
         ItemListAdapter adapter = new ItemListAdapter();
@@ -67,7 +68,7 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
                 items.add(new DisplayItem(contact.getName(), contact.getPhoneNumber(), contact.getProfilePicture(), () -> {
                     String myId = chatsViewModel.getCurrentUserId().getValue();
                     if (myId == null) return;
-                    chatsViewModel.createChat(null, "DIRECT", new String[]{myId, contact.getId().toString()});
+                    chatsViewModel.createDirectChat(new String[]{myId, contact.getId().toString()});
                     dismiss();
                 }));
             }

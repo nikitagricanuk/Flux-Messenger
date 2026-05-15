@@ -10,6 +10,9 @@
         <attr name="firstHint" format="string" />
         <attr name="secondHint" format="string" />
     </declare-styleable>
+    <declare-styleable name="BaseSingleInputView">
+        <attr name="hint" format="string" />
+    </declare-styleable>
 
     <declare-styleable name="PhoneOtpInvertedInput">
         <attr name="phoneLabel" format="string" />

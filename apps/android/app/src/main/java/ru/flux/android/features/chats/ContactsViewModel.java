@@ -47,7 +47,7 @@ public class ContactsViewModel extends AndroidViewModel {
                     }
                     contacts.postValue(mapped);
                 } else {
-                    Log.e(TAG, "loadContacts: failed, code=" + response.code());
+                    Log.e(TAG, "loadContacts: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось загрузить контакты");
                 }
             } catch (GeneralSecurityException | IOException e) {
@@ -68,7 +68,7 @@ public class ContactsViewModel extends AndroidViewModel {
                     Log.d(TAG, "addContact: success");
                     loadContacts();
                 } else {
-                    Log.e(TAG, "addContact: failed, code=" + response.code());
+                    Log.e(TAG, "addContact: failed, code=" + response.code() + " body=" + (response.errorBody() != null ? response.errorBody().string() : ""));
                     error.postValue("Не удалось добавить контакт");
                 }
             } catch (GeneralSecurityException | IOException e) {

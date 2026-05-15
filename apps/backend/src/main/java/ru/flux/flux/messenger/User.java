@@ -66,18 +66,18 @@ public class User implements UserDetails {
     @ManyToMany
     @JoinTable(
             name = "user_favorites",
-            joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "chat_id"),
             inverseJoinColumns = @JoinColumn(name = "favorite_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "favorite_id"})
+            uniqueConstraints = @UniqueConstraint(columnNames = {"chat_id", "favorite_id"})
     )
-    private List<User> favorites = new ArrayList<>();
+    private List<Chat> favorites = new ArrayList<>();
 
-    public void addFavorite(User favorite) {
+    public void addFavorite(Chat favorite) {
         if (favorites.contains(favorite)) throw new IllegalStateException("User is already in favorites");
         favorites.add(favorite);
     }
 
-    public void removeFavorite(User favorite) {
+    public void removeFavorite(Chat favorite) {
         favorites.remove(favorite);
     }
 
@@ -109,7 +109,7 @@ public class User implements UserDetails {
 
     public List<UUID> getFavoriteIds() {
         return favorites.stream()
-                .map(User::getId)
+                .map(Chat::getId)
                 .toList();
     }
 

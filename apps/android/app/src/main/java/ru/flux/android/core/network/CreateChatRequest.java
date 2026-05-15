@@ -10,4 +10,10 @@ public class CreateChatRequest {
         this.type = type;
         this.memberIds = memberIds;
     }
+
+    public CreateChatRequest(String name, String type, String[] memberIds) {
+        this.name = name;
+        this.type = type;
+        this.memberIds = memberIds;
+    }
 }

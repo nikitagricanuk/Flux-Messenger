@@ -21,12 +21,6 @@ public class ChatRequestValidator implements ConstraintValidator<ValidChatReques
                         .addConstraintViolation();
                 valid = false;
             }
-            if (request.avatarUrl() == null || request.avatarUrl().isBlank()) {
-                ctx.buildConstraintViolationWithTemplate("Group chats require a profile picture")
-                        .addPropertyNode("avatarUrl")
-                        .addConstraintViolation();
-                valid = false;
-            }
         } else if (request.type() == ChatType.DIRECT) {
             if (request.name() != null) {
                 ctx.buildConstraintViolationWithTemplate("Direct chats cannot have a name")

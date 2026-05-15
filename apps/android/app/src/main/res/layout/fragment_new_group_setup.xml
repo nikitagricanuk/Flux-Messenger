@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/bg_bottom_sheet"
-    android:clipChildren="false"
-    android:clipToPadding="false">
+    android:background="@drawable/bg_bottom_sheet">
 
-    <!-- Header: cancel button + centred title -->
+    <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,27 +31,35 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="@font/nunito_sans"
-            android:text="@string/select_chat"
+            android:text="@string/new_group"
             android:textColor="#000000"
             android:textSize="20sp" />
 
+        <ru.flux.android.core.views.button.BaseButton
+            android:id="@+id/confirmButton"
+            style="@style/Widget.App.Button.Icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@null"
+            app:icon="@drawable/ic_check"
+            app:iconTint="@null" />
+
     </RelativeLayout>
 
-    <!-- Scrollable body: action rows + alphabetical contacts -->
-
-    <ru.flux.android.core.views.input.BaseInputView
-        android:id="@+id/search_bar"
+    <!-- Group avatar + name input combined -->
+    <ru.flux.android.core.views.input.AvatarSingleInputView
+        android:id="@+id/groupInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp"
-        android:hint="@string/search_hint"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:singleLine="true" />
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp" />
 
+    <!-- Selected members -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contactsRecycler"
+        android:id="@+id/membersRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
