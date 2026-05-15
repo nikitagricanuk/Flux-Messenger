@@ -38,7 +38,7 @@ storage:
     bucket: ${MINIO_BUCKET:avatars}
 
 jwt:
-  secret: my-super-secure-secret-key-for-jwt-signing-12345
+  secret: ${JWT_SECRET:my-super-secure-secret-key-for-jwt-signing-12345}
   expiration-ms: 900000
   refresh-expiration-ms: 604800000
   registration-expiration-ms: 600000
