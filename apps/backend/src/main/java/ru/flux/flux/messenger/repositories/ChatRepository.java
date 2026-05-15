@@ -19,19 +19,25 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
     @Query(value = "SELECT * FROM chat WHERE id = :id", nativeQuery = true)
     Optional<Chat> findById(@Param("id") UUID id);
 
-    @Query(value = """
-            SELECT DISTINCT c.* FROM chat c
-            WHERE c.type = :type
-            AND (SELECT COUNT(*) FROM chat_member_ids m WHERE m.chat_id = c.id AND m.member_ids IN (:memberIds)) = :memberCount
-            AND (SELECT COUNT(*) FROM chat_member_ids m2 WHERE m2.chat_id = c.id) = :memberCount
-            """, nativeQuery = true)
-    List<Chat> findByTypeAndExactMembers(@Param("type") String type, @Param("memberIds") List<UUID> memberIds, @Param("memberCount") long memberCount);
+    @Query("""
+    SELECT c FROM Chat c
+    WHERE c.type = 'DIRECT'
+    AND (SELECT COUNT(cm) FROM ChatMember cm WHERE cm.chat = c) = :memberCount
+    AND (SELECT COUNT(cm) FROM ChatMember cm WHERE cm.chat = c AND cm.user.id IN :memberIds) = :memberCount
+    """)
+    List<Chat> findDirectChatWithExactMembers(
+            @Param("memberIds") List<UUID> memberIds,
+            @Param("memberCount") long memberCount
+    );
+
+    @Query("SELECT c FROM Chat c JOIN c.members cm WHERE cm.user.id = :userId")
+    List<Chat> findByMemberId(@Param("userId") UUID userId);
 
     @Query(value = """
-            SELECT c.* FROM chat c
-            WHERE c.type = 'GROUP'
-            AND EXISTS (SELECT 1 FROM chat_member_ids m1 WHERE m1.chat_id = c.id AND m1.member_ids = :userId)
-            AND EXISTS (SELECT 1 FROM chat_member_ids m2 WHERE m2.chat_id = c.id AND m2.member_ids = :contactId)
-            """, nativeQuery = true)
+        SELECT c.* FROM chat c
+        WHERE c.type = 'GROUP'
+        AND EXISTS (SELECT 1 FROM chat_member cm1 WHERE cm1.chat_id = c.id AND cm1.user_id = :userId)
+        AND EXISTS (SELECT 1 FROM chat_member cm2 WHERE cm2.chat_id = c.id AND cm2.user_id = :contactId)
+        """, nativeQuery = true)
     List<Chat> findSharedGroups(@Param("userId") UUID userId, @Param("contactId") UUID contactId);
 }

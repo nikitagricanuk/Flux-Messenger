@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean hasActiveSession() {
         try {
             TokenManager tokenManager = new TokenManager(this);
-            return !tokenManager.isAccessTokenExpired();
+            return tokenManager.getRefreshToken() != null;
         } catch (GeneralSecurityException | IOException ignored) {
             return false;
         }

@@ -17,18 +17,24 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import ru.flux.android.R;
-import ru.flux.android.core.ui.SegmentTabsView;
+import ru.flux.android.core.data.DisplayItem;
+import ru.flux.android.core.ui.ErrorDialog;
 import ru.flux.android.databinding.FragmentChatsBinding;
+import ru.flux.android.core.data.Chat;
 import ru.flux.android.features.chats.ChatAdapter;
 import ru.flux.android.features.chats.ChatsViewModel;
+import ru.flux.android.features.chats.FavoriteAdapter;
 
 public class ChatsFragment extends Fragment {
 
-    private SegmentTabsView segmentTabs;
     private ChatAdapter adapter;
+    private FavoriteAdapter favoriteAdapter;
     private FragmentChatsBinding binding;
     private boolean isSearchOpen = false;
 
@@ -45,24 +51,37 @@ public class ChatsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ChatsViewModel viewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
+        ChatsViewModel viewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
 
         binding.newChat.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.newMessageBottomSheet));
 
-        segmentTabs = view.findViewById(R.id.segment_tabs);
+        favoriteAdapter = new FavoriteAdapter();
+        binding.favoritesRecycler.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.favoritesRecycler.setAdapter(favoriteAdapter);
+        viewModel.getFavorites().observe(getViewLifecycleOwner(), favoriteAdapter::setFavorites);
+        viewModel.loadFavorites();
 
-        RecyclerView chatsRecycler = view.findViewById(R.id.chatsRecycler);
-        chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ChatAdapter();
-        adapter.setOnChatActionListener(viewModel::deleteChat);
-        chatsRecycler.setAdapter(adapter);
+        adapter.setOnChatActionListener(new ChatAdapter.OnChatActionListener() {
+            @Override public void onDeleteChat(Chat chat) { viewModel.deleteChat(chat); }
+            @Override public void onAddFavorite(Chat chat) { viewModel.addFavorite(chat); }
+        });
+        binding.chatsRecycler.setAdapter(adapter);
 
         viewModel.getChats().observe(getViewLifecycleOwner(), adapter::setChats);
+        viewModel.getError().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null) {
+                ErrorDialog.display(getChildFragmentManager(), msg);
+                viewModel.clearError();
+            }
+        });
         viewModel.loadChats();
 
         String[] filters = {"all", "dm", "group"};
-        segmentTabs.setOnTabSelectedListener(index -> {
+        binding.segmentTabs.setOnTabSelectedListener(index -> {
             if (index < filters.length) adapter.setFilter(filters[index]);
         });
         adapter.setFilter("all");
@@ -78,6 +97,17 @@ public class ChatsFragment extends Fragment {
                 adapter.setSearchQuery(s.toString());
             }
             @Override public void afterTextChanged(Editable s) {}
+        });
+
+        binding.addFavoriteBtn.setOnClickListener(v -> {
+            List<DisplayItem> items = new ArrayList<>();
+            for (Chat chat : Objects.requireNonNull(viewModel.getChats().getValue())) {
+                items.add(
+                        new DisplayItem(chat.name, chat.lastMessage, chat.avatarUrl, () ->
+                            viewModel.addFavorite(chat))
+                );
+            }
+            ChatListFragment.newInstance(items).show(getChildFragmentManager(), null);
         });
     }
 

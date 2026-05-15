@@ -53,13 +53,65 @@ public class User implements UserDetails {
     @Column
     private String avatarUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
     @Column(nullable = false)
     @ColumnDefault("true")
     private boolean notifications;
 
-    @Builder.Default
-    @ElementCollection
-    private List<UUID> contacts = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserContact> contacts = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorites",
+            joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "favorite_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"chat_id", "favorite_id"})
+    )
+    private List<Chat> favorites = new ArrayList<>();
+
+    public void addFavorite(Chat favorite) {
+        if (favorites.contains(favorite)) throw new IllegalStateException("User is already in favorites");
+        favorites.add(favorite);
+    }
+
+    public void removeFavorite(Chat favorite) {
+        favorites.remove(favorite);
+    }
+
+    public void addContact(User contact) {
+        UserContact uc = new UserContact();
+        uc.setUser(this);
+        uc.setContact(contact);
+        contacts.add(uc);
+    }
+
+    public void addContact(User contact, String firstName, String lastName) {
+        UserContact uc = new UserContact();
+        uc.setUser(this);
+        uc.setContact(contact);
+        uc.setFirstNameOverride(firstName);
+        uc.setLastNameOverride(lastName);
+        contacts.add(uc);
+    }
+
+    public void removeContact(User contact) {
+        contacts.removeIf(uc -> uc.getUser().equals(contact));
+    }
+
+    public List<UUID> getContactIds() {
+        return contacts.stream()
+                .map(uc -> uc.getContact().getId())
+                .toList();
+    }
+
+    public List<UUID> getFavoriteIds() {
+        return favorites.stream()
+                .map(Chat::getId)
+                .toList();
+    }
 
     @Column(nullable = false)
     private String password;

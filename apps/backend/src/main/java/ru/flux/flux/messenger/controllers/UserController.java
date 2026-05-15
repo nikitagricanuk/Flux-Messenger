@@ -4,10 +4,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.User;
-import ru.flux.flux.messenger.dto.ContactResponse;
-import ru.flux.flux.messenger.dto.CreateUserRequest;
-import ru.flux.flux.messenger.dto.UserResponse;
+import ru.flux.flux.messenger.dto.*;
 import ru.flux.flux.messenger.services.UserService;
 
 import java.util.List;
@@ -48,10 +47,21 @@ public class UserController {
         return service.updateUser(id, request);
     }
 
+    @PatchMapping("/{id}/avatar")
+    public UserResponse uploadAvatar(@PathVariable UUID id, @RequestParam MultipartFile file) {
+        return service.uploadAvatar(id, file);
+    }
+
     @PutMapping("/me")
     public UserResponse updateMe(@AuthenticationPrincipal User principal, @RequestBody CreateUserRequest request) {
         return service.updateUser(principal.getId(), request);
     }
+
+    @PatchMapping("/me/avatar")
+    public UserResponse uploadAvatarMe(@AuthenticationPrincipal User principal, @RequestParam MultipartFile file) {
+        return service.uploadAvatar(principal.getId(), file);
+    }
+
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -81,10 +91,10 @@ public class UserController {
         service.addContact(id, contactId);
     }
 
-    @PutMapping("/me/contacts/{contactId}")
+    @PostMapping("/me/contacts")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addContactToMe(@PathVariable UUID contactId, @AuthenticationPrincipal User principal) {
-        service.addContact(principal.getId(), contactId);
+    public void addContactToMe(@RequestBody AddContactRequest request, @AuthenticationPrincipal User principal) {
+        service.addContact(principal.getId(), request);
     }
 
     @DeleteMapping("/{id}/contacts/{contactId}")

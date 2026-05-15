@@ -51,6 +51,7 @@ dependencies {
     implementation("com.webauthn4j:webauthn4j-core:0.29.2.RELEASE")
     implementation("com.google.api-client:google-api-client:2.7.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("io.minio:minio:8.5.12")
 }
 
 tasks.withType<Test> {

@@ -23,12 +23,12 @@ public class BaseInvertedInput extends BaseBlurView {
         binding = BaseInvertedInputViewBinding.inflate(LayoutInflater.from(context), this);
     }
 
-    public void setLabel(String label) {
-        binding.baseLabel.setText(label);
+    public void setLabel(int resid) {
+        binding.baseLabel.setText(resid);
     }
 
-    public void setInput(String input) {
-        binding.baseInput.setText(input);
+    public void setInput(int resid) {
+        binding.baseInput.setText(resid);
     }
 
     public Editable getInput() {

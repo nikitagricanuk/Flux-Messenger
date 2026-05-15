@@ -1,6 +1,7 @@
 package ru.flux.android.core.views.input;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -18,6 +19,12 @@ public class BaseInputView extends BaseBlurView {
     public BaseInputView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         binding = BaseInputViewBinding.inflate(LayoutInflater.from(context), this);
+        if (attrs != null) {
+            TypedArray a = context.obtainStyledAttributes(attrs, new int[]{android.R.attr.hint});
+            CharSequence hint = a.getText(0);
+            a.recycle();
+            if (hint != null) binding.baseEdit.setHint(hint);
+        }
     }
 
     public Editable getText() {

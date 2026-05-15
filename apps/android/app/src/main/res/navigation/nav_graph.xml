@@ -16,7 +16,26 @@
         <action
             android:id="@+id/action_newMessageBottomSheet_to_newContactFragment"
             app:destination="@id/newContactFragment" />
+        <action
+            android:id="@+id/action_newMessageBottomSheet_to_newGroupSelectMembersFragment"
+            app:destination="@id/newGroupSelectMembersFragment" />
     </dialog>
+
+    <fragment
+        android:id="@+id/newGroupSelectMembersFragment"
+        android:name="ru.flux.android.features.chats.ui.NewGroupSelectMembersFragment"
+        android:label="NewGroupSelectMembersFragment"
+        tools:layout="@layout/bottom_sheet_new_group_select_members">
+        <action
+            android:id="@+id/action_newGroupSelectMembersFragment_to_newGroupSetupFragment"
+            app:destination="@id/newGroupSetupFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newGroupSetupFragment"
+        android:name="ru.flux.android.features.chats.ui.NewGroupSetupFragment"
+        android:label="NewGroupSetupFragment"
+        tools:layout="@layout/fragment_new_group_setup" />
 
 <!--    <fragment-->
 <!--        android:id="@+id/contactPage"-->

@@ -1,7 +1,6 @@
 package ru.flux.android.features.chats.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,35 +8,27 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import ru.flux.android.core.data.Contact;
-import ru.flux.android.core.network.ChatResponse;
-import ru.flux.android.core.network.ContactResponse;
-import ru.flux.android.core.network.CreateChatRequest;
-import ru.flux.android.databinding.BottomSheetNewMessageBinding;
-import ru.flux.android.features.chats.NewMessageAdapter;
 import ru.flux.android.R;
-import ru.flux.android.core.network.ApiClient;
+import ru.flux.android.core.data.DisplayItem;
+import ru.flux.android.databinding.BottomSheetNewMessageBinding;
+import ru.flux.android.features.chats.ChatsViewModel;
+import ru.flux.android.features.chats.ContactsViewModel;
+import ru.flux.android.features.chats.ItemListAdapter;
 
 public class NewMessageBottomSheet extends BottomSheetDialogFragment {
-    BottomSheetNewMessageBinding binding;
+    private BottomSheetNewMessageBinding binding;
 
     @Override
     public int getTheme() {
@@ -58,54 +49,38 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         NavController navController = NavHostFragment.findNavController(this);
+        ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
+        ContactsViewModel contactsViewModel = new ViewModelProvider(requireActivity()).get(ContactsViewModel.class);
 
         binding.cancelButton.setOnClickListener(v -> dismiss());
+        binding.newGroupButton.setOnClickListener(v ->
+                navController.navigate(R.id.action_newMessageBottomSheet_to_newGroupSelectMembersFragment));
+        binding.newContactButton.setOnClickListener(v -> navController.navigate(R.id.newContactFragment));
 
-        binding.newGroupButton.setOnClickListener(v -> {
-            // TODO: open new group flow
-        });
+        ItemListAdapter adapter = new ItemListAdapter();
+        binding.contactsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.contactsRecycler.setNestedScrollingEnabled(true);
+        binding.contactsRecycler.setAdapter(adapter);
 
-        binding.newContactButton.setOnClickListener(v -> {
-            navController.navigate(R.id.newContactFragment);
-        });
-
-        RecyclerView recycler = binding.contactsRecycler;
-        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setNestedScrollingEnabled(true);
-
-        NewMessageAdapter adapter = new NewMessageAdapter(new ArrayList<>(), contact -> {
-            try {
-                ApiClient.api(requireContext()).createChat(new CreateChatRequest(
-                        "DIRECT",
-                        new String[]{ contact.getId().toString() }
-                )).enqueue(new Callback<>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ChatResponse> call,
-                                           @NonNull Response<ChatResponse> response) {
-                        if (!response.isSuccessful()) {
-                            Log.e(TAG, "createChat failed: " + response.code());
-                            return;
-                        }
-                        dismiss();
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<ChatResponse> call, @NonNull Throwable t) {
-                        Log.e(TAG, "createChat error: " + t.getMessage());
-                    }
-                });
-            } catch (GeneralSecurityException | IOException e) {
-                Log.e(TAG, "TokenManager init failed: " + e.getMessage());
+        contactsViewModel.getContacts().observe(getViewLifecycleOwner(), contacts -> {
+            List<DisplayItem> items = new ArrayList<>();
+            for (var contact : contacts) {
+                items.add(new DisplayItem(contact.getName(), contact.getPhoneNumber(), contact.getProfilePicture(), () -> {
+                    String myId = chatsViewModel.getCurrentUserId().getValue();
+                    if (myId == null) return;
+                    chatsViewModel.createDirectChat(new String[]{myId, contact.getId().toString()});
+                    dismiss();
+                }));
             }
+            adapter.setItems(items);
         });
-        recycler.setAdapter(adapter);
-        loadContacts(adapter);
+
+        contactsViewModel.loadContacts();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // Expand the sheet to ~90 % of screen height immediately, skip the collapsed state.
         BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
         if (dialog == null) return;
 
@@ -123,32 +98,9 @@ public class NewMessageBottomSheet extends BottomSheetDialogFragment {
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    private static final String TAG = "NewMessageBottomSheet";
-
-    private void loadContacts(NewMessageAdapter adapter) {
-        try {
-            ApiClient.api(requireContext()).getMyContacts().enqueue(new Callback<>() {
-                @Override
-                public void onResponse(@NonNull Call<List<ContactResponse>> call,
-                                       @NonNull Response<List<ContactResponse>> response) {
-                    if (!response.isSuccessful() || response.body() == null) {
-                        Log.e(TAG, "getMyContacts failed: " + response.code());
-                        return;
-                    }
-                    List<Contact> contacts = new ArrayList<>();
-                    for (ContactResponse cr : response.body()) {
-                        contacts.add(new Contact(UUID.fromString(cr.id), cr.name, cr.avatarUrl, cr.contact, null));
-                    }
-                    adapter.setContacts(contacts);
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<List<ContactResponse>> call, @NonNull Throwable t) {
-                    Log.e(TAG, "getMyContacts error: " + t.getMessage());
-                }
-            });
-        } catch (GeneralSecurityException | IOException e) {
-            Log.e(TAG, "TokenManager init failed: " + e.getMessage());
-        }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

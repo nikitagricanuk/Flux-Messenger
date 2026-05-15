@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
+
 import ru.flux.android.R;
 import ru.flux.android.core.auth.TokenManager;
 import ru.flux.android.databinding.FragmentSettingsBinding;
@@ -47,6 +49,16 @@ public class SettingsFragment extends Fragment {
                     + (user.lastName != null ? " " + user.lastName : "");
             binding.profileName.setText(name.trim());
             binding.profileUsername.setText(user.nickname != null ? "@" + user.nickname : "");
+            boolean hasBio = user.bio != null && !user.bio.isBlank();
+            binding.profileBio.setVisibility(hasBio ? View.VISIBLE : View.GONE);
+            if (hasBio) binding.profileBio.setText(user.bio);
+            if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
+                Glide.with(requireContext()).load(user.avatarUrl)
+                        .circleCrop()
+                        .placeholder(R.drawable.bg_avatar_placeholder)
+                        .error(R.drawable.bg_avatar_placeholder)
+                        .into(binding.profileAvatar);
+            }
         });
 
         viewModel.loadUser();

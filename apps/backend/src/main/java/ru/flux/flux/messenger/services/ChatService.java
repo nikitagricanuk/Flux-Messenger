@@ -1,12 +1,20 @@
 package ru.flux.flux.messenger.services;
 
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.ChatType;
 import ru.flux.flux.messenger.User;
+import ru.flux.flux.messenger.dto.AddFavoriteRequest;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
+import ru.flux.flux.messenger.dto.FavoriteResponse;
+import ru.flux.flux.messenger.exceptions.ChatAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.ChatNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
@@ -17,12 +25,18 @@ import java.util.UUID;
 
 @Service
 public class ChatService {
+    Logger log = LoggerFactory.getLogger(this.getClass());
     private final ChatRepository repository;
     private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
+    private final StorageService storageService;
 
-    public ChatService(ChatRepository repository, UserRepository userRepository) {
+    public ChatService(ChatRepository repository, UserRepository userRepository,
+                       ChatRepository chatRepository, StorageService storageService) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.chatRepository = chatRepository;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -43,12 +57,19 @@ public class ChatService {
     @Transactional
     public ChatResponse createChat(CreateChatRequest request, UUID currentUserId) {
         if (request.type() == ChatType.DIRECT) {
-            boolean exists = !repository.findByTypeAndExactMembers(
-                    ChatType.DIRECT.name(), request.memberIds(), request.memberIds().size()
+            boolean exists = !repository.findDirectChatWithExactMembers(
+                    request.memberIds(), request.memberIds().size()
             ).isEmpty();
             if (exists) {
-                throw new IllegalStateException("A direct chat between these users already exists");
+                throw new ChatAlreadyExistsException("A direct chat between these users already exists");
             }
+        }
+
+        if (request.type() == ChatType.DIRECT &&
+                (request.memberIds().size() != 2 ||
+                request.memberIds().get(0).equals(request.memberIds().get(1)))) {
+            log.debug("Direct chat requires exactly 2 distinct members");
+            throw new IllegalArgumentException("Direct chat requires exactly 2 distinct members");
         }
 
         Chat chat = new Chat();
@@ -60,11 +81,33 @@ public class ChatService {
     }
 
     @Transactional
+    public ChatResponse createGroupChat(String name, List<UUID> memberIds, MultipartFile avatar, UUID currentUserId) {
+        Chat chat = new Chat();
+        chat.setType(ChatType.GROUP);
+        chat.setName(name);
+        memberIds.forEach(id -> userRepository.findById(id).ifPresent(chat::addMember));
+
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                String ext = StringUtils.getFilenameExtension(avatar.getOriginalFilename());
+                String objectName = "chat-" + UUID.randomUUID() + (ext != null ? "." + ext : "");
+                String url = storageService.upload(objectName, avatar.getInputStream(), avatar.getSize(), avatar.getContentType());
+                chat.setAvatarUrl(url);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload chat avatar", e);
+            }
+        }
+
+        return toResponse(repository.save(chat), currentUserId);
+    }
+
+    @Transactional
     public void deleteChatById(UUID id) {
         if (!repository.existsById(id)) {
             throw new ChatNotFoundException(id);
         }
         repository.deleteById(id);
+        log.debug("Deleted user with ID = {}", id);
     }
 
     private ChatResponse toResponse(Chat chat, UUID currentUserId) {
@@ -95,5 +138,30 @@ public class ChatService {
                 "Hey, how are you?",
                 LocalDateTime.now().minusHours(1)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<FavoriteResponse> getFavorites(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return user.getFavorites().stream()
+                .map(chat -> toFavoriteResponse(chat, userId))
+                .toList();
+    }
+
+    @Transactional
+    public FavoriteResponse addFavorite(AddFavoriteRequest request, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Chat target = chatRepository.findById(request.id())
+                .orElseThrow(() -> new IllegalArgumentException("Target chat not found"));
+        user.addFavorite(target);
+        userRepository.save(user);
+        return toFavoriteResponse(target, userId);
+    }
+
+    private FavoriteResponse toFavoriteResponse(Chat chat, UUID currentUserId) {
+        ChatResponse r = toResponse(chat, currentUserId);
+        return new FavoriteResponse(r.id(), r.name(), r.profilePicture());
     }
 }
