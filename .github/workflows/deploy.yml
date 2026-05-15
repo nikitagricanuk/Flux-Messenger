@@ -54,6 +54,6 @@ jobs:
             docker compose -f compose.prod.yaml down 2>/dev/null || true
             docker rm -f flux-backend flux-postgres flux-minio 2>/dev/null || true
 
-            docker compose -f compose.prod.yaml up -d
+            docker compose -f compose.prod.yaml --env-file .env.deploy up -d
 
             docker image prune -f
