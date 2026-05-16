@@ -159,7 +159,6 @@ public class PasskeyAuthManager {
                                          @NonNull PasskeyRegistrationOptions options,
                                          @NonNull Callback callback) {
         mainHandler.post(() -> {
-            Log.d(TAG, "creation options JSON: " + options.getOptionsJson());
             CreatePublicKeyCredentialRequest request =
                     new CreatePublicKeyCredentialRequest(options.getOptionsJson());
 

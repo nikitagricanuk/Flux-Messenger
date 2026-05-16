@@ -2,6 +2,7 @@ package ru.flux.android.features.login.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,9 +12,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -28,6 +34,7 @@ public class SignUpCompletion3rdPartyFragment extends Fragment {
 
     private FragmentSignUpCompletion3rdPartyBinding binding;
     private PasskeyAuthManager passkeyAuthManager;
+    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     public SignUpCompletion3rdPartyFragment() {}
 
@@ -38,6 +45,11 @@ public class SignUpCompletion3rdPartyFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri == null || binding == null) return;
+            Glide.with(this).load(uri).circleCrop()
+                    .into(binding.avatarInput.getAvatar());
+        });
         binding = FragmentSignUpCompletion3rdPartyBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -89,6 +101,11 @@ public class SignUpCompletion3rdPartyFragment extends Fragment {
         });
 
         binding.phoneInput.addTextChangedListener(validationWatcher);
+
+        binding.avatarInput.getAvatar().setOnClickListener(v ->
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build()));
 
         binding.login.setOnClickListener(v -> startPasskeyRegistration());
     }

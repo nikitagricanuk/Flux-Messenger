@@ -17,6 +17,8 @@ import com.bumptech.glide.Glide;
 
 import ru.flux.android.R;
 import ru.flux.android.core.auth.TokenManager;
+import ru.flux.android.core.ui.AvatarColorHelper;
+import ru.flux.android.core.ui.InitialsDrawable;
 import ru.flux.android.databinding.FragmentSettingsBinding;
 import ru.flux.android.features.settings.SettingsViewModel;
 import ru.flux.android.features.login.LoginActivity;
@@ -53,10 +55,14 @@ public class SettingsFragment extends Fragment {
             binding.profileBio.setVisibility(hasBio ? View.VISIBLE : View.GONE);
             if (hasBio) binding.profileBio.setText(user.bio);
             if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
+                InitialsDrawable placeholder = new InitialsDrawable(
+                        name,
+                        AvatarColorHelper.colorFor(name)
+                );
                 Glide.with(requireContext()).load(user.avatarUrl)
                         .circleCrop()
-                        .placeholder(R.drawable.bg_avatar_placeholder)
-                        .error(R.drawable.bg_avatar_placeholder)
+                        .placeholder(placeholder)
+                        .error(placeholder)
                         .into(binding.profileAvatar);
             }
         });
