@@ -41,9 +41,6 @@
     <string name="auth_restore_password">Восстановить пароль</string>
     <string name="passwords_do_not_match">Пароли не совпадают</string>
     <string name="auth_init_failed">Не удалось инициализировать авторизацию</string>
-    <string name="oauth_browser_not_found">Не найден браузер для OAuth входа</string>
-    <string name="oauth_error">OAuth вход не удался</string>
-    <string name="oauth_missing_callback_data">OAuth callback не содержит данных входа</string>
     <string name="passkey_cancelled">Вход с Passkey отменен</string>
     <string name="phone_input_confirm">подтвердить</string>
     <string name="phone_input_otp_label">Код подтверждения</string>

@@ -1,6 +1,5 @@
 package ru.flux.android.features.login.ui;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import java.security.GeneralSecurityException;
 
 import ru.flux.android.MainActivity;
 import ru.flux.android.R;
-import ru.flux.android.features.login.OAuthManager;
 import ru.flux.android.features.login.PasskeyAuthManager;
 import ru.flux.android.features.login.AuthRepositoryFactory;
 
@@ -53,8 +51,6 @@ public class WelcomeAuthFragment extends Fragment {
         MaterialButton loginBtn = view.findViewById(R.id.login);
         MaterialButton signupBtn = view.findViewById(R.id.signup);
         MaterialButton passkeyBtn = view.findViewById(R.id.materialButton);
-        MaterialButton githubBtn = view.findViewById(R.id.materialButton3);
-        MaterialButton googleBtn = view.findViewById(R.id.materialButton2);
 
         loginBtn.setEnabled(true);
         signupBtn.setEnabled(true);
@@ -65,8 +61,6 @@ public class WelcomeAuthFragment extends Fragment {
                 Navigation.findNavController(v).navigate(R.id.action_welcome_to_signup));
 
         passkeyBtn.setOnClickListener(v -> startPasskeySignIn());
-        githubBtn.setOnClickListener(v -> startOAuth(OAuthManager.PROVIDER_GITHUB));
-        googleBtn.setOnClickListener(v -> startOAuth(OAuthManager.PROVIDER_GOOGLE));
     }
 
     private void startPasskeySignIn() {
@@ -87,15 +81,6 @@ public class WelcomeAuthFragment extends Fragment {
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                     }
                 });
-    }
-
-    private void startOAuth(@NonNull String provider) {
-        try {
-            OAuthManager.startOAuth(requireActivity(), provider);
-        } catch (ActivityNotFoundException ex) {
-            Toast.makeText(requireContext(), R.string.oauth_browser_not_found,
-                    Toast.LENGTH_LONG).show();
-        }
     }
 
     private void openMainScreen() {

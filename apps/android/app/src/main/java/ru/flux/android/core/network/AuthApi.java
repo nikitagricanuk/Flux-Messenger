@@ -23,7 +23,4 @@ public interface AuthApi {
 
     @POST
     Call<AuthTokens> verifyPasskeyAssertion(@Url String url, @Body PasskeyAssertionRequest request);
-
-    @POST
-    Call<AuthTokens> exchangeOAuthCode(@Url String url, @Body OAuthCodeExchangeRequest request);
 }

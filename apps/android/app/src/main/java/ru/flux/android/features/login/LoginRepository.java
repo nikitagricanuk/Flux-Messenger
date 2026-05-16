@@ -13,7 +13,6 @@ import ru.flux.android.core.auth.AuthTokens;
 import ru.flux.android.core.auth.TokenManager;
 import ru.flux.android.core.network.AuthApi;
 import ru.flux.android.core.network.LoginRequest;
-import ru.flux.android.core.network.OAuthCodeExchangeRequest;
 import ru.flux.android.core.network.PasskeyAssertionOptionsResponse;
 import ru.flux.android.core.network.PasskeyAssertionRequest;
 import ru.flux.android.core.network.SignUpRequest;
@@ -138,34 +137,6 @@ public class LoginRepository {
             Log.e(TAG, "signInWithPasskey: network error", e);
             return new Result.Error(e);
         }
-    }
-
-    public Result<String> exchangeOAuthCode(String provider, String code, String redirectUri,
-                                            String state) {
-        Log.d(TAG, "exchangeOAuthCode: provider=" + provider);
-        try {
-            String url = resolveUrl(BuildConfig.OAUTH_CODE_EXCHANGE_PATH);
-            OAuthCodeExchangeRequest request =
-                    new OAuthCodeExchangeRequest(provider, code, redirectUri, state);
-            Response<AuthTokens> response = authApi.exchangeOAuthCode(url, request).execute();
-            if (response.isSuccessful() && response.body() != null) {
-                Log.d(TAG, "exchangeOAuthCode: success, provider=" + provider);
-                tokenManager.saveTokens(response.body());
-                return new Result.Success<>(provider);
-            } else {
-                String oauthErr = response.errorBody() != null ? response.errorBody().string() : "";
-                Log.e(TAG, "exchangeOAuthCode: failed, code=" + response.code() + " body=" + oauthErr);
-                return new Result.Error(new Exception("OAuth exchange failed: " + response.code()));
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "exchangeOAuthCode: network error", e);
-            return new Result.Error(e);
-        }
-    }
-
-    public void saveTokens(String accessToken, String refreshToken) {
-        Log.d(TAG, "saveTokens: storing tokens from external source");
-        tokenManager.saveTokens(accessToken, refreshToken);
     }
 
     public void logout() {
