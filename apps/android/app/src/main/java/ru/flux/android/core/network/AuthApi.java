@@ -1,7 +1,10 @@
 package ru.flux.android.core.network;
 
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Url;
 
@@ -19,11 +22,22 @@ public interface AuthApi {
     Call<AuthTokens> refreshToken(@Body RefreshTokenRequest request);
 
     @POST
-    Call<PasskeyAssertionOptionsResponse> getPasskeyAssertionOptions(@Url String url);
+    Call<ResponseBody> getPasskeyOptions(@Url String url, @Body PasskeyRegistrationRequest request);
 
     @POST
-    Call<AuthTokens> verifyPasskeyAssertion(@Url String url, @Body PasskeyAssertionRequest request);
+    Call<AuthTokens> completePasskey(
+            @Url String url,
+            @Header("X-Challenge-Nonce") String nonce,
+            @Body RequestBody credential
+    );
 
     @POST
-    Call<AuthTokens> exchangeOAuthCode(@Url String url, @Body OAuthCodeExchangeRequest request);
+    Call<ResponseBody> startPasskeyAuthentication(@Url String url);
+
+    @POST
+    Call<AuthTokens> finishPasskeyAuthentication(
+            @Url String url,
+            @Header("X-Challenge-Nonce") String nonce,
+            @Body RequestBody credential
+    );
 }

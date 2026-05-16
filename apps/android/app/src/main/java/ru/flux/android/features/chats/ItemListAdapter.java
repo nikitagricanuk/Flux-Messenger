@@ -16,6 +16,8 @@ import java.util.Set;
 
 import ru.flux.android.R;
 import ru.flux.android.core.data.DisplayItem;
+import ru.flux.android.core.ui.AvatarColorHelper;
+import ru.flux.android.core.ui.InitialsDrawable;
 import ru.flux.android.databinding.ItemNewMessageContactBinding;
 
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
@@ -78,11 +80,15 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
         DisplayItem item = filteredItems.get(position);
         holder.binding.contactName.setText(item.name);
         holder.binding.contactPhone.setText(item.subtitle);
+        InitialsDrawable placeholder = new InitialsDrawable(
+                item.name,
+                AvatarColorHelper.colorFor(item.name)
+        );
         Glide.with(holder.itemView.getContext())
                 .load(item.avatarUrl)
                 .circleCrop()
-                .placeholder(R.drawable.bg_avatar_placeholder)
-                .error(R.drawable.bg_avatar_placeholder)
+                .placeholder(placeholder)
+                .error(placeholder)
                 .into(holder.binding.avatar);
 
         if (selectable) {

@@ -13,6 +13,8 @@ import java.util.List;
 
 import ru.flux.android.R;
 import ru.flux.android.core.data.Chat;
+import ru.flux.android.core.ui.AvatarColorHelper;
+import ru.flux.android.core.ui.InitialsDrawable;
 import ru.flux.android.databinding.ItemFavoriteBinding;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
@@ -39,12 +41,16 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
     @Override
     public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
         Chat chat = favorites.get(position);
-        FavoriteViewHolder vh = (FavoriteViewHolder) holder;
+        FavoriteViewHolder vh = holder;
         vh.binding.name.setText(chat.name);
+        InitialsDrawable placeholder = new InitialsDrawable(
+                chat.name,
+                AvatarColorHelper.colorFor(chat.name)
+        );
         Glide.with(vh.itemView.getContext()).load(chat.avatarUrl)
                 .circleCrop()
-                .placeholder(R.drawable.bg_avatar_placeholder)
-                .error(R.drawable.bg_avatar_placeholder)
+                .placeholder(placeholder)
+                .error(placeholder)
                 .into(vh.binding.avatar);
     }
 

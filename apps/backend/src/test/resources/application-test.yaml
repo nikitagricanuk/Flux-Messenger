@@ -19,15 +19,3 @@ jwt:
   expiration-ms: 900000
   refresh-expiration-ms: 604800000
   registration-expiration-ms: 600000
-
-oauth:
-  google:
-    client-id: test-google-client-id
-  github:
-    client-id: test-github-client-id
-    client-secret: test-github-client-secret
-
-webauthn:
-  rp-id: localhost
-  rp-name: Flux Messenger Test
-  origin: http://localhost:8080

@@ -59,12 +59,6 @@ public class GlobalExceptionHandler {
         return Map.of("status", 404, "message", ex.getMessage());
     }
 
-    @ExceptionHandler({OAuthVerificationException.class, PasskeyVerificationException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, Object> handleAuthVerification(RuntimeException ex) {
-        return Map.of("status", 400, "message", ex.getMessage());
-    }
-
     @ExceptionHandler(RegistrationTokenExpiredException.class)
     @ResponseStatus(HttpStatus.GONE)
     public Map<String, Object> handleRegistrationTokenExpired(RegistrationTokenExpiredException ex) {

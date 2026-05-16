@@ -20,13 +20,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
-        buildConfigField("String", "OAUTH_CALLBACK_SCHEME", "\"flux\"")
-        buildConfigField("String", "OAUTH_CALLBACK_HOST", "\"auth\"")
-        buildConfigField("String", "OAUTH_CALLBACK_PATH", "\"/callback\"")
-        buildConfigField("String", "OAUTH_START_PATH_TEMPLATE", "\"api/auth/oauth/%s/start\"")
-        buildConfigField("String", "OAUTH_CODE_EXCHANGE_PATH", "\"api/auth/oauth/exchange\"")
-        buildConfigField("String", "PASSKEY_OPTIONS_PATH", "\"api/auth/passkey/authenticate/start\"")
-        buildConfigField("String", "PASSKEY_VERIFY_PATH", "\"api/auth/passkey/authenticate/finish\"")
+        buildConfigField("String", "PASSKEY_OPTIONS_PATH", "\"api/auth/passkey/options\"")
+        buildConfigField("String", "PASSKEY_COMPLETE_PATH", "\"api/auth/passkey/complete\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +33,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BACKEND_BASE_URL", "\"https://flux.nikitagricanuk.ru/\"")
         }
     }
 

@@ -15,6 +15,8 @@ import java.util.List;
 
 import ru.flux.android.R;
 import ru.flux.android.core.data.Chat;
+import ru.flux.android.core.ui.AvatarColorHelper;
+import ru.flux.android.core.ui.InitialsDrawable;
 import ru.flux.android.databinding.ItemChatBinding;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
@@ -79,11 +81,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         holder.binding.name.setText(chat.name);
         holder.binding.lastMessage.setText(chat.lastMessage);
         holder.binding.time.setText(chat.time);
+        InitialsDrawable placeholder = new InitialsDrawable(
+                chat.name,
+                AvatarColorHelper.colorFor(chat.name)
+        );
         Glide.with(holder.itemView.getContext())
                 .load(chat.avatarUrl)
                 .circleCrop()
-                .placeholder(R.drawable.bg_avatar_placeholder)
-                .error(R.drawable.bg_avatar_placeholder)
+                .placeholder(placeholder)
+                .error(placeholder)
                 .into(holder.binding.avatar);
 
         holder.itemView.setOnLongClickListener(v -> {

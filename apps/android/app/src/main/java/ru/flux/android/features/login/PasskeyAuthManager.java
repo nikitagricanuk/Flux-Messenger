@@ -6,23 +6,26 @@ import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
+import androidx.credentials.CreateCredentialResponse;
+import androidx.credentials.CreatePublicKeyCredentialRequest;
+import androidx.credentials.CreatePublicKeyCredentialResponse;
 import androidx.credentials.Credential;
 import androidx.credentials.CredentialManager;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
-import androidx.credentials.PublicKeyCredential;
-import androidx.credentials.exceptions.GetCredentialException;
 import androidx.credentials.GetPublicKeyCredentialOption;
+import androidx.credentials.PublicKeyCredential;
+import androidx.credentials.exceptions.CreateCredentialException;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.exceptions.NoCredentialException;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import ru.flux.android.R;
 import ru.flux.android.core.Result;
-import ru.flux.android.core.network.PasskeyAssertionOptionsResponse;
+import ru.flux.android.core.network.PasskeyAssertionOptions;
+import ru.flux.android.core.network.PasskeyRegistrationOptions;
 
 public class PasskeyAuthManager {
 
@@ -31,6 +34,7 @@ public class PasskeyAuthManager {
     public interface Callback {
         void onSuccess();
         void onError(@NonNull String message);
+        void onRegistrationRequired();
     }
 
     private final LoginRepository loginRepository;
@@ -44,44 +48,35 @@ public class PasskeyAuthManager {
         this.credentialManager = CredentialManager.create(activity);
     }
 
-    public void signIn(@NonNull ComponentActivity activity, @NonNull Callback callback) {
+    /** Entry point — tries sign-in first; calls onRegistrationRequired() for new users. */
+    public void authenticate(@NonNull ComponentActivity activity, @NonNull Callback callback) {
         ioExecutor.execute(() -> {
-            Result<PasskeyAssertionOptionsResponse> optionsResult =
-                    loginRepository.getPasskeyAssertionOptions();
-            if (optionsResult instanceof Result.Error) {
-                Exception error = ((Result.Error) optionsResult).getError();
-                String message = error.getMessage() != null ? error.getMessage()
-                        : "Passkey options request failed";
-                Log.e(TAG, message, error);
-                notifyError(callback, message);
-                return;
-            }
+            Result<PasskeyAssertionOptions> optionsResult =
+                    loginRepository.startPasskeyAuthentication();
             if (!(optionsResult instanceof Result.Success)) {
-                notifyError(callback, "Passkey options request failed");
+                String msg = optionsResult instanceof Result.Error
+                        ? ((Result.Error) optionsResult).getError().getMessage()
+                        : "Failed to start passkey authentication";
+                Log.e(TAG, "authenticate: " + msg);
+                notifyError(callback, msg != null ? msg : "Failed to start passkey authentication");
                 return;
             }
 
-            PasskeyAssertionOptionsResponse response =
-                    ((Result.Success<PasskeyAssertionOptionsResponse>) optionsResult).getData();
-            String requestJson;
-            try {
-                requestJson = buildCredentialRequestJson(response);
-            } catch (JSONException e) {
-                Log.e(TAG, "Failed to build passkey request JSON", e);
-                notifyError(callback, "Passkey options are invalid");
-                return;
-            }
-            requestCredential(activity, requestJson, callback);
+            PasskeyAssertionOptions options =
+                    ((Result.Success<PasskeyAssertionOptions>) optionsResult).getData();
+            requestGetCredential(activity, options, callback);
         });
     }
 
-    private void requestCredential(@NonNull ComponentActivity activity, @NonNull String requestJson,
-                                   @NonNull Callback callback) {
+    private void requestGetCredential(@NonNull ComponentActivity activity,
+                                      @NonNull PasskeyAssertionOptions options,
+                                      @NonNull Callback callback) {
         mainHandler.post(() -> {
             GetPublicKeyCredentialOption passkeyOption =
-                    new GetPublicKeyCredentialOption(requestJson);
+                    new GetPublicKeyCredentialOption(options.getOptionsJson());
             GetCredentialRequest request = new GetCredentialRequest.Builder()
                     .addCredentialOption(passkeyOption)
+                    .setPreferImmediatelyAvailableCredentials(true)
                     .build();
 
             credentialManager.getCredentialAsync(
@@ -89,7 +84,9 @@ public class PasskeyAuthManager {
                     request,
                     null,
                     activity.getMainExecutor(),
-                    new androidx.credentials.CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    new androidx.credentials.CredentialManagerCallback<
+                            GetCredentialResponse, GetCredentialException>() {
+
                         @Override
                         public void onResult(GetCredentialResponse result) {
                             Credential credential = result.getCredential();
@@ -97,55 +94,122 @@ public class PasskeyAuthManager {
                                 notifyError(callback, "Unsupported credential type");
                                 return;
                             }
-                            String credentialJson =
+                            String assertionJson =
                                     ((PublicKeyCredential) credential).getAuthenticationResponseJson();
-                            verifyCredential(credentialJson, callback);
+                            finishAuthentication(options.getNonce(), assertionJson, callback);
                         }
 
                         @Override
                         public void onError(GetCredentialException e) {
-                            String message = e.getMessage() != null ? e.getMessage()
-                                    : activity.getString(R.string.passkey_cancelled);
-                            Log.e(TAG, "CredentialManager getCredential failed", e);
-                            notifyError(callback, message);
+                            if (e instanceof NoCredentialException) {
+                                Log.d(TAG, "No passkey found — routing to registration");
+                                mainHandler.post(callback::onRegistrationRequired);
+                            } else {
+                                String msg = e.getMessage() != null ? e.getMessage()
+                                        : activity.getString(R.string.passkey_cancelled);
+                                Log.e(TAG, "getCredential failed", e);
+                                notifyError(callback, msg);
+                            }
                         }
                     }
             );
         });
     }
 
-    private void verifyCredential(@NonNull String credentialJson, @NonNull Callback callback) {
+    private void finishAuthentication(@NonNull String nonce,
+                                      @NonNull String assertionJson,
+                                      @NonNull Callback callback) {
         ioExecutor.execute(() -> {
-            Result<String> signInResult = loginRepository.signInWithPasskey(credentialJson);
-            if (signInResult instanceof Result.Success) {
+            Result<String> result = loginRepository.finishPasskeyAuthentication(nonce, assertionJson);
+            if (result instanceof Result.Success) {
                 mainHandler.post(callback::onSuccess);
-            } else if (signInResult instanceof Result.Error) {
-                Exception error = ((Result.Error) signInResult).getError();
-                String message = error.getMessage() != null ? error.getMessage()
-                        : "Passkey verification failed";
-                Log.e(TAG, message, error);
-                notifyError(callback, message);
             } else {
-                notifyError(callback, "Passkey verification failed");
+                String msg = result instanceof Result.Error
+                        ? ((Result.Error) result).getError().getMessage()
+                        : "Passkey authentication failed";
+                Log.e(TAG, "finishAuthentication: " + msg);
+                notifyError(callback, msg != null ? msg : "Passkey authentication failed");
             }
         });
     }
 
-    @NonNull
-    private String buildCredentialRequestJson(@NonNull PasskeyAssertionOptionsResponse response)
-            throws JSONException {
-        JSONObject json = new JSONObject();
-        json.put("challenge", response.getChallenge());
-        if (response.getRpId() != null && !response.getRpId().isEmpty()) {
-            json.put("rpId", response.getRpId());
-        }
-        if (response.getTimeout() > 0) {
-            json.put("timeout", response.getTimeout());
-        }
-        if (response.getUserVerification() != null && !response.getUserVerification().isEmpty()) {
-            json.put("userVerification", response.getUserVerification());
-        }
-        return json.toString();
+    /** Called after the user provides a phone number for first-time registration. */
+    public void register(@NonNull ComponentActivity activity,
+                         @NonNull String phone,
+                         @NonNull Callback callback) {
+        ioExecutor.execute(() -> {
+            Result<PasskeyRegistrationOptions> optionsResult =
+                    loginRepository.getPasskeyRegistrationOptions(phone);
+            if (!(optionsResult instanceof Result.Success)) {
+                String msg = optionsResult instanceof Result.Error
+                        ? ((Result.Error) optionsResult).getError().getMessage()
+                        : "Failed to get registration options";
+                Log.e(TAG, "register: " + msg);
+                notifyError(callback, msg != null ? msg : "Failed to get registration options");
+                return;
+            }
+
+            PasskeyRegistrationOptions options =
+                    ((Result.Success<PasskeyRegistrationOptions>) optionsResult).getData();
+            requestCreateCredential(activity, options, callback);
+        });
+    }
+
+    private void requestCreateCredential(@NonNull ComponentActivity activity,
+                                         @NonNull PasskeyRegistrationOptions options,
+                                         @NonNull Callback callback) {
+        mainHandler.post(() -> {
+            CreatePublicKeyCredentialRequest request =
+                    new CreatePublicKeyCredentialRequest(options.getOptionsJson());
+
+            credentialManager.createCredentialAsync(
+                    activity,
+                    request,
+                    null,
+                    activity.getMainExecutor(),
+                    new androidx.credentials.CredentialManagerCallback<
+                            CreateCredentialResponse, CreateCredentialException>() {
+
+                        @Override
+                        public void onResult(CreateCredentialResponse result) {
+                            if (!(result instanceof CreatePublicKeyCredentialResponse)) {
+                                notifyError(callback, "Unsupported credential type");
+                                return;
+                            }
+                            String registrationJson =
+                                    ((CreatePublicKeyCredentialResponse) result)
+                                            .getRegistrationResponseJson();
+                            finishRegistration(options.getNonce(), registrationJson, callback);
+                        }
+
+                        @Override
+                        public void onError(CreateCredentialException e) {
+                            String msg = e.getMessage() != null ? e.getMessage()
+                                    : activity.getString(R.string.passkey_cancelled);
+                            Log.e(TAG, "createCredential failed", e);
+                            notifyError(callback, msg);
+                        }
+                    }
+            );
+        });
+    }
+
+    private void finishRegistration(@NonNull String nonce,
+                                    @NonNull String registrationJson,
+                                    @NonNull Callback callback) {
+        ioExecutor.execute(() -> {
+            Result<String> result =
+                    loginRepository.completePasskeyRegistration(nonce, registrationJson);
+            if (result instanceof Result.Success) {
+                mainHandler.post(callback::onSuccess);
+            } else {
+                String msg = result instanceof Result.Error
+                        ? ((Result.Error) result).getError().getMessage()
+                        : "Passkey registration failed";
+                Log.e(TAG, "finishRegistration: " + msg);
+                notifyError(callback, msg != null ? msg : "Passkey registration failed");
+            }
+        });
     }
 
     private void notifyError(@NonNull Callback callback, @NonNull String message) {

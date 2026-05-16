@@ -5,14 +5,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.flux.flux.messenger.OAuthProvider;
 import ru.flux.flux.messenger.User;
-import ru.flux.flux.messenger.UserOAuthIdentity;
 import ru.flux.flux.messenger.dto.*;
 import ru.flux.flux.messenger.exceptions.UserAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.UserNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
-import ru.flux.flux.messenger.repositories.UserOAuthIdentityRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
 
 import java.util.List;
@@ -23,16 +20,13 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository repository;
     private final ChatRepository chatRepository;
-    private final UserOAuthIdentityRepository oauthIdentityRepository;
     private final StorageService storageService;
 
     public UserService(UserRepository repository,
                        ChatRepository chatRepository,
-                       UserOAuthIdentityRepository oauthIdentityRepository,
                        StorageService storageService) {
         this.repository = repository;
         this.chatRepository = chatRepository;
-        this.oauthIdentityRepository = oauthIdentityRepository;
         this.storageService = storageService;
     }
 
@@ -224,59 +218,6 @@ public class UserService {
     public UserDetailsService userDetailsService() {
         return phone -> repository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + phone));
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<User> findLinkedUser(OAuthProvider provider, String providerUserId) {
-        return oauthIdentityRepository.findByProviderAndProviderUserId(provider, providerUserId)
-                .flatMap(identity -> repository.findById(identity.getUserId()));
-    }
-
-    @Transactional
-    public User createOAuthUser(OAuthProvider provider,
-                                String providerUserId,
-                                String email,
-                                String phone,
-                                String username,
-                                String firstName,
-                                String lastName,
-                                String avatarUrl,
-                                String encodedPlaceholderPassword) {
-        if (repository.existsByPhone(phone)) {
-            throw new UserAlreadyExistsException("User with phone " + phone + " already exists");
-        }
-        if (repository.existsByUsername(username)) {
-            throw new UserAlreadyExistsException("User with username " + username + " already exists");
-        }
-        if (email != null && !email.isBlank() && repository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException("User with email " + email + " already exists");
-        }
-
-        User user = User.builder()
-                .firstName(firstName != null && !firstName.isBlank() ? firstName : username)
-                .lastName(lastName)
-                .username(username)
-                .phone(phone)
-                .email(email)
-                .avatarUrl(avatarUrl)
-                .password(encodedPlaceholderPassword)
-                .notifications(true)
-                .build();
-
-        User saved = repository.save(user);
-        linkOAuthIdentity(saved, provider, providerUserId, email);
-        return saved;
-    }
-
-    @Transactional
-    public UserOAuthIdentity linkOAuthIdentity(User user, OAuthProvider provider, String providerUserId, String email) {
-        UserOAuthIdentity identity = UserOAuthIdentity.builder()
-                .provider(provider)
-                .providerUserId(providerUserId)
-                .email(email)
-                .userId(user.getId())
-                .build();
-        return oauthIdentityRepository.save(identity);
     }
 
     @Transactional(readOnly = true)

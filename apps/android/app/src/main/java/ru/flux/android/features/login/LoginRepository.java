@@ -4,8 +4,9 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import com.google.gson.Gson;
-
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 import ru.flux.android.BuildConfig;
 import ru.flux.android.core.Result;
@@ -13,9 +14,9 @@ import ru.flux.android.core.auth.AuthTokens;
 import ru.flux.android.core.auth.TokenManager;
 import ru.flux.android.core.network.AuthApi;
 import ru.flux.android.core.network.LoginRequest;
-import ru.flux.android.core.network.OAuthCodeExchangeRequest;
-import ru.flux.android.core.network.PasskeyAssertionOptionsResponse;
-import ru.flux.android.core.network.PasskeyAssertionRequest;
+import ru.flux.android.core.network.PasskeyAssertionOptions;
+import ru.flux.android.core.network.PasskeyRegistrationOptions;
+import ru.flux.android.core.network.PasskeyRegistrationRequest;
 import ru.flux.android.core.network.SignUpRequest;
 
 /**
@@ -84,88 +85,98 @@ public class LoginRepository {
         }
     }
 
-    public Result<PasskeyAssertionOptionsResponse> getPasskeyAssertionOptions() {
-        Log.d(TAG, "getPasskeyAssertionOptions");
+    public Result<PasskeyRegistrationOptions> getPasskeyRegistrationOptions(String phone) {
+        Log.d(TAG, "getPasskeyRegistrationOptions: phone=" + phone);
         try {
             String url = resolveUrl(BuildConfig.PASSKEY_OPTIONS_PATH);
-            Response<PasskeyAssertionOptionsResponse> response =
-                    authApi.getPasskeyAssertionOptions(url).execute();
-            if (response.isSuccessful() && response.body() != null
-                    && response.body().getChallenge() != null
-                    && !response.body().getChallenge().isEmpty()) {
-                Log.d(TAG, "getPasskeyAssertionOptions: success");
-                return new Result.Success<>(response.body());
+            Response<ResponseBody> response =
+                    authApi.getPasskeyOptions(url, new PasskeyRegistrationRequest(phone)).execute();
+            if (response.isSuccessful() && response.body() != null) {
+                String optionsJson = response.body().string();
+                String nonce = response.headers().get("X-Challenge-Nonce");
+                if (nonce == null || nonce.isEmpty()) {
+                    Log.e(TAG, "getPasskeyRegistrationOptions: missing X-Challenge-Nonce header");
+                    return new Result.Error(new Exception("Server did not return challenge nonce"));
+                }
+                Log.d(TAG, "getPasskeyRegistrationOptions: success");
+                return new Result.Success<>(new PasskeyRegistrationOptions(optionsJson, nonce));
             } else {
-                String passkeyOptErr = response.errorBody() != null ? response.errorBody().string() : "";
-                Log.e(TAG, "getPasskeyAssertionOptions: failed, code=" + response.code() + " body=" + passkeyOptErr);
+                String err = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "getPasskeyRegistrationOptions: failed, code=" + response.code() + " body=" + err);
                 return new Result.Error(new Exception("Passkey options failed: " + response.code()));
             }
         } catch (IOException e) {
-            Log.e(TAG, "getPasskeyAssertionOptions: network error", e);
+            Log.e(TAG, "getPasskeyRegistrationOptions: network error", e);
             return new Result.Error(e);
         }
     }
 
-    public Result<String> signInWithPasskey(String credentialJson) {
-        Log.d(TAG, "signInWithPasskey");
+    public Result<String> completePasskeyRegistration(String nonce, String credentialJson) {
+        Log.d(TAG, "completePasskeyRegistration");
         try {
-            PasskeyAssertionRequest request =
-                    new Gson().fromJson(credentialJson, PasskeyAssertionRequest.class);
-            if (request == null
-                    || request.getRawId() == null
-                    || request.getResponse() == null
-                    || request.getResponse().getClientDataJSON() == null
-                    || request.getResponse().getAuthenticatorData() == null
-                    || request.getResponse().getSignature() == null) {
-                Log.e(TAG, "signInWithPasskey: invalid credential payload");
-                return new Result.Error(new Exception("Passkey credential payload is invalid"));
-            }
-
-            String url = resolveUrl(BuildConfig.PASSKEY_VERIFY_PATH);
+            String url = resolveUrl(BuildConfig.PASSKEY_COMPLETE_PATH);
+            RequestBody body = RequestBody.create(credentialJson, MediaType.get("application/json"));
             Response<AuthTokens> response =
-                    authApi.verifyPasskeyAssertion(url, request)
-                            .execute();
+                    authApi.completePasskey(url, nonce, body).execute();
             if (response.isSuccessful() && response.body() != null) {
-                Log.d(TAG, "signInWithPasskey: success");
+                Log.d(TAG, "completePasskeyRegistration: success");
                 tokenManager.saveTokens(response.body());
                 return new Result.Success<>("passkey");
             } else {
-                String passkeyErr = response.errorBody() != null ? response.errorBody().string() : "";
-                Log.e(TAG, "signInWithPasskey: failed, code=" + response.code() + " body=" + passkeyErr);
-                return new Result.Error(new Exception("Passkey login failed: " + response.code()));
+                String err = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "completePasskeyRegistration: failed, code=" + response.code() + " body=" + err);
+                return new Result.Error(new Exception("Passkey failed: " + response.code()));
             }
         } catch (IOException e) {
-            Log.e(TAG, "signInWithPasskey: network error", e);
+            Log.e(TAG, "completePasskeyRegistration: network error", e);
             return new Result.Error(e);
         }
     }
 
-    public Result<String> exchangeOAuthCode(String provider, String code, String redirectUri,
-                                            String state) {
-        Log.d(TAG, "exchangeOAuthCode: provider=" + provider);
+    public Result<PasskeyAssertionOptions> startPasskeyAuthentication() {
+        Log.d(TAG, "startPasskeyAuthentication");
         try {
-            String url = resolveUrl(BuildConfig.OAUTH_CODE_EXCHANGE_PATH);
-            OAuthCodeExchangeRequest request =
-                    new OAuthCodeExchangeRequest(provider, code, redirectUri, state);
-            Response<AuthTokens> response = authApi.exchangeOAuthCode(url, request).execute();
+            String url = resolveUrl("api/auth/passkey/authenticate/start");
+            Response<ResponseBody> response = authApi.startPasskeyAuthentication(url).execute();
             if (response.isSuccessful() && response.body() != null) {
-                Log.d(TAG, "exchangeOAuthCode: success, provider=" + provider);
-                tokenManager.saveTokens(response.body());
-                return new Result.Success<>(provider);
+                String optionsJson = response.body().string();
+                String nonce = response.headers().get("X-Challenge-Nonce");
+                if (nonce == null || nonce.isEmpty()) {
+                    Log.e(TAG, "startPasskeyAuthentication: missing X-Challenge-Nonce header");
+                    return new Result.Error(new Exception("Server did not return challenge nonce"));
+                }
+                Log.d(TAG, "startPasskeyAuthentication: success");
+                return new Result.Success<>(new PasskeyAssertionOptions(optionsJson, nonce));
             } else {
-                String oauthErr = response.errorBody() != null ? response.errorBody().string() : "";
-                Log.e(TAG, "exchangeOAuthCode: failed, code=" + response.code() + " body=" + oauthErr);
-                return new Result.Error(new Exception("OAuth exchange failed: " + response.code()));
+                String err = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "startPasskeyAuthentication: failed code=" + response.code() + " " + err);
+                return new Result.Error(new Exception("Authentication start failed: " + response.code()));
             }
         } catch (IOException e) {
-            Log.e(TAG, "exchangeOAuthCode: network error", e);
+            Log.e(TAG, "startPasskeyAuthentication: network error", e);
             return new Result.Error(e);
         }
     }
 
-    public void saveTokens(String accessToken, String refreshToken) {
-        Log.d(TAG, "saveTokens: storing tokens from external source");
-        tokenManager.saveTokens(accessToken, refreshToken);
+    public Result<String> finishPasskeyAuthentication(String nonce, String credentialJson) {
+        Log.d(TAG, "finishPasskeyAuthentication");
+        try {
+            String url = resolveUrl("api/auth/passkey/authenticate/finish");
+            RequestBody body = RequestBody.create(credentialJson, MediaType.get("application/json"));
+            Response<AuthTokens> response = authApi.finishPasskeyAuthentication(url, nonce, body).execute();
+            if (response.isSuccessful() && response.body() != null) {
+                Log.d(TAG, "finishPasskeyAuthentication: success");
+                tokenManager.saveTokens(response.body());
+                return new Result.Success<>("passkey");
+            } else {
+                String err = response.errorBody() != null ? response.errorBody().string() : "";
+                Log.e(TAG, "finishPasskeyAuthentication: failed code=" + response.code() + " " + err);
+                return new Result.Error(new Exception("Authentication failed: " + response.code()));
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "finishPasskeyAuthentication: network error", e);
+            return new Result.Error(e);
+        }
     }
 
     public void logout() {

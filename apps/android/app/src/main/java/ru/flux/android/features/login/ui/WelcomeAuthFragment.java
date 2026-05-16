@@ -1,6 +1,5 @@
 package ru.flux.android.features.login.ui;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,9 +20,8 @@ import java.security.GeneralSecurityException;
 
 import ru.flux.android.MainActivity;
 import ru.flux.android.R;
-import ru.flux.android.features.login.OAuthManager;
-import ru.flux.android.features.login.PasskeyAuthManager;
 import ru.flux.android.features.login.AuthRepositoryFactory;
+import ru.flux.android.features.login.PasskeyAuthManager;
 
 public class WelcomeAuthFragment extends Fragment {
 
@@ -53,8 +51,6 @@ public class WelcomeAuthFragment extends Fragment {
         MaterialButton loginBtn = view.findViewById(R.id.login);
         MaterialButton signupBtn = view.findViewById(R.id.signup);
         MaterialButton passkeyBtn = view.findViewById(R.id.materialButton);
-        MaterialButton githubBtn = view.findViewById(R.id.materialButton3);
-        MaterialButton googleBtn = view.findViewById(R.id.materialButton2);
 
         loginBtn.setEnabled(true);
         signupBtn.setEnabled(true);
@@ -64,18 +60,17 @@ public class WelcomeAuthFragment extends Fragment {
         signupBtn.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_welcome_to_signup));
 
-        passkeyBtn.setOnClickListener(v -> startPasskeySignIn());
-        githubBtn.setOnClickListener(v -> startOAuth(OAuthManager.PROVIDER_GITHUB));
-        googleBtn.setOnClickListener(v -> startOAuth(OAuthManager.PROVIDER_GOOGLE));
+        passkeyBtn.setOnClickListener(v -> startPasskeyFlow(v));
     }
 
-    private void startPasskeySignIn() {
+    private void startPasskeyFlow(View v) {
         if (passkeyAuthManager == null) {
             Toast.makeText(requireContext(), R.string.auth_init_failed, Toast.LENGTH_LONG).show();
             return;
         }
 
-        passkeyAuthManager.signIn((ComponentActivity) requireActivity(),
+        passkeyAuthManager.authenticate(
+                (ComponentActivity) requireActivity(),
                 new PasskeyAuthManager.Callback() {
                     @Override
                     public void onSuccess() {
@@ -86,16 +81,12 @@ public class WelcomeAuthFragment extends Fragment {
                     public void onError(@NonNull String message) {
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                     }
-                });
-    }
 
-    private void startOAuth(@NonNull String provider) {
-        try {
-            OAuthManager.startOAuth(requireActivity(), provider);
-        } catch (ActivityNotFoundException ex) {
-            Toast.makeText(requireContext(), R.string.oauth_browser_not_found,
-                    Toast.LENGTH_LONG).show();
-        }
+                    @Override
+                    public void onRegistrationRequired() {
+                        Navigation.findNavController(v).navigate(R.id.action_welcome_to_3rd_party);
+                    }
+                });
     }
 
     private void openMainScreen() {

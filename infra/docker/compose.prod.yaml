@@ -45,6 +45,9 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET}
       JWT_SECRET: ${JWT_SECRET}
+      WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:-flux.nikitagricanuk.ru}
+      WEBAUTHN_RP_NAME: ${WEBAUTHN_RP_NAME:-Flux Messenger}
+      WEBAUTHN_ALLOWED_ORIGINS: ${WEBAUTHN_ALLOWED_ORIGINS:-android:apk-key-hash:qL2p-s1Wfly7futhkYxIC9kw3b2M5aEotuugnk1zs_s}
     ports:
       - "8081:8080"
     depends_on:

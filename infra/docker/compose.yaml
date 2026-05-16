@@ -48,6 +48,9 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: avatars
+      WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:-flux.nikitagricanuk.ru}
+      WEBAUTHN_RP_NAME: ${WEBAUTHN_RP_NAME:-Flux Messenger}
+      WEBAUTHN_ALLOWED_ORIGINS: ${WEBAUTHN_ALLOWED_ORIGINS:-android:apk-key-hash:qL2p-s1Wfly7futhkYxIC9kw3b2M5aEotuugnk1zs_s}
     ports:
       - "8080:8080"
     depends_on:
