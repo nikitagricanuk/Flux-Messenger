@@ -1,5 +1,7 @@
 package ru.flux.android.features.login;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -11,6 +13,8 @@ import ru.flux.android.R;
 import ru.flux.android.core.Result;
 
 public class LoginViewModel extends ViewModel {
+
+    private static final String TAG = "LoginViewModel";
 
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
@@ -35,12 +39,14 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String phone, String password) {
-        // Run on the background thread, post a result to the main
+        Log.d(TAG, "login: phone=" + phone);
         executor.execute(() -> {
             Result<String> result = loginRepository.login(phone, password);
             if (result instanceof Result.Success) {
+                Log.d(TAG, "login: success");
                 loginResult.postValue(new LoginResult(new LoggedInUserView(phone)));
             } else {
+                Log.e(TAG, "login: failed — " + ((Result.Error) result).getError().getMessage());
                 loginResult.postValue(new LoginResult(R.string.login_failed));
             }
         });
@@ -48,11 +54,14 @@ public class LoginViewModel extends ViewModel {
 
     public void signUp(String firstName, String lastName, String username,
                        String phone, String password) {
+        Log.d(TAG, "signUp: phone=" + phone + ", username=" + username);
         executor.execute(() -> {
             Result<String> result = loginRepository.signUp(firstName, lastName, username, phone, password);
             if (result instanceof Result.Success) {
+                Log.d(TAG, "signUp: success");
                 signUpResult.postValue(new LoginResult(new LoggedInUserView(phone)));
             } else {
+                Log.e(TAG, "signUp: failed — " + ((Result.Error) result).getError().getMessage());
                 signUpResult.postValue(new LoginResult(R.string.login_failed));
             }
         });

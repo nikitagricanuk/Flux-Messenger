@@ -12,6 +12,7 @@ public record UserResponse(
         String phone,
         String email,
         String avatarUrl,
-        boolean notifications
+        boolean notifications,
+        String bio
 ) {
 }

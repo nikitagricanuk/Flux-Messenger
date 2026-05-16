@@ -42,9 +42,12 @@ public class SettingsNotificationsFragment extends Fragment {
                         current.firstName,
                         current.lastName,
                         current.nickname,
+                        current.dateOfBirth,
                         current.phone,
                         current.email,
-                        checked
+                        checked,
+                        current.bio,
+                        current.avatarUrl
                 ));
             });
         });

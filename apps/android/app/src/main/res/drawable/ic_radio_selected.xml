@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Filled circle -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/light_blue_400" />
+        </shape>
+    </item>
+    <!-- White checkmark centred inside -->
+    <item
+        android:top="6dp"
+        android:bottom="6dp"
+        android:left="6dp"
+        android:right="6dp">
+        <vector
+            android:width="13dp"
+            android:height="13dp"
+            android:viewportWidth="13"
+            android:viewportHeight="13">
+            <path
+                android:pathData="M4.197,11.192C3.828,11.192 3.475,11.046 3.214,10.785L0.24,7.812C-0.08,7.492 -0.08,6.973 0.24,6.653C0.56,6.333 1.079,6.333 1.399,6.653L4.197,9.451L11.601,2.048C11.921,1.728 12.44,1.728 12.76,2.048C13.08,2.368 13.08,2.887 12.76,3.207L5.181,10.785C4.92,11.046 4.566,11.192 4.197,11.192Z"
+                android:fillColor="#FFFFFF" />
+        </vector>
+    </item>
+</layer-list>

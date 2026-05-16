@@ -24,11 +24,12 @@
         android:elevation="10dp">
 
         <!-- Left avatar -->
-        <View
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/avatar"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/bg_avatar_placeholder"
-            android:clipToOutline="true" />
+            android:clipToOutline="true"
+            android:scaleType="centerCrop" />
 
         <!-- Name + phone -->
         <LinearLayout

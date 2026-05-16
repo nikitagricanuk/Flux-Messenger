@@ -20,7 +20,7 @@ public class PhoneOtpInvertedInput extends BaseInvertedInput {
         super(context, attrs);
         binding = PhoneOtpInvertedInputViewBinding.bind(this);
 
-        setLabel(getResources().getString(R.string.prompt_phone));
+        setLabel(R.string.prompt_phone);
         binding.baseInput.setHint("+7");
         binding.tvConfirm.setText(R.string.phone_input_confirm);
         binding.otpLabel.setText(R.string.phone_input_otp_label);

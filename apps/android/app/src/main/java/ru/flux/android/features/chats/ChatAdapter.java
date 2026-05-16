@@ -1,36 +1,24 @@
 package ru.flux.android.features.chats;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.imageview.ShapeableImageView;
+import com.bumptech.glide.Glide;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.flux.android.R;
-import ru.flux.android.core.auth.TokenManager;
 import ru.flux.android.core.data.Chat;
-import ru.flux.android.core.network.ApiClient;
-import ru.flux.android.core.network.ApiService;
-import ru.flux.android.core.network.ChatResponse;
+import ru.flux.android.databinding.ItemChatBinding;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
 
-    // allChats is the full unfiltered list from the API
-    // filteredChats is what the RecyclerView actually displays
     private List<Chat> allChats = new ArrayList<>();
     private List<Chat> filteredChats = new ArrayList<>();
     private String activeFilter = "all";
@@ -38,6 +26,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     public interface OnChatActionListener {
         void onDeleteChat(Chat chat);
+        void onAddFavorite(Chat chat);
     }
 
     private OnChatActionListener listener;
@@ -61,6 +50,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         applyFilter();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void applyFilter() {
         filteredChats = new ArrayList<>();
         for (Chat chat : allChats) {
@@ -78,24 +68,33 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     @NonNull
     @Override
     public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_chat, parent, false);
-        return new ChatViewHolder(v);
+        ItemChatBinding binding = ItemChatBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
+        return new ChatViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         Chat chat = filteredChats.get(position);
-        holder.name.setText(chat.name);
-        holder.lastMessage.setText(chat.lastMessage);
-        holder.time.setText(chat.time);
+        holder.binding.name.setText(chat.name);
+        holder.binding.lastMessage.setText(chat.lastMessage);
+        holder.binding.time.setText(chat.time);
+        Glide.with(holder.itemView.getContext())
+                .load(chat.avatarUrl)
+                .circleCrop()
+                .placeholder(R.drawable.bg_avatar_placeholder)
+                .error(R.drawable.bg_avatar_placeholder)
+                .into(holder.binding.avatar);
 
         holder.itemView.setOnLongClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
-            popup.getMenu().add(0, 0, 0, "Delete");
+            popup.getMenu().add(0, 0, 0, "Удалить");
+            popup.getMenu().add(0, 1, 1, "В избранное");
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 0 && listener != null) {
                     listener.onDeleteChat(chat);
+                } else if (item.getItemId() == 1 && listener != null) {
+                    listener.onAddFavorite(chat);
                 }
                 return true;
             });
@@ -110,15 +109,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     }
 
     static class ChatViewHolder extends RecyclerView.ViewHolder {
-        ShapeableImageView avatar;
-        TextView name, lastMessage, time;
+        final ItemChatBinding binding;
 
-        ChatViewHolder(View itemView) {
-            super(itemView);
-            avatar = itemView.findViewById(R.id.avatar);
-            name = itemView.findViewById(R.id.name);
-            lastMessage = itemView.findViewById(R.id.lastMessage);
-            time = itemView.findViewById(R.id.time);
+        ChatViewHolder(ItemChatBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

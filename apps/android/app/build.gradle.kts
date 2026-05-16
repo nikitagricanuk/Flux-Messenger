@@ -11,13 +11,15 @@ android {
         }
     }
 
+    val backendBaseUrl = (project.findProperty("backendBaseUrl") as String?) ?: "http://10.0.2.2:8080/"
+
     defaultConfig {
         applicationId = "ru.flux.android"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "BACKEND_BASE_URL", "\"http://10.0.2.2:8080/\"")
+        buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
         buildConfigField("String", "OAUTH_CALLBACK_SCHEME", "\"flux\"")
         buildConfigField("String", "OAUTH_CALLBACK_HOST", "\"auth\"")
         buildConfigField("String", "OAUTH_CALLBACK_PATH", "\"/callback\"")
@@ -89,6 +91,8 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.browser)
+    implementation(libs.glide)
+    implementation(libs.legacy.support.v4)
 
 
 

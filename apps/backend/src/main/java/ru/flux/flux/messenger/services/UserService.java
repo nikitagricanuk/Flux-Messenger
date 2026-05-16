@@ -4,14 +4,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.OAuthProvider;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.UserOAuthIdentity;
-import ru.flux.flux.messenger.dto.ContactResponse;
-import ru.flux.flux.messenger.dto.CreateUserRequest;
-import ru.flux.flux.messenger.dto.SignUpRequest;
-import ru.flux.flux.messenger.dto.UserResponse;
-import ru.flux.flux.messenger.dto.SharedGroupInfo;
+import ru.flux.flux.messenger.dto.*;
 import ru.flux.flux.messenger.exceptions.UserAlreadyExistsException;
 import ru.flux.flux.messenger.exceptions.UserNotFoundException;
 import ru.flux.flux.messenger.repositories.ChatRepository;
@@ -27,13 +24,16 @@ public class UserService {
     private final UserRepository repository;
     private final ChatRepository chatRepository;
     private final UserOAuthIdentityRepository oauthIdentityRepository;
+    private final StorageService storageService;
 
     public UserService(UserRepository repository,
                        ChatRepository chatRepository,
-                       UserOAuthIdentityRepository oauthIdentityRepository) {
+                       UserOAuthIdentityRepository oauthIdentityRepository,
+                       StorageService storageService) {
         this.repository = repository;
         this.chatRepository = chatRepository;
         this.oauthIdentityRepository = oauthIdentityRepository;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -101,10 +101,10 @@ public class UserService {
 
     @Transactional
     public void deleteUserById(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
-        repository.deleteById(id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        chatRepository.findByMemberId(id).forEach(chat -> chat.removeMember(user));
+        repository.delete(user);
     }
 
     @Transactional(readOnly = true)
@@ -112,7 +112,7 @@ public class UserService {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return user.getContacts().stream().map(contactId -> {
+        return user.getContactIds().stream().map(contactId -> {
             User contact = repository.findById(contactId)
                     .orElseThrow(() -> new UserNotFoundException(contactId));
 
@@ -140,15 +140,38 @@ public class UserService {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        User contact = repository.findById(contactId)
+                .orElseThrow(() -> new UserNotFoundException(contactId));
+
         if (!repository.existsById(contactId)) {
             throw new UserNotFoundException(contactId);
         }
 
-        if (user.getContacts().contains(contactId)) {
+        if (user.getContactIds().contains(contactId)) {
             throw new IllegalStateException("Contact already exists");
         }
 
-        user.getContacts().add(contactId);
+        user.addContact(contact);
+        repository.save(user);
+    }
+
+    @Transactional
+    public void addContact(UUID userId, AddContactRequest request) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        User contact = repository.findByPhone(request.phone())
+                .orElseThrow(() -> new UserNotFoundException(request.phone()));
+
+        if (userId.equals(contact.getId())) {
+            throw new IllegalArgumentException("Cannot add yourself as a contact");
+        }
+
+        if (user.getContactIds().contains(contact.getId())) {
+            throw new IllegalStateException("Contact already exists");
+        }
+
+        user.addContact(contact, request.firstName(), request.lastName());
         repository.save(user);
     }
 
@@ -157,20 +180,43 @@ public class UserService {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (!user.getContacts().remove(contactId)) {
-            throw new UserNotFoundException(contactId);
-        }
+        User contact = repository.findById(contactId)
+                .orElseThrow(() -> new UserNotFoundException(contactId));
+
+        user.removeContact(contact);
 
         repository.save(user);
+    }
+
+    @Transactional
+    public UserResponse uploadAvatar(UUID userId, MultipartFile file) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        try {
+            String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
+            String objectName = userId + (ext != null ? "." + ext : "");
+            String url = storageService.upload(objectName, file.getInputStream(), file.getSize(), file.getContentType());
+            user.setAvatarUrl(url);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload avatar", e);
+        }
+        return toResponse(repository.save(user));
     }
 
     private void applyRequest(User user, CreateUserRequest request) {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
-        user.setUsername(request.nickname());
+        // Required fields: only update if non-blank (prevent accidental clearing)
+        if (request.nickname() != null && !request.nickname().isBlank()) {
+            user.setUsername(request.nickname());
+        }
+        if (request.phone() != null && !request.phone().isBlank()) {
+            user.setPhone(request.phone());
+        }
+        // Optional fields: null means clear
         user.setDateOfBirth(request.dateOfBirth());
-        user.setPhone(request.phone());
-        user.setEmail(request.email());
+        user.setEmail(request.email() != null && request.email().isBlank() ? null : request.email());
+        user.setBio(request.bio());
         user.setAvatarUrl(request.avatarUrl());
         user.setNotifications(Boolean.TRUE.equals(request.notifications()));
     }
@@ -256,7 +302,8 @@ public class UserService {
                 user.getPhone(),
                 user.getEmail(),
                 user.getAvatarUrl(),
-                user.isNotifications()
+                user.isNotifications(),
+                user.getBio()
         );
     }
 }

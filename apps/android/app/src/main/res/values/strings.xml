@@ -51,4 +51,7 @@
     <string name="name_hint">Имя</string>
     <string name="surname_hint">Фамилия</string>
     <string name="username_hint">Имя пользователя</string>
+    <string name="add">Добавить</string>
+    <string name="select_chat">Выберите чат</string>
+    <string name="group_name_hint">Название группы</string>
 </resources>

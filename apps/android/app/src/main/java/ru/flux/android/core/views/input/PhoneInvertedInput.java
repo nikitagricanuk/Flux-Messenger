@@ -5,12 +5,14 @@ import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 
+import ru.flux.android.R;
 import ru.flux.android.core.ui.PhoneTextWatcher;
 
 public class PhoneInvertedInput extends BaseInvertedInput {
     public PhoneInvertedInput(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         PhoneTextWatcher.setup(binding.baseInput);
+        setLabel(R.string.prompt_phone);
     }
 
     public String getPhone() {

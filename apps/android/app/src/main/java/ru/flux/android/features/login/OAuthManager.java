@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,8 @@ import java.util.UUID;
 import ru.flux.android.BuildConfig;
 
 public final class OAuthManager {
+
+    private static final String TAG = "OAuthManager";
 
     public static final String PROVIDER_GOOGLE = "google";
     public static final String PROVIDER_GITHUB = "github";
@@ -40,6 +43,7 @@ public final class OAuthManager {
                 .appendQueryParameter("state", state)
                 .build();
 
+        Log.d(TAG, "startOAuth: provider=" + normalizedProvider + ", url=" + startUri);
         CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().setShowTitle(true).build();
         customTabsIntent.launchUrl(activity, startUri);
     }
@@ -59,11 +63,14 @@ public final class OAuthManager {
             return false;
         }
         String path = uri.getPath();
-        return expectedPath.equals(path);
+        boolean match = expectedPath.equals(path);
+        Log.v(TAG, "isOAuthCallback: uri=" + uri + ", match=" + match);
+        return match;
     }
 
     @NonNull
     public static OAuthCallbackPayload parseCallback(@NonNull Context context, @NonNull Uri uri) {
+        Log.d(TAG, "parseCallback: uri=" + uri);
         String error = firstNonEmpty(uri.getQueryParameter("error"),
                 uri.getQueryParameter("error_description"));
 
@@ -76,6 +83,7 @@ public final class OAuthManager {
         String callbackState = uri.getQueryParameter("state");
 
         if (expectedState != null && !expectedState.equals(callbackState)) {
+            Log.e(TAG, "parseCallback: state mismatch, expected=" + expectedState + ", got=" + callbackState);
             clearPendingState(context);
             return OAuthCallbackPayload.error("invalid_state");
         }
@@ -89,8 +97,10 @@ public final class OAuthManager {
         clearPendingState(context);
 
         if (error != null) {
+            Log.e(TAG, "parseCallback: provider returned error=" + error);
             return OAuthCallbackPayload.error(error);
         }
+        Log.d(TAG, "parseCallback: success, provider=" + provider + ", hasCode=" + (code != null) + ", hasTokens=" + (accessToken != null));
         return new OAuthCallbackPayload(provider, code, callbackState, accessToken, refreshToken,
                 null);
     }

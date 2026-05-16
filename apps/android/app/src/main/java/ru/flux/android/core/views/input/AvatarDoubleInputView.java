@@ -44,8 +44,7 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
         avatarView.setBackground(AppCompatResources.getDrawable(context, R.drawable.bg_circle_gray));
         avatarView.setScaleType(ImageView.ScaleType.CENTER);
         avatarView.setImageResource(R.drawable.ic_camera_placeholder);
-        int avatarPad = dp(context, 20);
-        avatarView.setPadding(avatarPad, avatarPad, avatarPad, avatarPad);
+        avatarView.setId(R.id.avatar);
 
         FrameLayout avatarContainer = new FrameLayout(context);
         avatarContainer.addView(avatarView, new FrameLayout.LayoutParams(avatarSize, avatarSize));
@@ -64,6 +63,8 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
                 FrameLayout.LayoutParams.MATCH_PARENT, dp(context, 92)));
     }
 
+
+
     private void applyWhiteCardStyle(Context context) {
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(Color.WHITE);
@@ -79,5 +80,9 @@ public class AvatarDoubleInputView extends BaseDoubleInputView {
     private int dp(Context context, int value) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, value, context.getResources().getDisplayMetrics());
+    }
+
+    public ImageView getAvatar() {
+        return avatarView;
     }
 }
