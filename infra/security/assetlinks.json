@@ -1,9 +1,14 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls",
-    "delegate_permission/common.get_login_creds"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "ru.nikitagricanuk.flux",
-    "sha256_cert_fingerprints": ["AA:BB:CC:...your signing cert fingerprint..."]
+[
+  {
+    "relation": [
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ru.flux.android",
+      "sha256_cert_fingerprints": [
+        "A8:BD:A9:FA:CD:56:7E:5C:BB:7E:EB:61:91:8C:48:0B:D9:30:DD:BD:8C:E5:A1:28:B6:EB:A0:9E:4D:73:B3:FB"
+      ]
+    }
   }
-}]
+]

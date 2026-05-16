@@ -24,6 +24,13 @@ public class PasskeyChallengeCache {
                     .maximumSize(10_000)
                     .build();
 
+    // Keyed by the base64url challenge string itself (extracted from clientDataJSON on finish)
+    private final Cache<String, byte[]> assertionChallengeCache =
+            Caffeine.newBuilder()
+                    .expireAfterWrite(5, TimeUnit.MINUTES)
+                    .maximumSize(10_000)
+                    .build();
+
     public String saveRegistrationOptions(PublicKeyCredentialCreationOptions options) {
         String nonce = UUID.randomUUID().toString();
         registrationCache.put(nonce, options);

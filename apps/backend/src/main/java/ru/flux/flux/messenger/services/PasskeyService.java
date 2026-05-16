@@ -1,18 +1,25 @@
 package ru.flux.flux.messenger.services;
 
 import com.webauthn4j.WebAuthnManager;
+import com.webauthn4j.authenticator.AuthenticatorImpl;
 import com.webauthn4j.converter.util.ObjectConverter;
+import com.webauthn4j.data.AuthenticationData;
+import com.webauthn4j.data.AuthenticationParameters;
+import com.webauthn4j.data.AuthenticationRequest;
 import com.webauthn4j.data.RegistrationData;
 import com.webauthn4j.data.RegistrationParameters;
 import com.webauthn4j.data.RegistrationRequest;
 import com.webauthn4j.data.attestation.AttestationObject;
+import com.webauthn4j.data.attestation.authenticator.AAGUID;
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
+import com.webauthn4j.data.attestation.authenticator.COSEKey;
 import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.data.client.challenge.Challenge;
 import com.webauthn4j.data.client.challenge.DefaultChallenge;
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorOutput;
 import com.webauthn4j.server.ServerProperty;
+import com.webauthn4j.util.Base64UrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -48,6 +55,7 @@ public class PasskeyService {
     private String allowedOriginsRaw;
 
     public record PasskeyOptions(PublicKeyCredentialCreationOptions options, String nonce) {}
+    public record AuthOptions(PublicKeyCredentialRequestOptions options, String nonce) {}
 
     public PasskeyOptions startPasskey(String phone) {
         PublicKeyCredentialCreationOptions options = PublicKeyCredentialCreationOptions.builder()
@@ -159,6 +167,67 @@ public class PasskeyService {
             candidate = base + "_" + (++i);
         }
         return candidate;
+    }
+
+    public AuthOptions startAuthentication() {
+        PublicKeyCredentialRequestOptions options = PublicKeyCredentialRequestOptions.builder()
+                .challenge(Bytes.random())
+                .rpId(rpEntity.getId())
+                .userVerification(UserVerificationRequirement.PREFERRED)
+                .timeout(Duration.ofMinutes(5))
+                .build();
+        String nonce = challengeCache.saveAuthenticationOptions(options);
+        return new AuthOptions(options, nonce);
+    }
+
+    @Transactional
+    public User completeAuthentication(String nonce,
+                                       PublicKeyCredential<AuthenticatorAssertionResponse> credential) {
+        PublicKeyCredentialRequestOptions options = challengeCache.consumeAuthenticationOptions(nonce);
+        if (options == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Challenge expired or invalid nonce");
+        }
+
+        String credentialId = credential.getRawId().toBase64UrlString();
+        PasskeyCredential stored = credentialRepository.findById(credentialId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Passkey not registered for this device"));
+
+        AuthenticatorAssertionResponse response = credential.getResponse();
+
+        Set<Origin> origins = Arrays.stream(allowedOriginsRaw.split(","))
+                .map(String::trim)
+                .map(Origin::new)
+                .collect(Collectors.toSet());
+        Challenge challenge = new DefaultChallenge(options.getChallenge().getBytes());
+        ServerProperty serverProperty = new ServerProperty(origins, rpEntity.getId(), challenge);
+
+        COSEKey coseKey = objectConverter.getCborConverter()
+                .readValue(stored.getPublicKey(), COSEKey.class);
+        AttestedCredentialData credData = new AttestedCredentialData(
+                AAGUID.ZERO, Base64UrlUtil.decode(credentialId), coseKey);
+        AuthenticatorImpl authenticator = new AuthenticatorImpl(credData, null, stored.getSignCount());
+
+        AuthenticationRequest authRequest = new AuthenticationRequest(
+                Base64UrlUtil.decode(credentialId),
+                response.getAuthenticatorData().getBytes(),
+                response.getClientDataJSON().getBytes(),
+                response.getSignature().getBytes()
+        );
+        AuthenticationParameters authParams = new AuthenticationParameters(
+                serverProperty, authenticator, null, false);
+
+        AuthenticationData data;
+        try {
+            data = webAuthnManager.verify(authRequest, authParams);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Passkey verification failed");
+        }
+
+        stored.setSignCount(data.getAuthenticatorData().getSignCount());
+        credentialRepository.save(stored);
+
+        return stored.getUser();
     }
 
     private List<com.webauthn4j.data.PublicKeyCredentialParameters> convertParams(

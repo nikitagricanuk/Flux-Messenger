@@ -137,14 +137,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
-    <ru.flux.android.core.views.input.PhoneOtpInvertedInput
+    <ru.flux.android.core.views.input.PhoneInputView
         android:id="@+id/phoneInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
         android:layout_marginTop="17dp"
         android:layout_marginEnd="17dp"
-        android:background="@drawable/bg_inverted_input_card"
         android:elevation="4dp"
         app:blurRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"

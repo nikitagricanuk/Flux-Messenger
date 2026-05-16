@@ -42,6 +42,7 @@
     <string name="passwords_do_not_match">Пароли не совпадают</string>
     <string name="auth_init_failed">Не удалось инициализировать авторизацию</string>
     <string name="passkey_cancelled">Вход с Passkey отменен</string>
+    <string name="passkey_phone_title">Войти через Passkey</string>
     <string name="phone_input_confirm">подтвердить</string>
     <string name="phone_input_otp_label">Код подтверждения</string>
     <string name="phone_input_otp_hint">123-456</string>

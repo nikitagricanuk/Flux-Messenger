@@ -20,8 +20,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
-        buildConfigField("String", "PASSKEY_OPTIONS_PATH", "\"api/auth/passkey/authenticate/start\"")
-        buildConfigField("String", "PASSKEY_VERIFY_PATH", "\"api/auth/passkey/authenticate/finish\"")
+        buildConfigField("String", "PASSKEY_OPTIONS_PATH", "\"api/auth/passkey/options\"")
+        buildConfigField("String", "PASSKEY_COMPLETE_PATH", "\"api/auth/passkey/complete\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -20,8 +20,8 @@ import java.security.GeneralSecurityException;
 
 import ru.flux.android.MainActivity;
 import ru.flux.android.R;
-import ru.flux.android.features.login.PasskeyAuthManager;
 import ru.flux.android.features.login.AuthRepositoryFactory;
+import ru.flux.android.features.login.PasskeyAuthManager;
 
 public class WelcomeAuthFragment extends Fragment {
 
@@ -60,16 +60,17 @@ public class WelcomeAuthFragment extends Fragment {
         signupBtn.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_welcome_to_signup));
 
-        passkeyBtn.setOnClickListener(v -> startPasskeySignIn());
+        passkeyBtn.setOnClickListener(v -> startPasskeyFlow(v));
     }
 
-    private void startPasskeySignIn() {
+    private void startPasskeyFlow(View v) {
         if (passkeyAuthManager == null) {
             Toast.makeText(requireContext(), R.string.auth_init_failed, Toast.LENGTH_LONG).show();
             return;
         }
 
-        passkeyAuthManager.signIn((ComponentActivity) requireActivity(),
+        passkeyAuthManager.authenticate(
+                (ComponentActivity) requireActivity(),
                 new PasskeyAuthManager.Callback() {
                     @Override
                     public void onSuccess() {
@@ -79,6 +80,11 @@ public class WelcomeAuthFragment extends Fragment {
                     @Override
                     public void onError(@NonNull String message) {
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onRegistrationRequired() {
+                        Navigation.findNavController(v).navigate(R.id.action_welcome_to_3rd_party);
                     }
                 });
     }
