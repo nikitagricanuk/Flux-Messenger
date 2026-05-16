@@ -94,7 +94,9 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.legacy.support.v4)
 
-
+    implementation(libs.stompprotocolandroid)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
