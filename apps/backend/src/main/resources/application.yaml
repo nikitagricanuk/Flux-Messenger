@@ -42,3 +42,8 @@ jwt:
   expiration-ms: 900000
   refresh-expiration-ms: 604800000
   registration-expiration-ms: 600000
+
+webauthn:
+  rp-id: ${WEBAUTHN_RP_ID:localhost}
+  rp-name: ${WEBAUTHN_RP_NAME:Flux Messenger}
+  allowed-origins: ${WEBAUTHN_ALLOWED_ORIGINS:http://localhost:8080,http://localhost:3000}
