@@ -10,11 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,14 @@ import ru.flux.android.core.data.Message;
 import ru.flux.android.core.network.ApiClient;
 import ru.flux.android.core.network.ApiService;
 import ru.flux.android.core.network.MessageResponse;
-import ru.flux.android.core.network.MessagingApi;
 import ru.flux.android.core.network.SendMessageRequest;
 import ru.flux.android.core.network.UserResponse;
 import ru.flux.android.core.network.WebSocketManager;
 import ru.flux.android.features.chat.ChatMessangerAdapter;
 
 public class ChatFragment extends Fragment {
+
+    private static final String TAG = "ChatFragment";
 
     private WebSocketManager webSocketManager;
     private ChatMessangerAdapter chatAdapter;
@@ -46,6 +48,7 @@ public class ChatFragment extends Fragment {
     private UUID editingMessageId = null;
     private String currentUserId = null;
     private RecyclerView recyclerView;
+    private String chatAvatarUrl = null;
 
     public ChatFragment() {
         super(R.layout.fragment_chat);
@@ -54,12 +57,13 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        messages.clear();
 
         try {
             tokenManager = new TokenManager(requireContext());
             messagingApi = ApiClient.api(requireContext());
         } catch (Exception e) {
-            Log.e("ChatFragment", "TokenManager init failed", e);
+            Log.e(TAG, "Init failed", e);
             return;
         }
 
@@ -69,6 +73,19 @@ public class ChatFragment extends Fragment {
                 && getArguments().getBoolean("isGroup", false);
         String chatIdStr = getArguments() != null
                 ? getArguments().getString("chatId") : null;
+        String peerId = getArguments() != null
+                ? getArguments().getString("peerId") : null;
+        chatAvatarUrl = getArguments() != null
+                ? getArguments().getString("chatAvatarUrl") : null;
+
+        ShapeableImageView chatAvatar = view.findViewById(R.id.chatAvatar);
+        if (chatAvatarUrl != null) {
+            Glide.with(this)
+                    .load(chatAvatarUrl)
+                    .placeholder(R.drawable.bg_avatar_placeholder)
+                    .error(R.drawable.bg_avatar_placeholder)
+                    .into(chatAvatar);
+        }
 
         if (chatIdStr != null) {
             chatId = UUID.fromString(chatIdStr);
@@ -76,7 +93,8 @@ public class ChatFragment extends Fragment {
 
         ((TextView) view.findViewById(R.id.chatName)).setText(chatName);
 
-        RecyclerView recyclerView = view.findViewById(R.id.messagesRecyclerView);
+
+        recyclerView = view.findViewById(R.id.messagesRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -85,11 +103,8 @@ public class ChatFragment extends Fragment {
             MessageActionsBottomSheet sheet = MessageActionsBottomSheet.newInstance(message);
             sheet.setMessage(message);
             sheet.setListener(new MessageActionsBottomSheet.MessageActionListener() {
-
                 @Override
-                public void onReply(Message message) {
-                    // TODO: показать панель ответа
-                }
+                public void onReply(Message message) {}
 
                 @Override
                 public void onCopy(Message message) {
@@ -123,8 +138,9 @@ public class ChatFragment extends Fragment {
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                                    Log.e("ChatFragment", "Delete error", t);
+                                public void onFailure(@NonNull Call<Void> call,
+                                                      @NonNull Throwable t) {
+                                    Log.e(TAG, "Delete error", t);
                                 }
                             });
                 }
@@ -132,11 +148,6 @@ public class ChatFragment extends Fragment {
             sheet.show(getChildFragmentManager(), "messageActions");
         });
         recyclerView.setAdapter(chatAdapter);
-
-        if (chatId != null) {
-            loadHistory(recyclerView);
-            connectWebSocket();
-        }
 
         EditText input = view.findViewById(R.id.messageInput);
         view.findViewById(R.id.btnSend).setOnClickListener(v -> {
@@ -153,13 +164,14 @@ public class ChatFragment extends Fragment {
                                     input.setText("");
                                     editingMessageId = null;
                                 } else {
-                                    Log.e("ChatFragment", "Edit failed, code=" + response.code());
+                                    Log.e(TAG, "Edit failed: " + response.code());
                                 }
                             }
 
                             @Override
-                            public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                                Log.e("ChatFragment", "Edit error", t);
+                            public void onFailure(@NonNull Call<MessageResponse> call,
+                                                  @NonNull Throwable t) {
+                                Log.e(TAG, "Edit error", t);
                             }
                         });
             } else {
@@ -171,22 +183,50 @@ public class ChatFragment extends Fragment {
                 NavHostFragment.findNavController(this).popBackStack()
         );
 
-        view.findViewById(R.id.chatHeader).setOnClickListener(v ->
-                NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_chatFragment_to_profileFragment)
-        );
+        view.findViewById(R.id.chatHeader).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("contactId", peerId);
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_chatFragment_to_profileFragment, args);
+        });
+
+        if (chatId != null) {
+            loadCurrentUser();
+        }
     }
 
-    private void loadHistory(RecyclerView recyclerView) {
+    private void loadCurrentUser() {
+        try {
+            ApiClient.api(requireContext()).getMe().enqueue(new Callback<UserResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<UserResponse> call,
+                                       @NonNull Response<UserResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        currentUserId = response.body().id.toString();
+                        loadHistory();
+                        connectWebSocket();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<UserResponse> call, @NonNull Throwable t) {
+                    Log.e(TAG, "getMe error", t);
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "ApiClient error", e);
+        }
+    }
+
+    private void loadHistory() {
         messagingApi.getMessages(chatId, 0, 50).enqueue(new Callback<List<MessageResponse>>() {
             @Override
             public void onResponse(@NonNull Call<List<MessageResponse>> call,
                                    @NonNull Response<List<MessageResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String myId = currentUserId;
                     for (MessageResponse msg : response.body()) {
-                        boolean isOutgoing = myId != null
-                                && myId.equals(msg.senderId.toString());
+                        boolean isOutgoing = currentUserId != null
+                                && currentUserId.equals(msg.senderId.toString());
                         messages.add(new Message(
                                 msg.id.toString(),
                                 msg.text,
@@ -205,90 +245,60 @@ public class ChatFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<MessageResponse>> call,
-                                  @NonNull Throwable t) {
-                Log.e("ChatFragment", "Failed to load messages", t);
+            public void onFailure(@NonNull Call<List<MessageResponse>> call, @NonNull Throwable t) {
+                Log.e(TAG, "loadHistory error", t);
             }
         });
-    }
-
-
-    private void loadCurrentUser() {
-        try {
-            ApiClient.api(requireContext()).getMe().enqueue(new Callback<UserResponse>() {
-                @Override
-                public void onResponse(@NonNull Call<UserResponse> call,
-                                       @NonNull Response<UserResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        currentUserId = response.body().id.toString();
-                        loadHistory(recyclerView);
-                        connectWebSocket();
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<UserResponse> call, @NonNull Throwable t) {
-                    Log.e("ChatFragment", "Failed to get current user", t);
-                }
-            });
-        } catch (Exception e) {
-            Log.e("ChatFragment", "ApiClient error", e);
-        }
     }
 
     private void connectWebSocket() {
         String token = tokenManager.getAccessToken();
-        if (token == null) {
-            return;
-        }
+        if (token == null) return;
 
         webSocketManager = new WebSocketManager();
-        webSocketManager.connect(token);
-        webSocketManager.subscribeTo(chatId, message -> {
-            if (getActivity() == null) {
-                return;
-            }
-            requireActivity().runOnUiThread(() -> {
-                int existingIndex = -1;
-                for (int i = 0; i < messages.size(); i++) {
-                    if (messages.get(i).id.equals(message.id.toString())) {
-                        existingIndex = i;
-                        break;
+        webSocketManager.connect(token, () -> {
+            webSocketManager.subscribeTo(chatId, message -> {
+                if (getActivity() == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    int existingIndex = -1;
+                    for (int i = 0; i < messages.size(); i++) {
+                        if (messages.get(i).id.equals(message.id.toString())) {
+                            existingIndex = i;
+                            break;
+                        }
                     }
-                }
-                if (existingIndex != -1) {
-                    Message existing = messages.get(existingIndex);
-                    existing.text = message.text;
-                    chatAdapter.notifyItemChanged(existingIndex);
-                } else {
-                    String myId = currentUserId;
-                    boolean isOutgoing = myId != null
-                            && myId.equals(message.senderId.toString());
-                    messages.add(new Message(
-                            message.id.toString(),
-                            message.text,
-                            message.senderId.toString(),
-                            message.senderName,
-                            message.senderAvatar,
-                            message.createdAt,
-                            isOutgoing
-                    ));
-                    chatAdapter.notifyItemInserted(messages.size() - 1);
-                }
+                    if (existingIndex != -1) {
+                        messages.get(existingIndex).text = message.text;
+                        chatAdapter.notifyItemChanged(existingIndex);
+                    } else {
+                        boolean isOutgoing = currentUserId != null
+                                && currentUserId.equals(message.senderId.toString());
+                        messages.add(new Message(
+                                message.id.toString(),
+                                message.text,
+                                message.senderId.toString(),
+                                message.senderName,
+                                message.senderAvatar,
+                                message.createdAt,
+                                isOutgoing
+                        ));
+                        chatAdapter.notifyItemInserted(messages.size() - 1);
+                        recyclerView.scrollToPosition(messages.size() - 1);
+                    }
+                });
             });
-        });
-        webSocketManager.subscribeToDelete(chatId, messageId -> {
-            if (getActivity() == null) {
-                return;
-            }
-            requireActivity().runOnUiThread(() -> {
-                for (int i = 0; i < messages.size(); i++) {
-                    if (messages.get(i).id.equals(messageId.toString())) {
-                        messages.remove(i);
-                        chatAdapter.notifyItemRemoved(i);
-                        break;
+
+            webSocketManager.subscribeToDelete(chatId, messageId -> {
+                if (getActivity() == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    for (int i = 0; i < messages.size(); i++) {
+                        if (messages.get(i).id.equals(messageId.toString())) {
+                            messages.remove(i);
+                            chatAdapter.notifyItemRemoved(i);
+                            break;
+                        }
                     }
-                }
+                });
             });
         });
     }
@@ -300,17 +310,16 @@ public class ChatFragment extends Fragment {
                     public void onResponse(@NonNull Call<MessageResponse> call,
                                            @NonNull Response<MessageResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            Log.d("ChatFragment", "Message sent via REST: " + response.body().id);
+                            Log.d(TAG, "Message sent: " + response.body().id);
                             input.setText("");
                         } else {
-                            Log.e("ChatFragment", "REST send failed, code=" + response.code());
+                            Log.e(TAG, "Send failed: " + response.code());
                         }
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<MessageResponse> call,
-                                          @NonNull Throwable t) {
-                        Log.e("ChatFragment", "REST send error", t);
+                    public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
+                        Log.e(TAG, "Send error", t);
                     }
                 });
     }

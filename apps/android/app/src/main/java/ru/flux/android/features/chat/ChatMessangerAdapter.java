@@ -84,7 +84,9 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 h.avatar.setVisibility(View.VISIBLE);
                 Glide.with(h.avatar.getContext())
                         .load(message.senderAvatar)
-                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.bg_avatar_placeholder)
+                        .error(R.drawable.bg_avatar_placeholder)
                         .into(h.avatar);
             } else {
                 h.senderName.setVisibility(View.GONE);

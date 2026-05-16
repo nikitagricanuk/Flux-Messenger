@@ -37,6 +37,7 @@ public class ChatsFragment extends Fragment {
     private FavoriteAdapter favoriteAdapter;
     private FragmentChatsBinding binding;
     private boolean isSearchOpen = false;
+    private String currentUserId = null;
 
     @Nullable
     @Override
@@ -63,11 +64,34 @@ public class ChatsFragment extends Fragment {
         viewModel.getFavorites().observe(getViewLifecycleOwner(), favoriteAdapter::setFavorites);
         viewModel.loadFavorites();
 
+        viewModel.getCurrentUserId().observe(getViewLifecycleOwner(), id -> {
+            currentUserId = id;
+        });
+
         binding.chatsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ChatAdapter();
         adapter.setOnChatActionListener(new ChatAdapter.OnChatActionListener() {
             @Override public void onDeleteChat(Chat chat) { viewModel.deleteChat(chat); }
             @Override public void onAddFavorite(Chat chat) { viewModel.addFavorite(chat); }
+            @Override public void onChatClick(Chat chat) {
+                Bundle args = new Bundle();
+                args.putString("chatId", chat.id);
+                args.putString("chatName", chat.name);
+                args.putBoolean("isGroup", chat.type.equals("group"));
+                args.putString("chatAvatarUrl", chat.avatarUrl);
+
+                if (chat.memberIds != null && currentUserId != null) {
+                    for (String memberId : chat.memberIds) {
+                        if (!memberId.equals(currentUserId)) {
+                            args.putString("peerId", memberId);
+                            break;
+                        }
+                    }
+                }
+
+                Navigation.findNavController(requireView())
+                        .navigate(R.id.action_chatsFragment_to_chatFragment, args);
+            }
         });
         binding.chatsRecycler.setAdapter(adapter);
 

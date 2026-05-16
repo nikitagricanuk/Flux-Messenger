@@ -27,6 +27,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public interface OnChatActionListener {
         void onDeleteChat(Chat chat);
         void onAddFavorite(Chat chat);
+        void onChatClick(Chat chat);
     }
 
     private OnChatActionListener listener;
@@ -100,6 +101,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             });
             popup.show();
             return true;
+        });
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onChatClick(chat);
         });
     }
 

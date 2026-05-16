@@ -45,8 +45,8 @@
         android:name="ru.flux.android.features.contacts.ui.ContactPage"
         tools:layout="@layout/fragment_contact_page">
         <action
-            android:id="@+id/action_contactPage_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_contactPage_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
 
     <dialog

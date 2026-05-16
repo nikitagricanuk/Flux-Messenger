@@ -1,6 +1,8 @@
 package ru.flux.android.core.network;
 
 import java.util.List;
+import java.util.UUID;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -80,4 +82,7 @@ public interface ApiService {
 
     @GET("users/search")
     Call<List<UserResponse>> searchUsers(@retrofit2.http.Query("query") String query);
+
+    @GET("users/{id}")
+    Call<UserResponse> getUserById(@Path("id") UUID id);
 }

@@ -31,7 +31,7 @@ public class WebSocketManager {
         void onDelete(UUID messageId);
     }
 
-    public void connect(String jwtToken) {
+    public void connect(String jwtToken, Runnable onConnected) {
         List<StompHeader> headers = Arrays.asList(
                 new StompHeader("Authorization", "Bearer " + jwtToken)
         );
@@ -44,6 +44,7 @@ public class WebSocketManager {
                     switch (event.getType()) {
                         case OPENED:
                             Log.d(TAG, "WebSocket connected");
+                            if (onConnected != null) onConnected.run();
                             break;
                         case ERROR:
                             Log.e(TAG, "WebSocket error", event.getException());
@@ -64,7 +65,7 @@ public class WebSocketManager {
 
     public void subscribeTo(UUID chatId, MessageListener listener) {
         disposables.add(
-                stompClient.topic("/topic/chat/" + chatId)
+                stompClient.topic("/topic/user/" + chatId)
                         .subscribe(stompMessage -> {
                             MessageResponse message = gson.fromJson(
                                     stompMessage.getPayload(),
@@ -77,7 +78,7 @@ public class WebSocketManager {
 
     public void subscribeToDelete(UUID chatId, DeleteListener listener) {
         disposables.add(
-                stompClient.topic("/topic/chat/" + chatId + "/delete")
+                stompClient.topic("/topic/user/" + chatId + "/delete")
                         .subscribe(stompMessage -> {
                             MessageStatusUpdate update = gson.fromJson(
                                     stompMessage.getPayload(),

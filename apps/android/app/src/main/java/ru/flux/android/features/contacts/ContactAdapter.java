@@ -3,10 +3,13 @@ package ru.flux.android.features.contacts;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         void onContactClick(Contact contact);
     }
 
-    private final List<Contact> contacts;
+    private List<Contact> contacts;
     private final OnContactClickListener listener;
 
     public ContactAdapter(List<Contact> contacts, OnContactClickListener listener) {
@@ -41,6 +44,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder.name.setText(contact.getName());
         holder.phone.setText(contact.getPhoneNumber());
 
+        Glide.with(holder.itemView.getContext())
+                .load(contact.getProfilePicture())
+                .circleCrop()
+                .placeholder(R.drawable.bg_avatar_placeholder)
+                .error(R.drawable.bg_avatar_placeholder)
+                .into(holder.avatar);
+
         holder.itemView.setOnClickListener(v -> listener.onContactClick(contact));
     }
 
@@ -49,13 +59,21 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         return contacts.size();
     }
 
+    public void setContacts(List<Contact> newContacts) {
+        contacts.clear();
+        contacts.addAll(newContacts);
+        notifyDataSetChanged();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, phone;
+        ImageView avatar;
 
         ViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.contactName);
             phone = view.findViewById(R.id.contactPhone);
+            avatar = view.findViewById(R.id.contactAvatar);
         }
     }
 }

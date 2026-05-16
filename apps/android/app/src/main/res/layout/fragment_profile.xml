@@ -37,14 +37,16 @@
                     android:contentDescription="back" />
             </LinearLayout>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/profileAvatar"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 android:translationZ="2dp"
-                android:src="@drawable/bg_avatar_placeholder" />
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                app:srcCompat="@drawable/bg_avatar_placeholder" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,7 +80,7 @@
                             android:id="@+id/profileName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Евгений Сафонов"
+                            android:text=""
                             android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@color/black"
@@ -88,7 +90,7 @@
                             android:id="@+id/profileUsername"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@Ewgen207"
+                            android:text=""
                             android:textSize="16sp"
                             android:alpha="0.7"
                             android:textColor="@color/black"
@@ -104,7 +106,7 @@
                     android:layout_marginTop="10dp"
                     android:textSize="16sp"
                     android:textColor="@color/black"
-                    android:text="Крутой чел | великий экономист | не менее великий политик" />
+                    android:text="" />
 
             </LinearLayout>
 
