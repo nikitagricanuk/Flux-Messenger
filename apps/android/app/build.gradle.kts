@@ -50,7 +50,7 @@ android {
 tasks.register("adbReverse") {
     description = "Forward host ports 80 and 8080 to the emulator via adb reverse"
     doLast {
-        ProcessBuilder("adb", "reverse", "tcp:80", "tcp:80").inheritIO().start().waitFor()
+        ProcessBuilder("adb", "reverse", "tcp:80", "tcp:8080").inheritIO().start().waitFor()
         ProcessBuilder("adb", "reverse", "tcp:8080", "tcp:8080").inheritIO().start().waitFor()
     }
 }

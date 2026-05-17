@@ -81,8 +81,11 @@ public class PasskeyAuthController {
         var params = o.getPubKeyCredParams().stream()
                 .map(p -> new PasskeyCreationOptionsResponse.PubKeyCredParam("public-key", p.getAlg().getValue()))
                 .toList();
+        String residentKeyValue = o.getAuthenticatorSelection().getResidentKey().getValue();
         var authSel = new PasskeyCreationOptionsResponse.AuthenticatorSelection(
-                o.getAuthenticatorSelection().getResidentKey().getValue(),
+                "platform",
+                "required".equals(residentKeyValue),
+                residentKeyValue,
                 o.getAuthenticatorSelection().getUserVerification().getValue());
 
         return new PasskeyCreationOptionsResponse(

@@ -18,5 +18,10 @@ public record PasskeyCreationOptionsResponse(
 
     public record PubKeyCredParam(String type, long alg) {}
 
-    public record AuthenticatorSelection(String residentKey, String userVerification) {}
+    public record AuthenticatorSelection(
+            String authenticatorAttachment,
+            boolean requireResidentKey,
+            String residentKey,
+            String userVerification
+    ) {}
 }
