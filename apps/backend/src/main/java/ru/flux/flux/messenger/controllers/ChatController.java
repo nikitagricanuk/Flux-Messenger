@@ -43,7 +43,7 @@ public class ChatController {
 
     @PostMapping("/direct")
     public ChatResponse createDirectChat(@Valid @RequestBody CreateChatRequest request, @AuthenticationPrincipal User currentUser) {
-        return chatService.createChat(request, currentUser.getId());
+        return chatService.createOrGetDirect(request, currentUser.getId());
     }
 
     @PostMapping("/group")

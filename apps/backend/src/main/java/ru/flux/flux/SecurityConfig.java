@@ -67,7 +67,9 @@ public class SecurityConfig {
                                 "/.well-known/assetlinks.json",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/error"
+                                "/error",
+                                "/ws/**", 
+                                "/ws"   
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

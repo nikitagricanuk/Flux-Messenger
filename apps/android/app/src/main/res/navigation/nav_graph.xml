@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
@@ -7,12 +8,61 @@
 
     <fragment
         android:id="@+id/chatsFragment"
-        android:name="ru.flux.android.features.chats.ui.ChatsFragment" />
+        android:name="ru.flux.android.features.chats.ui.ChatsFragment">
+        <action
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="ru.flux.android.features.chat.ui.ChatFragment"
+        tools:layout="@layout/fragment_chat">
+        <action
+            android:id="@+id/action_chatFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ru.flux.android.features.chat.ui.Profile">
+
+        <argument
+            android:name="contactId"
+            app:argType="string" />
+
+        <argument
+            android:name="chatId"
+            app:argType="string"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_profile_to_imageViewer"
+            app:destination="@id/imageViewerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/imageViewerFragment"
+        android:name="ru.flux.android.features.chat.ui.ImageViewerFragment"
+        tools:layout="@layout/fragment_image_viewer">
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contactPage"
+        android:name="ru.flux.android.features.contacts.ui.ContactPage"
+        tools:layout="@layout/fragment_contact_page">
+        <action
+            android:id="@+id/action_contactPage_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
     <dialog
         android:id="@+id/newMessageBottomSheet"
         android:name="ru.flux.android.features.chats.ui.NewMessageBottomSheet"
-        tools:layout="@layout/bottom_sheet_new_message" >
+        tools:layout="@layout/bottom_sheet_new_message">
         <action
             android:id="@+id/action_newMessageBottomSheet_to_newContactFragment"
             app:destination="@id/newContactFragment" />
@@ -37,35 +87,11 @@
         android:label="NewGroupSetupFragment"
         tools:layout="@layout/fragment_new_group_setup" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/contactPage"-->
-<!--        android:name="ru.flux.android.ContactPage">-->
-
-<!--        <action-->
-<!--            android:id="@+id/action_contactPage_to_profileFragment"-->
-<!--            app:destination="@id/profileFragment" />-->
-<!--    </fragment>-->
-
-<!--    <fragment-->
-<!--        android:id="@+id/profileFragment"-->
-<!--        android:name="ru.flux.android.Profile">-->
-<!--        <action-->
-<!--            android:id="@+id/action_profile_to_imageViewer"-->
-<!--            app:destination="@id/imageViewerFragment" />-->
-<!--    </fragment>-->
-
-<!--    <fragment-->
-<!--        android:id="@+id/imageViewerFragment"-->
-<!--        android:name="ru.flux.android.ImageViewerFragment">-->
-<!--        <argument-->
-<!--            android:name="imageUrl"-->
-<!--            app:argType="string" />-->
-<!--    </fragment>-->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="ru.flux.android.features.settings.ui.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" >
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment_to_settingsProfileFragment"
             app:destination="@id/settingsProfileFragment" />
@@ -73,20 +99,22 @@
             android:id="@+id/action_settingsFragment_to_settingsNotificationsFragment"
             app:destination="@id/settingsNotificationsFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/settingsProfileFragment"
         android:name="ru.flux.android.features.settings.ui.SettingsProfileFragment"
         android:label="fragment_settings_profile"
         tools:layout="@layout/fragment_settings_profile" />
+
     <fragment
         android:id="@+id/settingsNotificationsFragment"
         android:name="ru.flux.android.features.settings.ui.SettingsNotificationsFragment"
         android:label="fragment_settings_notifications"
         tools:layout="@layout/fragment_settings_notifications" />
+
     <fragment
         android:id="@+id/newContactFragment"
         android:name="ru.flux.android.features.chats.ui.NewContactFragment"
         android:label="NewContactFragment" />
-
 
 </navigation>

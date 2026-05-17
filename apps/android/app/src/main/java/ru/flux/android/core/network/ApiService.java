@@ -1,7 +1,10 @@
 package ru.flux.android.core.network;
 
 import java.util.List;
+import java.util.UUID;
+
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -57,4 +60,37 @@ public interface ApiService {
     @Multipart
     @PATCH("users/me/avatar")
     Call<UserResponse> uploadAvatar(@Part MultipartBody.Part file);
+
+    @GET("messages/chat/{chatId}")
+    Call<List<MessageResponse>> getMessages(
+            @Path("chatId") java.util.UUID chatId,
+            @retrofit2.http.Query("page") int page,
+            @retrofit2.http.Query("size") int size);
+
+    @POST("messages")
+    Call<MessageResponse> sendMessage(@Body SendMessageRequest request);
+
+    @POST("messages/chat/{chatId}/read")
+    Call<Void> markAsRead(@Path("chatId") java.util.UUID chatId);
+
+    @PATCH("messages/{messageId}")
+    Call<MessageResponse> editMessage(
+            @Path("messageId") java.util.UUID messageId,
+            @Body SendMessageRequest request);
+
+    @DELETE("messages/{messageId}")
+    Call<Void> deleteMessage(@Path("messageId") java.util.UUID messageId);
+
+    @GET("users/search")
+    Call<List<UserResponse>> searchUsers(@retrofit2.http.Query("query") String query);
+
+    @GET("users/{id}")
+    Call<UserResponse> getUserById(@Path("id") UUID id);
+
+    @Multipart
+    @POST("messages/upload")
+    Call<ResponseBody> uploadMedia(@Part MultipartBody.Part file);
+
+    @GET("messages/chat/{chatId}/media")
+    Call<List<MessageResponse>> getMediaMessages(@Path("chatId") UUID chatId);
 }
