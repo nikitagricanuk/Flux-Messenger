@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/api/auth/sign-in",
                                 "/api/auth/refresh",
                                 "/api/auth/passkey/**",
+                                "/.well-known/assetlinks.json",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/error"
