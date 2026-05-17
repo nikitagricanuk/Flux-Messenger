@@ -22,12 +22,10 @@
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
             android:src="@drawable/fi_rr_angle_small_right"
-            android:clickable="true"
-            android:focusable="true"
             android:contentDescription="back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/chatAvatar"
@@ -36,10 +34,9 @@
             android:layout_marginStart="8dp"
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/RoundedImage"
-            app:srcCompat="@drawable/bg_avatar_placeholder"
             app:layout_constraintStart_toEndOf="@id/btnBack"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -56,11 +53,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Имя чата"
-                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/chatStatus"
@@ -68,9 +62,7 @@
                 android:layout_height="wrap_content"
                 android:text="Недавно был в сети"
                 android:textSize="13sp"
-                android:alpha="0.6"
-                android:textColor="#000000" />
-
+                android:alpha="0.6"/>
         </LinearLayout>
 
         <ImageView
@@ -80,10 +72,9 @@
             android:layout_marginEnd="12dp"
             android:src="@drawable/fi_rs_settings"
             android:alpha="0.5"
-            android:contentDescription="encrypted"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,13 +82,14 @@
         android:id="@+id/messagesRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingHorizontal="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:paddingBottom="8dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/chatHeader"
         app:layout_constraintBottom_toTopOf="@id/inputPanel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:id="@+id/inputPanel"
@@ -106,7 +98,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="8dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -114,74 +105,54 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:cardBackgroundColor="@color/white"
-            app:shapeAppearanceOverlay="@style/RoundedImage"
             app:cardElevation="0dp"
-            android:clickable="true"
-            android:focusable="true"
-            >
+            app:shapeAppearanceOverlay="@style/RoundedImage">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:foreground="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:id="@+id/btnAttach"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/fi_rr_plus"
-                    android:contentDescription="attach" />
-            </FrameLayout>
-
+            <ImageView
+                android:id="@+id/btnAttach"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/fi_rr_plus"/>
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginStart="8dp"
             android:background="@drawable/bg_rounded"
-            android:padding="4dp"
-            >
+            android:padding="6dp">
 
             <EditText
                 android:id="@+id/messageInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Введите сообщение..."
                 android:background="@android:color/transparent"
-                android:maxLines="1" />
+                android:hint="Введите сообщение..."
+                android:inputType="textMultiLine"
+                android:minLines="1"
+                android:maxLines="3"
+                android:gravity="top|start"
+                android:scrollbars="vertical"
+                android:overScrollMode="ifContentScrolls"/>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="41dp"
                 android:layout_height="32dp"
-                app:cardBackgroundColor="@color/white"
-                app:shapeAppearanceOverlay="@style/RoundedImage"
-                app:cardElevation="0dp"
                 android:layout_marginStart="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                >
+                app:cardElevation="0dp"
+                app:shapeAppearanceOverlay="@style/RoundedImage">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:foreground="?attr/selectableItemBackgroundBorderless">
-
-                    <ImageView
-                        android:id="@+id/btnSend"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/fi_rr_paper_plane"
-                        android:contentDescription="send" />
-                </FrameLayout>
-
+                <ImageView
+                    android:id="@+id/btnSend"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/fi_rr_paper_plane"/>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
