@@ -37,6 +37,12 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.longClickListener = longClickListener;
     }
 
+    public void updateMessages(List<Message> newMessages) {
+        this.messages.clear();
+        this.messages.addAll(newMessages);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
         return messages.get(position).isOutgoing ? TYPE_OUT : TYPE_IN;
