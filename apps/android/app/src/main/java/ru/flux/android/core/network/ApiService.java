@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -85,4 +86,11 @@ public interface ApiService {
 
     @GET("users/{id}")
     Call<UserResponse> getUserById(@Path("id") UUID id);
+
+    @Multipart
+    @POST("messages/upload")
+    Call<ResponseBody> uploadMedia(@Part MultipartBody.Part file);
+
+    @GET("messages/chat/{chatId}/media")
+    Call<List<MessageResponse>> getMediaMessages(@Path("chatId") UUID chatId);
 }

@@ -11,4 +11,6 @@ public class MessageResponse {
     public String text;
     public String status;
     public String createdAt;
+    public String mediaUrl;
+    public String mediaType;
 }

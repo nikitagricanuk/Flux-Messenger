@@ -26,6 +26,16 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="ru.flux.android.features.chat.ui.Profile">
+
+        <argument
+            android:name="contactId"
+            app:argType="string" />
+
+        <argument
+            android:name="chatId"
+            app:argType="string"
+            app:nullable="true" />
+
         <action
             android:id="@+id/action_profile_to_imageViewer"
             app:destination="@id/imageViewerFragment" />

@@ -60,7 +60,17 @@ public class Profile extends Fragment {
 
     private void setupTabs(View view) {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
-        viewPager.setAdapter(new ProfileAdapter(getChildFragmentManager(), getLifecycle()));
+        String chatId = getArguments() != null
+                ? getArguments().getString("chatId")
+                : null;
+
+        viewPager.setAdapter(
+                new ProfileAdapter(
+                        getChildFragmentManager(),
+                        getLifecycle(),
+                        chatId
+                )
+        );
 
         TextView tabMedia = view.findViewById(R.id.tabMedia);
         TextView tabLinks = view.findViewById(R.id.tabLinks);

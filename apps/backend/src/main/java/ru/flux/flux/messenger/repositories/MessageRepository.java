@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import ru.flux.flux.messenger.Message;
 import ru.flux.flux.messenger.MessageStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
@@ -19,4 +20,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     @Modifying
     @Query("UPDATE Message m SET m.status = :status WHERE m.chat.id = :chatId AND m.sender.id != :userId AND m.status != :status")
     void updateStatusForChat(UUID chatId, UUID userId, MessageStatus status);
+    
+    List<Message> findByChatIdAndMediaUrlNotNull(UUID chatId);
 }

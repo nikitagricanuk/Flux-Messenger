@@ -1,5 +1,7 @@
 package ru.flux.android.features.chat;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -12,19 +14,32 @@ import ru.flux.android.features.chat.ui.MediaFragment;
 
 public class ProfileAdapter  extends FragmentStateAdapter {
 
-    public ProfileAdapter(@NonNull FragmentManager fm, Lifecycle lifecycle) {
+    private final String chatId;
+
+    public ProfileAdapter(
+            @NonNull FragmentManager fm,
+            @NonNull Lifecycle lifecycle,
+            String chatId
+    ) {
         super(fm, lifecycle);
+        this.chatId = chatId;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
-            case 0: return new MediaFragment();
-            case 1: return new LinksFragment();
-            case 2: return new GroupsFragment();
-            default: return new MediaFragment();
-        }
+
+        Fragment fragment;
+
+        if (position == 0) fragment = new MediaFragment();
+        else if (position == 1) fragment = new LinksFragment();
+        else fragment = new GroupsFragment();
+
+        Bundle args = new Bundle();
+        args.putString("chatId", chatId);
+
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override

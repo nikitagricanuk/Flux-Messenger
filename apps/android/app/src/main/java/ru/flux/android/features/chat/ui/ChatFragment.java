@@ -24,16 +24,30 @@ import ru.flux.android.core.data.Message;
 import ru.flux.android.features.chat.ChatMessangerAdapter;
 import ru.flux.android.features.chat.ChatViewModel;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.net.Uri;
+
 public class ChatFragment extends Fragment {
 
     private ChatViewModel viewModel;
     private ChatMessangerAdapter chatAdapter;
     private RecyclerView recyclerView;
     private EditText input;
+    private UUID chatId;
 
     public ChatFragment() {
         super(R.layout.fragment_chat);
     }
+
+    private final ActivityResultLauncher<String> pickMedia = registerForActivityResult(
+            new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    viewModel.setMediaAttachment(uri);
+                    // показать превью прикреплённого файла
+                    //showAttachmentPreview(uri);
+                }
+            });
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -46,6 +60,11 @@ public class ChatFragment extends Fragment {
         String chatIdStr = getArguments() != null ? getArguments().getString("chatId") : null;
         String peerId = getArguments() != null ? getArguments().getString("peerId") : null;
         String chatAvatarUrl = getArguments() != null ? getArguments().getString("chatAvatarUrl") : null;
+
+        if (chatIdStr != null) {
+            chatId = UUID.fromString(chatIdStr);
+            viewModel.initChat(chatId);
+        }
 
         if (chatIdStr != null) {
             viewModel.initChat(UUID.fromString(chatIdStr));
@@ -81,9 +100,13 @@ public class ChatFragment extends Fragment {
         view.findViewById(R.id.chatHeader).setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("contactId", peerId);
+            args.putString("chatId", chatId.toString());
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_chatFragment_to_profileFragment, args);
+
         });
+        view.findViewById(R.id.btnAttach).setOnClickListener(v ->
+                pickMedia.launch("image/*"));
     }
 
     private void setupRecyclerView(boolean isGroup) {
@@ -145,4 +168,5 @@ public class ChatFragment extends Fragment {
         });
         sheet.show(getChildFragmentManager(), "messageActions");
     }
+
 }

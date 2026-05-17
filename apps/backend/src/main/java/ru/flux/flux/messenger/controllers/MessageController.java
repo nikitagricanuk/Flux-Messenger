@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.MessageResponse;
 import ru.flux.flux.messenger.dto.SendMessageRequest;
@@ -61,5 +63,20 @@ public class MessageController {
             @AuthenticationPrincipal User user) {
         messageService.deleteMessage(messageId, user.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadMedia(
+            @RequestParam MultipartFile file,
+            @AuthenticationPrincipal User user) {
+        String url = messageService.uploadMedia(file);
+        return ResponseEntity.ok(url);
+    }
+
+    @GetMapping("/chat/{chatId}/media")
+    public ResponseEntity<List<MessageResponse>> getMedia(
+            @PathVariable UUID chatId,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(messageService.getMediaMessages(chatId, user.getId()));
     }
 }

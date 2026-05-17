@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StringUtils;
+
 import ru.flux.flux.messenger.Chat;
 import ru.flux.flux.messenger.Message;
 import ru.flux.flux.messenger.MessageStatus;
@@ -27,6 +30,7 @@ public class MessageService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
+    private final StorageService storageService;
 
     @Transactional
     public MessageResponse sendMessage(SendMessageRequest request, UUID senderId) {
@@ -42,7 +46,9 @@ public class MessageService {
         Message message = Message.builder()
                 .chat(chat)
                 .sender(sender)
-                .text(request.text())
+                .text(request.text() != null ? request.text() : "")
+                .mediaUrl(request.mediaUrl())
+                .mediaType(request.mediaType())
                 .build();
 
         message = messageRepository.save(message);
@@ -113,5 +119,31 @@ public class MessageService {
         messageRepository.delete(message);
 
         webSocketService.sendDeleteEvent(chatId, messageId);
+    }
+
+    @Transactional
+    public String uploadMedia(MultipartFile file) {
+        try {
+            String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
+            String objectName = "media/msg-" + UUID.randomUUID() 
+                    + (ext != null ? "." + ext : "");
+            return storageService.upload(
+                    objectName,
+                    file.getInputStream(),
+                    file.getSize(),
+                    file.getContentType()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload media", e);
+        }
+    }
+
+    @Transactional
+    public List<MessageResponse> getMediaMessages(UUID chatId, UUID userId) {
+        requireChatMember(chatId, userId);
+        return messageRepository.findByChatIdAndMediaUrlNotNull(chatId)
+                .stream()
+                .map(MessageResponse::from)
+                .toList();
     }
 }

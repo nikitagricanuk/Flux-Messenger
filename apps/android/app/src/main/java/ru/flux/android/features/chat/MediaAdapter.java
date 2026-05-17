@@ -1,5 +1,6 @@
 package ru.flux.android.features.chat;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> 
         void onImageClick(String imageUrl);
     }
 
-    private final List<String> imageUrls;
+    private List<String> imageUrls;
     private final OnImageClickListener listener;
 
     public MediaAdapter(List<String> imageUrls, OnImageClickListener listener) {
@@ -42,9 +43,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> 
 
         Glide.with(holder.image.getContext())
                 .load(url)
+                .placeholder(R.drawable.bg_avatar_placeholder)
+                .error(R.drawable.ic_exclamation)
                 .centerCrop()
                 .into(holder.image);
-
         holder.itemView.setOnClickListener(v -> listener.onImageClick(url));
     }
 
@@ -60,5 +62,11 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> 
             super(view);
             image = view.findViewById(R.id.mediaImage);
         }
+    }
+
+    public void updateImages(List<String> newUrls) {
+        imageUrls.clear();
+        imageUrls.addAll(newUrls);
+        notifyDataSetChanged();
     }
 }

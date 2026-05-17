@@ -39,6 +39,12 @@ public class Message {
     @Builder.Default
     private Instant createdAt = Instant.now();
 
+    @Column
+    private String mediaUrl;
+
+    @Column
+    private String mediaType;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

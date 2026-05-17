@@ -8,10 +8,12 @@ public class Message {
     public String senderAvatar;
     public String time;
     public boolean isOutgoing;
+    public String mediaUrl;
+    public String mediaType;
 
-    public Message(String id, String text, String senderId,
-                   String senderName, String senderAvatar,
-                   String time, boolean isOutgoing) {
+    public Message(String id, String text, String senderId, String senderName,
+                   String senderAvatar, String time, boolean isOutgoing,
+                   String mediaUrl, String mediaType) {
         this.id = id;
         this.text = text;
         this.senderId = senderId;
@@ -19,5 +21,7 @@ public class Message {
         this.senderAvatar = senderAvatar;
         this.time = time;
         this.isOutgoing = isOutgoing;
+        this.mediaUrl = mediaUrl;
+        this.mediaType = mediaType;
     }
 }

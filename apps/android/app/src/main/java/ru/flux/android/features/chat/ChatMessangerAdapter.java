@@ -3,6 +3,7 @@ package ru.flux.android.features.chat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -70,6 +71,18 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
             OutViewHolder h = (OutViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
+
+            if (message.mediaUrl != null) {
+                h.mediaImage.setVisibility(View.VISIBLE);
+                Glide.with(h.mediaImage.getContext())
+                        .load(message.mediaUrl)
+                        .placeholder(R.drawable.bg_avatar_placeholder)
+                        .error(R.drawable.bg_avatar_placeholder)
+                        .into(h.mediaImage);
+            } else {
+                h.mediaImage.setVisibility(View.GONE);
+            }
+
             h.itemView.setOnLongClickListener(v -> {
                 if (longClickListener != null) longClickListener.onLongClick(message);
                 return true;
@@ -79,10 +92,17 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
             InViewHolder h = (InViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
-            h.itemView.setOnLongClickListener(v -> {
-                if (longClickListener != null) longClickListener.onLongClick(message);
-                return true;
-            });
+
+            if (message.mediaUrl != null) {
+                h.mediaImage.setVisibility(View.VISIBLE);
+                Glide.with(h.mediaImage.getContext())
+                        .load(message.mediaUrl)
+                        .placeholder(R.drawable.bg_avatar_placeholder)
+                        .error(R.drawable.bg_avatar_placeholder)
+                        .into(h.mediaImage);
+            } else {
+                h.mediaImage.setVisibility(View.GONE);
+            }
 
             if (isGroupChat) {
                 h.senderName.setVisibility(View.VISIBLE);
@@ -98,6 +118,11 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 h.senderName.setVisibility(View.GONE);
                 h.avatar.setVisibility(View.GONE);
             }
+
+            h.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) longClickListener.onLongClick(message);
+                return true;
+            });
         }
     }
 
@@ -108,17 +133,20 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     static class OutViewHolder extends RecyclerView.ViewHolder {
         TextView text, time;
+        ImageView mediaImage;
 
         OutViewHolder(View view) {
             super(view);
             text = view.findViewById(R.id.messageText);
             time = view.findViewById(R.id.messageTime);
+            mediaImage = view.findViewById(R.id.messageMedia);
         }
     }
 
     static class InViewHolder extends RecyclerView.ViewHolder {
         TextView text, time, senderName;
         ShapeableImageView avatar;
+        ImageView mediaImage;
 
         InViewHolder(View view) {
             super(view);
@@ -126,6 +154,7 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
             time = view.findViewById(R.id.messageTime);
             senderName = view.findViewById(R.id.senderName);
             avatar = view.findViewById(R.id.senderAvatar);
+            mediaImage = view.findViewById(R.id.messageMedia);
         }
     }
 }

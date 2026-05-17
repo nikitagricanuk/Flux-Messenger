@@ -14,6 +14,14 @@
         android:background="@drawable/bg_bubble_out"
         android:padding="10dp">
 
+        <ImageView
+            android:id="@+id/messageMedia"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:layout_marginBottom="4dp" />
+
         <TextView
             android:id="@+id/messageText"
             android:layout_width="wrap_content"

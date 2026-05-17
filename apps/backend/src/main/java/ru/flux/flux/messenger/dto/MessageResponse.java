@@ -14,7 +14,9 @@ public record MessageResponse(
         String senderAvatar,
         String text,
         MessageStatus status,
-        Instant createdAt
+        Instant createdAt,
+        String mediaUrl,
+        String mediaType 
 ) {
     public static MessageResponse from(Message message) {
         return new MessageResponse(
@@ -27,7 +29,9 @@ public record MessageResponse(
                 message.getSender().getAvatarUrl(),
                 message.getText(),
                 message.getStatus(),
-                message.getCreatedAt()
+                message.getCreatedAt(),
+                message.getMediaUrl(),   
+                message.getMediaType() 
         );
     }
 }
