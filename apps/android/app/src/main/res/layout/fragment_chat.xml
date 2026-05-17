@@ -95,9 +95,50 @@
         android:paddingBottom="8dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/chatHeader"
-        app:layout_constraintBottom_toTopOf="@id/inputPanel"
+        app:layout_constraintBottom_toTopOf="@id/attachmentPreview"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/attachmentPreview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@drawable/bg_rounded"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/inputPanel"
+        app:layout_constraintTop_toBottomOf="@id/messagesRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/attachmentThumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/RoundedImage" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Фото прикреплено"
+            android:textSize="14sp"
+            android:textColor="#000000" />
+
+        <ImageView
+            android:id="@+id/btnRemoveAttachment"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/cross"
+            android:contentDescription="remove" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/inputPanel"
@@ -106,7 +147,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="8dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -118,8 +158,7 @@
             app:shapeAppearanceOverlay="@style/RoundedImage"
             app:cardElevation="0dp"
             android:clickable="true"
-            android:focusable="true"
-            >
+            android:focusable="true">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -133,6 +172,7 @@
                     android:layout_gravity="center"
                     android:src="@drawable/fi_rr_plus"
                     android:contentDescription="attach" />
+
             </FrameLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -145,8 +185,7 @@
             android:gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:background="@drawable/bg_rounded"
-            android:padding="4dp"
-            >
+            android:padding="4dp">
 
             <EditText
                 android:id="@+id/messageInput"
@@ -154,8 +193,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Введите сообщение..."
+                android:textColor="#000000"
+                android:textColorHint="#88000000"
                 android:background="@android:color/transparent"
-                android:maxLines="1" />
+                android:maxLines="4"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:inputType="textMultiLine|textCapSentences" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="41dp"
@@ -165,8 +209,7 @@
                 app:cardElevation="0dp"
                 android:layout_marginStart="8dp"
                 android:clickable="true"
-                android:focusable="true"
-                >
+                android:focusable="true">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -180,6 +223,7 @@
                         android:layout_gravity="center"
                         android:src="@drawable/fi_rr_paper_plane"
                         android:contentDescription="send" />
+
                 </FrameLayout>
 
             </com.google.android.material.card.MaterialCardView>

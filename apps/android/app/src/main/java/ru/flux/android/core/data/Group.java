@@ -1,15 +1,17 @@
 package ru.flux.android.core.data;
 
-public class Group {
-    public String name;
-    public String membersCount;
-    public String date;
-    public String avatarUrl;
+import java.util.List;
 
-    public Group(String name, String membersCount, String date, String avatarUrl) {
+public class Group {
+    public String id;
+    public String name;
+    public String avatarUrl;
+    public List<String> memberIds;
+
+    public Group(String id, String name, String avatarUrl, List<String> memberIds) {
+        this.id = id;
         this.name = name;
-        this.membersCount = membersCount;
-        this.date = date;
         this.avatarUrl = avatarUrl;
+        this.memberIds = memberIds;
     }
 }

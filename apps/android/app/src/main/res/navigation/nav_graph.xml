@@ -39,6 +39,10 @@
         <action
             android:id="@+id/action_profile_to_imageViewer"
             app:destination="@id/imageViewerFragment" />
+
+        <action
+            android:id="@+id/action_profile_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
 
     <fragment

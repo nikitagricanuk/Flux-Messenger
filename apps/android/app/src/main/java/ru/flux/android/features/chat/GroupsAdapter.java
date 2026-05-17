@@ -22,12 +22,18 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         void onGroupClick(Group group);
     }
 
-    private final List<Group> groups;
+    private List<Group> groups;
     private final OnGroupClickListener listener;
 
     public GroupsAdapter(List<Group> groups, OnGroupClickListener listener) {
         this.groups = groups;
         this.listener = listener;
+    }
+
+    public void setGroups(List<Group> newGroups) {
+        groups.clear();
+        groups.addAll(newGroups);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -42,8 +48,10 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Group group = groups.get(position);
         holder.name.setText(group.name);
-        holder.members.setText(group.membersCount + " участников");
-        holder.date.setText("С " + group.date);
+        holder.name.setText(group.name);
+        holder.members.setText(group.memberIds != null
+                ? group.memberIds.size() + " участников" : "");
+        holder.date.setText("");
 
         Glide.with(holder.avatar.getContext())
                 .load(group.avatarUrl)

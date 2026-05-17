@@ -18,6 +18,7 @@ import java.util.UUID;
 import ru.flux.android.R;
 import ru.flux.android.features.chat.ProfileAdapter;
 import ru.flux.android.features.chat.ProfileViewModel;
+import ru.flux.android.features.chats.ChatsViewModel;
 
 public class Profile extends Fragment {
 
@@ -36,10 +37,18 @@ public class Profile extends Fragment {
 
         String contactIdStr = getArguments() != null
                 ? getArguments().getString("contactId") : null;
+        String chatIdStr = getArguments() != null
+                ? getArguments().getString("chatId") : null;
 
-        if (contactIdStr != null) {
-            viewModel.loadUser(UUID.fromString(contactIdStr));
+        if (contactIdStr != null) viewModel.loadUser(UUID.fromString(contactIdStr));
+
+        if (chatIdStr != null) {
+            viewModel.loadMedia(UUID.fromString(chatIdStr));
+            viewModel.loadLinks(UUID.fromString(chatIdStr));
         }
+
+        ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
+        chatsViewModel.getChats().observe(getViewLifecycleOwner(), viewModel::loadGroups);
 
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             ((TextView) view.findViewById(R.id.profileName)).setText(

@@ -22,12 +22,18 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
         void onLinkClick(Link link);
     }
 
-    private final List<Link> links;
+    private List<Link> links;
     private final OnLinkClickListener listener;
 
     public LinksAdapter(List<Link> links, OnLinkClickListener listener) {
         this.links = links;
         this.listener = listener;
+    }
+
+    public void setLinks(List<Link> newLinks) {
+        links.clear();
+        links.addAll(newLinks);
+        notifyDataSetChanged();
     }
 
     @NonNull

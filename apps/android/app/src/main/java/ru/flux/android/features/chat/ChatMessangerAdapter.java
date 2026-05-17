@@ -157,4 +157,8 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
             mediaImage = view.findViewById(R.id.messageMedia);
         }
     }
+
+    public boolean isEmpty() {
+        return messages.isEmpty();
+    }
 }

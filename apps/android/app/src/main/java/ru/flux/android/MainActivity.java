@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_main);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -48,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
         navController = navHostFragment.getNavController();
 
         navController.addOnDestinationChangedListener((ctrl, destination, arguments) -> {
-            if (destination.getId() == R.id.chatFragment) {
+            if (destination.getId() == R.id.chatFragment
+                    || destination.getId() == R.id.imageViewerFragment
+                    || destination.getId() == R.id.profileFragment) {
                 setNavBarVisible(false);
             } else {
                 setNavBarVisible(true);
