@@ -38,6 +38,8 @@ public class ChatViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Message>> messagesLiveData = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> editingMessageTextLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> clearInput = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isUploading = new MutableLiveData<>(false);
+    public LiveData<Boolean> getIsUploading() { return isUploading; }
     private ApiService messagingApi;
     private TokenManager tokenManager;
     private WebSocketManager webSocketManager;
@@ -125,6 +127,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     public void sendMedia(Uri fileUri, String caption) {
         Log.d(TAG, "sendMedia called, uri=" + fileUri + " caption=" + caption);
+        isUploading.postValue(true);
         try {
             android.content.ContentResolver resolver =
                     getApplication().getApplicationContext().getContentResolver();
@@ -153,6 +156,7 @@ public class ChatViewModel extends AndroidViewModel {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call,
                                        @NonNull Response<ResponseBody> response) {
+                    isUploading.postValue(false);
                     if (response.isSuccessful() && response.body() != null) {
                         try {
                             String mediaUrl = response.body().string();
@@ -167,12 +171,15 @@ public class ChatViewModel extends AndroidViewModel {
                         Log.e(TAG, "Upload failed: " + response.code());
                     }
                 }
+
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                    isUploading.postValue(false);
                     Log.e(TAG, "Upload error", t);
                 }
             });
         } catch (Exception e) {
+            isUploading.postValue(false);
             Log.e(TAG, "sendMedia error", e);
         }
     }

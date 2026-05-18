@@ -67,42 +67,34 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
 
+        View itemView = holder.itemView;
+        ImageView mediaImage = itemView.findViewById(R.id.messageMedia);
+
+        if (message.mediaUrl != null) {
+            mediaImage.setVisibility(View.VISIBLE);
+            Glide.with(mediaImage.getContext())
+                    .load(message.mediaUrl)
+                    .placeholder(R.drawable.bg_avatar_placeholder)
+                    .error(R.drawable.bg_avatar_placeholder)
+                    .into(mediaImage);
+        } else {
+            mediaImage.setVisibility(View.GONE);
+        }
+
+        itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) longClickListener.onLongClick(message);
+            return true;
+        });
+
         if (holder instanceof OutViewHolder) {
             OutViewHolder h = (OutViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
 
-            if (message.mediaUrl != null) {
-                h.mediaImage.setVisibility(View.VISIBLE);
-                Glide.with(h.mediaImage.getContext())
-                        .load(message.mediaUrl)
-                        .placeholder(R.drawable.bg_avatar_placeholder)
-                        .error(R.drawable.bg_avatar_placeholder)
-                        .into(h.mediaImage);
-            } else {
-                h.mediaImage.setVisibility(View.GONE);
-            }
-
-            h.itemView.setOnLongClickListener(v -> {
-                if (longClickListener != null) longClickListener.onLongClick(message);
-                return true;
-            });
-
         } else if (holder instanceof InViewHolder) {
             InViewHolder h = (InViewHolder) holder;
             h.text.setText(message.text);
             h.time.setText(message.time);
-
-            if (message.mediaUrl != null) {
-                h.mediaImage.setVisibility(View.VISIBLE);
-                Glide.with(h.mediaImage.getContext())
-                        .load(message.mediaUrl)
-                        .placeholder(R.drawable.bg_avatar_placeholder)
-                        .error(R.drawable.bg_avatar_placeholder)
-                        .into(h.mediaImage);
-            } else {
-                h.mediaImage.setVisibility(View.GONE);
-            }
 
             if (isGroupChat) {
                 h.senderName.setVisibility(View.VISIBLE);
@@ -118,11 +110,6 @@ public class ChatMessangerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 h.senderName.setVisibility(View.GONE);
                 h.avatar.setVisibility(View.GONE);
             }
-
-            h.itemView.setOnLongClickListener(v -> {
-                if (longClickListener != null) longClickListener.onLongClick(message);
-                return true;
-            });
         }
     }
 

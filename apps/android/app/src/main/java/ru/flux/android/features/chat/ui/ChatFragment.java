@@ -149,7 +149,17 @@ public class ChatFragment extends Fragment {
         });
 
         viewModel.getClearInput().observe(getViewLifecycleOwner(), clear -> {
-            if (clear != null && clear) input.setText("");
+            if (clear != null && clear) {
+                input.setText("");
+                View preview = requireView().findViewById(R.id.attachmentPreview);
+                preview.setVisibility(View.GONE);
+            }
+        });
+
+        viewModel.getIsUploading().observe(getViewLifecycleOwner(), uploading -> {
+            View btnSend = requireView().findViewById(R.id.btnSend);
+            btnSend.setEnabled(!uploading);
+            btnSend.setAlpha(uploading ? 0.2f : 1f);
         });
 
         recyclerView.addOnLayoutChangeListener((v, left, top, right, bottom,
