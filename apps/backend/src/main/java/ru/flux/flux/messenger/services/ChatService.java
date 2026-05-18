@@ -50,8 +50,10 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public List<ChatResponse> getAllChats(UUID currentUserId) {
-        List<Chat> chats = repository.findByMemberIdWithMembers(currentUserId);
-        if (chats.isEmpty()) return List.of();
+        List<UUID> chatIds = repository.findChatIdsByMemberId(currentUserId);
+        if (chatIds.isEmpty()) return List.of();
+        // Second query loads ALL members of each chat without the WHERE filtering the fetched collection
+        List<Chat> chats = repository.findByIdsWithAllMembers(chatIds);
 
         // Batch-load peer users for all DIRECT chats in one query
         List<UUID> peerIds = chats.stream()
@@ -63,8 +65,7 @@ public class ChatService {
                 : userRepository.findAllById(peerIds).stream()
                         .collect(Collectors.toMap(User::getId, u -> u));
 
-        // Batch-load last message for each chat in one query
-        List<UUID> chatIds = chats.stream().map(Chat::getId).toList();
+        // Batch-load last message for each chat in one query (reuse chatIds already resolved above)
         Map<UUID, Message> lastMessages = messageRepository.findLastMessagesForChats(chatIds)
                 .stream().collect(Collectors.toMap(m -> m.getChat().getId(), m -> m));
 
