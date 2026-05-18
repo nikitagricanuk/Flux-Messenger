@@ -28,6 +28,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     private final MutableLiveData<UserResponse> user = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingUser = new MutableLiveData<>(false);
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final AtomicBoolean loading = new AtomicBoolean(false);
 
@@ -37,11 +38,13 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public LiveData<UserResponse> getUser() { return user; }
     public LiveData<String> getError() { return error; }
+    public LiveData<Boolean> isLoadingUser() { return loadingUser; }
 
     public void loadUser() {
         if (user.getValue() != null) return;
         if (!loading.compareAndSet(false, true)) return;
         Log.d(TAG, "loadUser");
+        loadingUser.postValue(true);
         executor.execute(() -> {
             try {
                 ApiService api = buildApi();
@@ -58,6 +61,7 @@ public class SettingsViewModel extends AndroidViewModel {
                 error.postValue(e.getMessage());
             } finally {
                 loading.set(false);
+                loadingUser.postValue(false);
             }
         });
     }

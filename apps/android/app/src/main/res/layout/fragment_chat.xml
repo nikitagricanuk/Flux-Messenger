@@ -99,6 +99,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ru.flux.android.core.views.ShimmerLayout
+        android:id="@+id/shimmerMessages"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingHorizontal="8dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/chatHeader"
+        app:layout_constraintBottom_toTopOf="@id/attachmentPreview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
+
+            <include layout="@layout/skeleton_item_message_in" />
+            <include layout="@layout/skeleton_item_message_out" />
+            <include layout="@layout/skeleton_item_message_in" />
+            <include layout="@layout/skeleton_item_message_out" />
+            <include layout="@layout/skeleton_item_message_out" />
+            <include layout="@layout/skeleton_item_message_in" />
+
+        </LinearLayout>
+
+    </ru.flux.android.core.views.ShimmerLayout>
+
     <LinearLayout
         android:id="@+id/attachmentPreview"
         android:layout_width="0dp"

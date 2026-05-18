@@ -44,7 +44,34 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_scrollFlags="scroll|exitUntilCollapsed"
-        />
+        app:layout_scrollFlags="scroll|exitUntilCollapsed" />
+
+    <ru.flux.android.core.views.ShimmerLayout
+        android:id="@+id/shimmerContacts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="12dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/contacts_page"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/skeleton_item_contact" />
+            <include layout="@layout/skeleton_item_contact" />
+            <include layout="@layout/skeleton_item_contact" />
+            <include layout="@layout/skeleton_item_contact" />
+            <include layout="@layout/skeleton_item_contact" />
+            <include layout="@layout/skeleton_item_contact" />
+
+        </LinearLayout>
+
+    </ru.flux.android.core.views.ShimmerLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

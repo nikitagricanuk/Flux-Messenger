@@ -62,7 +62,7 @@ public class PasskeyService {
     public record PasskeyOptions(PublicKeyCredentialCreationOptions options, String nonce) {}
     public record AuthOptions(PublicKeyCredentialRequestOptions options, String nonce) {}
 
-    public PasskeyOptions startPasskey(String phone) {
+    public PasskeyOptions startPasskey(String phone, String firstName, String lastName, String username) {
         PublicKeyCredentialCreationOptions options = PublicKeyCredentialCreationOptions.builder()
                 .rp(rpEntity)
                 .user(ImmutablePublicKeyCredentialUserEntity.builder()
@@ -79,16 +79,17 @@ public class PasskeyService {
                 .timeout(Duration.ofMinutes(5))
                 .build();
 
-        String nonce = challengeCache.saveRegistrationOptions(options);
+        String nonce = challengeCache.saveRegistrationOptions(options, phone, firstName, lastName, username);
         return new PasskeyOptions(options, nonce);
     }
 
     @Transactional
     public User completePasskey(String nonce, PublicKeyCredential<AuthenticatorAttestationResponse> credential) {
-        PublicKeyCredentialCreationOptions options = challengeCache.consumeRegistrationOptions(nonce);
-        if (options == null) {
+        PasskeyChallengeCache.PendingRegistration pending = challengeCache.consumeRegistrationOptions(nonce);
+        if (pending == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Challenge expired or invalid nonce");
         }
+        PublicKeyCredentialCreationOptions options = pending.options();
 
         AuthenticatorAttestationResponse response = credential.getResponse();
 
@@ -141,11 +142,18 @@ public class PasskeyService {
 
         // Case 2: phone known, new passkey   Case 3: fully new user
         User user = userRepository.findByPhone(phone).orElseGet(() -> {
-            String base = "user_" + phone.replaceAll("[^0-9]", "");
+            String firstName = pending.firstName();
+            String lastName  = pending.lastName();
+            String username  = pending.username();
+            String resolvedFirst = (firstName != null && !firstName.isBlank()) ? firstName : phone;
+            String resolvedUser  = (username != null && !username.isBlank())
+                    ? ensureUniqueUsername(username)
+                    : ensureUniqueUsername("user_" + phone.replaceAll("[^0-9]", ""));
             User newUser = User.builder()
                     .phone(phone)
-                    .username(ensureUniqueUsername(base))
-                    .firstName(phone)
+                    .username(resolvedUser)
+                    .firstName(resolvedFirst)
+                    .lastName(lastName != null && !lastName.isBlank() ? lastName : null)
                     .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                     .notifications(true)
                     .build();

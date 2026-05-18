@@ -27,6 +27,7 @@ public class ContactsViewModel extends AndroidViewModel {
     private static final String TAG = "ContactsViewModel";
     private final MutableLiveData<List<Contact>> contacts = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<ChatNavigationEvent> navigateToChat = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingContacts = new MutableLiveData<>(false);
 
     public ContactsViewModel(@NonNull Application application) {
         super(application);
@@ -34,13 +35,16 @@ public class ContactsViewModel extends AndroidViewModel {
 
     public LiveData<List<Contact>> getContacts() { return contacts; }
     public LiveData<ChatNavigationEvent> getNavigateToChat() { return navigateToChat; }
+    public LiveData<Boolean> isLoadingContacts() { return loadingContacts; }
 
     public void loadContacts() {
+        loadingContacts.setValue(true);
         try {
             ApiClient.api(getApplication()).getMyContacts().enqueue(new Callback<List<ContactResponse>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<ContactResponse>> call,
                                        @NonNull Response<List<ContactResponse>> response) {
+                    loadingContacts.postValue(false);
                     if (!response.isSuccessful() || response.body() == null) {
                         Log.e(TAG, "getMyContacts failed: " + response.code());
                         return;
@@ -55,10 +59,12 @@ public class ContactsViewModel extends AndroidViewModel {
 
                 @Override
                 public void onFailure(@NonNull Call<List<ContactResponse>> call, @NonNull Throwable t) {
+                    loadingContacts.postValue(false);
                     Log.e(TAG, "getMyContacts error", t);
                 }
             });
         } catch (Exception e) {
+            loadingContacts.postValue(false);
             Log.e(TAG, "ApiClient error", e);
         }
     }

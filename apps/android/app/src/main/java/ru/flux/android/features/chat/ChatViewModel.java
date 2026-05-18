@@ -39,7 +39,9 @@ public class ChatViewModel extends AndroidViewModel {
     private final MutableLiveData<String> editingMessageTextLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> clearInput = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isUploading = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> loadingMessages = new MutableLiveData<>(false);
     public LiveData<Boolean> getIsUploading() { return isUploading; }
+    public LiveData<Boolean> isLoadingMessages() { return loadingMessages; }
     private ApiService messagingApi;
     private TokenManager tokenManager;
     private WebSocketManager webSocketManager;
@@ -66,6 +68,7 @@ public class ChatViewModel extends AndroidViewModel {
     public void initChat(UUID chatId) {
         if (this.chatId != null) return;
         this.chatId = chatId;
+        loadingMessages.setValue(true);
         loadCurrentUser();
     }
 
@@ -226,6 +229,7 @@ public class ChatViewModel extends AndroidViewModel {
             @Override
             public void onResponse(@NonNull Call<List<MessageResponse>> call,
                                    @NonNull Response<List<MessageResponse>> response) {
+                loadingMessages.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     List<Message> newMessages = new ArrayList<>();
                     for (MessageResponse msg : response.body()) {
@@ -236,6 +240,7 @@ public class ChatViewModel extends AndroidViewModel {
             }
             @Override
             public void onFailure(@NonNull Call<List<MessageResponse>> call, @NonNull Throwable t) {
+                loadingMessages.postValue(false);
                 Log.e(TAG, "loadHistory error", t);
             }
         });

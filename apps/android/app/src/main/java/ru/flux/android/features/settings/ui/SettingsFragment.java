@@ -46,6 +46,11 @@ public class SettingsFragment extends Fragment {
         binding.notificationsButton.setOnClickListener(v -> navController.navigate(R.id.settingsNotificationsFragment));
         binding.logoutButton.setOnClickListener(v -> logout());
 
+        viewModel.isLoadingUser().observe(getViewLifecycleOwner(), loading -> {
+            binding.shimmerSettings.setVisibility(loading ? View.VISIBLE : View.GONE);
+            binding.profileHeader.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        });
+
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             String name = (user.firstName != null ? user.firstName : "")
                     + (user.lastName != null ? " " + user.lastName : "");

@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Pattern;
 
 public record PasskeyOptionsRequest(
         @Pattern(regexp = "^\\+?[0-9]{10,15}$")
-        @NotBlank String phone
+        @NotBlank String phone,
+        String firstName,
+        String lastName,
+        String username
 ) {
 }

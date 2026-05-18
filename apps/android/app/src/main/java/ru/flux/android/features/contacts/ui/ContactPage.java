@@ -42,6 +42,11 @@ public class ContactPage extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
+        View shimmerContacts = view.findViewById(R.id.shimmerContacts);
+        viewModel.isLoadingContacts().observe(getViewLifecycleOwner(), loading -> {
+            shimmerContacts.setVisibility(loading ? View.VISIBLE : View.GONE);
+            recyclerView.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        });
         viewModel.getContacts().observe(getViewLifecycleOwner(), adapter::setContacts);
 
         viewModel.getNavigateToChat().observe(getViewLifecycleOwner(), event -> {

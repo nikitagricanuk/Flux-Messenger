@@ -135,6 +135,12 @@ public class ChatFragment extends Fragment {
     }
 
     private void observeViewModel() {
+        View shimmerMessages = requireView().findViewById(R.id.shimmerMessages);
+        viewModel.isLoadingMessages().observe(getViewLifecycleOwner(), loading -> {
+            shimmerMessages.setVisibility(loading ? View.VISIBLE : View.GONE);
+            recyclerView.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        });
+
         viewModel.getMessages().observe(getViewLifecycleOwner(), messages -> {
             chatAdapter.updateMessages(messages);
             if (!messages.isEmpty()) {

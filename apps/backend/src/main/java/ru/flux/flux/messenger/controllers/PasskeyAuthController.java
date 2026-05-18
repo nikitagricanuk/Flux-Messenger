@@ -32,7 +32,8 @@ public class PasskeyAuthController {
     public ResponseEntity<PasskeyCreationOptionsResponse> options(
             @Valid @RequestBody PasskeyOptionsRequest request
     ) {
-        PasskeyService.PasskeyOptions result = passkeyService.startPasskey(request.phone());
+        PasskeyService.PasskeyOptions result = passkeyService.startPasskey(
+                request.phone(), request.firstName(), request.lastName(), request.username());
         return ResponseEntity.ok()
                 .header("X-Challenge-Nonce", result.nonce())
                 .body(toCreationResponse(result.options()));
