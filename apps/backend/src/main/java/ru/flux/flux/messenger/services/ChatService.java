@@ -221,7 +221,7 @@ public class ChatService {
             }
 
             if (name == null || name.isBlank()) {
-                name = "Личный чат";
+                name = "Удалённый аккаунт";
             }
         }
 
