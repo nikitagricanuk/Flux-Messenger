@@ -29,45 +29,52 @@ public class AuthInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
+        Request original = chain.request();
 
-        // /api/auth/** endpoints (sign-in, sign-up, refresh, passkey/*) are public:
-        // they neither accept a bearer token nor benefit from a refresh-and-retry on
-        // 4xx, and some (passkey finish/complete) consume single-use server-side
-        // nonces, so a blind retry corrupts state. Skip token handling for them.
-        boolean isPublicAuth = request.url().encodedPath().startsWith("/api/auth/");
+        if (isPublicEndpoint(original.url().encodedPath())) {
+            Response response = chain.proceed(original);
+            Log.v(TAG, "intercept: " + original.method() + " " + original.url() + " -> " + response.code() + " (public)");
+            return response;
+        }
 
-        if (!isPublicAuth) {
-            String token = getValidToken();
-            if (token != null) {
-                Log.d(TAG, "intercept: attaching token ..." + token.substring(Math.max(0, token.length() - 8)) + " for " + request.method() + " " + request.url());
-                request = request.newBuilder()
-                        .header("Authorization", "Bearer " + token)
-                        .build();
-            } else {
-                Log.w(TAG, "intercept: no valid token for " + request.url());
-            }
+        String token = getValidToken();
+
+        Request request = original;
+        if (token != null) {
+            Log.d(TAG, "intercept: attaching token ..." + token.substring(Math.max(0, token.length() - 8)) + " for " + request.method() + " " + request.url());
+            request = request.newBuilder()
+                    .header("Authorization", "Bearer " + token)
+                    .build();
+        } else {
+            Log.w(TAG, "intercept: no valid token for " + request.url());
         }
 
         Response response = chain.proceed(request);
         Log.v(TAG, "intercept: " + request.method() + " " + request.url() + " -> " + response.code());
 
-        if (!isPublicAuth && (response.code() == 401 || response.code() == 403)) {
+        if (response.code() == 401 || response.code() == 403) {
             Log.w(TAG, "intercept: " + response.code() + " received, attempting token refresh");
             response.close();
             String refreshed = refreshTokens();
             if (refreshed == null) {
-                Log.e(TAG, "intercept: token refresh failed, propagating " + response.code());
-                return chain.proceed(chain.request());
+                Log.e(TAG, "intercept: token refresh failed, retrying without auth");
+                return chain.proceed(original);
             }
             Log.d(TAG, "intercept: token refreshed, retrying request");
-            Request retry = chain.request().newBuilder()
+            Request retry = original.newBuilder()
                     .header("Authorization", "Bearer " + refreshed)
                     .build();
             return chain.proceed(retry);
         }
 
         return response;
+    }
+
+    private static boolean isPublicEndpoint(String path) {
+        return path.startsWith("/api/auth/sign-in")
+                || path.startsWith("/api/auth/sign-up")
+                || path.startsWith("/api/auth/refresh")
+                || path.startsWith("/api/auth/passkey/");
     }
 
     @Nullable
