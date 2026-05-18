@@ -111,13 +111,17 @@ public class ChatFragment extends Fragment {
                 NavHostFragment.findNavController(this).popBackStack());
 
         view.findViewById(R.id.chatHeader).setOnClickListener(v -> {
-            Bundle args = new Bundle();
-            args.putString("contactId", peerId);
-            args.putString("chatId", chatId != null ? chatId.toString() : null);
-            args.putBoolean("isGroup", isGroup);
-            NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_chatFragment_to_profileFragment, args);
-        });
+                    Bundle args = new Bundle();
+                    if (!isGroup && peerId != null) {
+                        args.putString("contactId", peerId);
+                    }
+                    if (chatId != null) {
+                        args.putString("chatId", chatId.toString());
+                    }
+                    args.putBoolean("isGroup", isGroup);
+                    NavHostFragment.findNavController(this)
+                            .navigate(R.id.action_chatFragment_to_profileFragment, args);
+                });
 
         view.findViewById(R.id.btnAttach).setOnClickListener(v ->
                 pickMedia.launch("image/*"));
