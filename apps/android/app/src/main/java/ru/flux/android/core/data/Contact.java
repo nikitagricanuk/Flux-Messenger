@@ -9,7 +9,6 @@ public class Contact {
     UUID id;
     String name;
     String profilePicture;
-
     String phoneNumber;
     String email;
 

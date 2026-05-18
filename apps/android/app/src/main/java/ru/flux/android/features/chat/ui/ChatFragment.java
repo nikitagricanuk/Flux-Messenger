@@ -36,6 +36,7 @@ public class ChatFragment extends Fragment {
     private RecyclerView recyclerView;
     private EditText input;
     private UUID chatId;
+    private boolean isGroup = false;
 
     public ChatFragment() {
         super(R.layout.fragment_chat);
@@ -69,7 +70,7 @@ public class ChatFragment extends Fragment {
 
         String chatName = getArguments() != null
                 ? getArguments().getString("chatName", "Чат") : "Чат";
-        boolean isGroup = getArguments() != null
+        this.isGroup = getArguments() != null
                 && getArguments().getBoolean("isGroup", false);
         String chatIdStr = getArguments() != null
                 ? getArguments().getString("chatId") : null;
@@ -84,7 +85,7 @@ public class ChatFragment extends Fragment {
         }
 
         setupUI(view, chatName, chatAvatarUrl, peerId);
-        setupRecyclerView(view, isGroup);
+        setupRecyclerView(view, this.isGroup);
         observeViewModel();
     }
 
@@ -112,7 +113,8 @@ public class ChatFragment extends Fragment {
         view.findViewById(R.id.chatHeader).setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("contactId", peerId);
-            if (chatId != null) args.putString("chatId", chatId.toString());
+            args.putString("chatId", chatId != null ? chatId.toString() : null);
+            args.putBoolean("isGroup", isGroup);
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_chatFragment_to_profileFragment, args);
         });
