@@ -29,9 +29,17 @@ public class AuthInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
+        Request original = chain.request();
+
+        if (isPublicEndpoint(original.url().encodedPath())) {
+            Response response = chain.proceed(original);
+            Log.v(TAG, "intercept: " + original.method() + " " + original.url() + " -> " + response.code() + " (public)");
+            return response;
+        }
+
         String token = getValidToken();
 
-        Request request = chain.request();
+        Request request = original;
         if (token != null) {
             Log.d(TAG, "intercept: attaching token ..." + token.substring(Math.max(0, token.length() - 8)) + " for " + request.method() + " " + request.url());
             request = request.newBuilder()
@@ -50,16 +58,23 @@ public class AuthInterceptor implements Interceptor {
             String refreshed = refreshTokens();
             if (refreshed == null) {
                 Log.e(TAG, "intercept: token refresh failed, retrying without auth");
-                return chain.proceed(chain.request());
+                return chain.proceed(original);
             }
             Log.d(TAG, "intercept: token refreshed, retrying request");
-            Request retry = chain.request().newBuilder()
+            Request retry = original.newBuilder()
                     .header("Authorization", "Bearer " + refreshed)
                     .build();
             return chain.proceed(retry);
         }
 
         return response;
+    }
+
+    private static boolean isPublicEndpoint(String path) {
+        return path.startsWith("/api/auth/sign-in")
+                || path.startsWith("/api/auth/sign-up")
+                || path.startsWith("/api/auth/refresh")
+                || path.startsWith("/api/auth/passkey/");
     }
 
     @Nullable

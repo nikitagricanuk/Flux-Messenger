@@ -21,6 +21,8 @@ import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenti
 import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.Base64UrlUtil;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +44,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PasskeyService {
+
+    private static final Logger log = LoggerFactory.getLogger(PasskeyService.class);
 
     private final WebAuthnManager webAuthnManager;
     private final ObjectConverter objectConverter;
@@ -190,8 +194,11 @@ public class PasskeyService {
 
         String credentialId = credential.getRawId().toBase64UrlString();
         PasskeyCredential stored = credentialRepository.findById(credentialId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                        "Passkey not registered for this device"));
+                .orElseThrow(() -> {
+                    log.warn("completeAuthentication: credentialId={} not found in repository", credentialId);
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                            "Passkey not registered for this device");
+                });
 
         AuthenticatorAssertionResponse response = credential.getResponse();
 
@@ -221,6 +228,7 @@ public class PasskeyService {
         try {
             data = webAuthnManager.verify(authRequest, authParams);
         } catch (Exception e) {
+            log.warn("completeAuthentication: webauthn verify failed for credentialId={}: {}", credentialId, e.toString());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Passkey verification failed");
         }
 
