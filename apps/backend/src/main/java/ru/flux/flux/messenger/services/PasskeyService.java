@@ -21,6 +21,7 @@ import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenti
 import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.Base64UrlUtil;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -133,7 +134,9 @@ public class PasskeyService {
         // Case 1: credential already registered → returning user
         Optional<PasskeyCredential> existingCred = credentialRepository.findById(credentialId);
         if (existingCred.isPresent()) {
-            return existingCred.get().getUser();
+            User existingUser = existingCred.get().getUser();
+            Hibernate.initialize(existingUser);
+            return existingUser;
         }
 
         // Case 2: phone known, new passkey   Case 3: fully new user
@@ -235,7 +238,9 @@ public class PasskeyService {
         stored.setSignCount(data.getAuthenticatorData().getSignCount());
         credentialRepository.save(stored);
 
-        return stored.getUser();
+        User user = stored.getUser();
+        Hibernate.initialize(user);
+        return user;
     }
 
     private List<com.webauthn4j.data.PublicKeyCredentialParameters> convertParams(
