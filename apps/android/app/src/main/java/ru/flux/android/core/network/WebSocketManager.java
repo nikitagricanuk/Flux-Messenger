@@ -57,12 +57,6 @@ public class WebSocketManager {
         );
     }
 
-    public interface SendCallback {
-        void onSuccess();
-
-        void onError(Throwable throwable);
-    }
-
     public void subscribeTo(UUID chatId, MessageListener listener) {
         disposables.add(
                 stompClient.topic("/topic/user/" + chatId)
@@ -89,23 +83,6 @@ public class WebSocketManager {
                             }
                         }, throwable -> Log.e(TAG, "Subscribe delete error", throwable))
         );
-    }
-
-    public void sendMessage(UUID chatId, String text, SendCallback callback) {
-        String payload = gson.toJson(new SendMessageRequest(chatId, text));
-        Log.d(TAG, "Sending payload: " + payload);
-
-        stompClient.send("/app/chat.send", payload)
-                .subscribe(
-                        () -> {
-                            Log.d(TAG, "SEND completed");
-                            if (callback != null) callback.onSuccess();
-                        },
-                        throwable -> {
-                            Log.e(TAG, "SEND failed", throwable);
-                            if (callback != null) callback.onError(throwable);
-                        }
-                );
     }
 
     public void disconnect() {

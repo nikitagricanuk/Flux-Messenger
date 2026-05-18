@@ -34,6 +34,8 @@ public class ProfileViewModel extends AndroidViewModel {
     private final MutableLiveData<List<String>> mediaUrls = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Link>> links = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Group>> groups = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<UserResponse>> members = new MutableLiveData<>(new ArrayList<>());
+    public LiveData<List<UserResponse>> getMembers() { return members; }
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
@@ -118,6 +120,32 @@ public class ProfileViewModel extends AndroidViewModel {
                     });
         } catch (Exception e) {
             Log.e(TAG, "ApiClient error", e);
+        }
+    }
+
+    public void loadMembers(List<String> memberIds) {
+        List<UserResponse> result = new ArrayList<>();
+        for (String memberId : memberIds) {
+            try {
+                ApiClient.api(getApplication()).getUserById(UUID.fromString(memberId))
+                        .enqueue(new Callback<UserResponse>() {
+                            @Override
+                            public void onResponse(@NonNull Call<UserResponse> call,
+                                                   @NonNull Response<UserResponse> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    result.add(response.body());
+                                    members.postValue(new ArrayList<>(result));
+                                }
+                            }
+                            @Override
+                            public void onFailure(@NonNull Call<UserResponse> call,
+                                                  @NonNull Throwable t) {
+                                Log.e(TAG, "loadMembers error", t);
+                            }
+                        });
+            } catch (Exception e) {
+                Log.e(TAG, "ApiClient error", e);
+            }
         }
     }
 

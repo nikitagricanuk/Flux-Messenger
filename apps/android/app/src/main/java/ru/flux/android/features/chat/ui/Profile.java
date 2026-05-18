@@ -32,58 +32,81 @@ public class Profile extends Fragment {
 
         ProfileViewModel viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        setupTabs(view);
-        setupBackButton(view);
-
         String contactIdStr = getArguments() != null
                 ? getArguments().getString("contactId") : null;
         String chatIdStr = getArguments() != null
                 ? getArguments().getString("chatId") : null;
+        boolean isGroup = getArguments() != null
+                && getArguments().getBoolean("isGroup", false);
 
-        if (contactIdStr != null) viewModel.loadUser(UUID.fromString(contactIdStr));
+        setupTabs(view, chatIdStr, isGroup);
+        setupBackButton(view);
+
+        if (isGroup) {
+            if (chatIdStr != null) {
+                ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity())
+                        .get(ChatsViewModel.class);
+                chatsViewModel.getChats().observe(getViewLifecycleOwner(), chats -> {
+                    for (ru.flux.android.core.data.Chat chat : chats) {
+                        if (chat.id.equals(chatIdStr)) {
+                            ((TextView) view.findViewById(R.id.profileName)).setText(chat.name);
+                            ((TextView) view.findViewById(R.id.profileUsername)).setText("");
+                            ((TextView) view.findViewById(R.id.profileBio)).setText(
+                                    chat.memberIds != null
+                                            ? chat.memberIds.size() + " участников" : "");
+                            if (chat.avatarUrl != null) {
+                                Glide.with(requireContext())
+                                        .load(chat.avatarUrl)
+                                        .centerCrop()
+                                        .into((ImageView) view.findViewById(R.id.profileAvatar));
+                            }
+                            if (chat.memberIds != null) {
+                                viewModel.loadMembers(chat.memberIds);
+                            }
+                            break;
+                        }
+                    }
+                });
+            }
+        } else {
+            if (contactIdStr != null) viewModel.loadUser(UUID.fromString(contactIdStr));
+
+            viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+                ((TextView) view.findViewById(R.id.profileName)).setText(
+                        user.firstName + (user.lastName != null ? " " + user.lastName : ""));
+                ((TextView) view.findViewById(R.id.profileUsername)).setText(
+                        user.nickname != null ? "@" + user.nickname : "");
+                ((TextView) view.findViewById(R.id.profileBio)).setText(
+                        user.bio != null ? user.bio : "");
+                if (user.avatarUrl != null) {
+                    Glide.with(requireContext())
+                            .load(user.avatarUrl)
+                            .centerCrop()
+                            .into((ImageView) view.findViewById(R.id.profileAvatar));
+                }
+            });
+
+            ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity())
+                    .get(ChatsViewModel.class);
+            chatsViewModel.getChats().observe(getViewLifecycleOwner(), viewModel::loadGroups);
+        }
 
         if (chatIdStr != null) {
             viewModel.loadMedia(UUID.fromString(chatIdStr));
             viewModel.loadLinks(UUID.fromString(chatIdStr));
         }
-
-        ChatsViewModel chatsViewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
-        chatsViewModel.getChats().observe(getViewLifecycleOwner(), viewModel::loadGroups);
-
-        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            ((TextView) view.findViewById(R.id.profileName)).setText(
-                    user.firstName + (user.lastName != null ? " " + user.lastName : ""));
-            ((TextView) view.findViewById(R.id.profileUsername)).setText(
-                    user.nickname != null ? "@" + user.nickname : "");
-            ((TextView) view.findViewById(R.id.profileBio)).setText(
-                    user.bio != null ? user.bio : "");
-
-            if (user.avatarUrl != null) {
-                Glide.with(requireContext())
-                        .load(user.avatarUrl)
-                        .centerCrop()
-                        .into((ImageView) view.findViewById(R.id.profileAvatar));
-            }
-        });
     }
 
-    private void setupTabs(View view) {
+    private void setupTabs(View view, String chatId, boolean isGroup) {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
-        String chatId = getArguments() != null
-                ? getArguments().getString("chatId")
-                : null;
-
-        viewPager.setAdapter(
-                new ProfileAdapter(
-                        getChildFragmentManager(),
-                        getLifecycle(),
-                        chatId
-                )
-        );
+        viewPager.setAdapter(new ProfileAdapter(
+                getChildFragmentManager(), getLifecycle(), chatId, isGroup));
 
         TextView tabMedia = view.findViewById(R.id.tabMedia);
         TextView tabLinks = view.findViewById(R.id.tabLinks);
         TextView tabGroups = view.findViewById(R.id.tabGroups);
+
+        tabGroups.setText(isGroup ? "Участники" : "Группы");
 
         tabMedia.setOnClickListener(v -> viewPager.setCurrentItem(0));
         tabLinks.setOnClickListener(v -> viewPager.setCurrentItem(1));
