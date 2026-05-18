@@ -20,6 +20,16 @@ import ru.flux.android.databinding.ItemFavoriteBinding;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
     private List<Chat> favorites = new ArrayList<>();
 
+    public interface OnFavoriteClickListener {
+        void onFavoriteClick(Chat chat);
+    }
+
+    private OnFavoriteClickListener clickListener;
+
+    public void setOnFavoriteClickListener(OnFavoriteClickListener listener) {
+        this.clickListener = listener;
+    }
+
     /**
      * @param parent   The ViewGroup into which the new View will be added after it is bound to
      *                 an adapter position.
@@ -52,6 +62,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                 .placeholder(placeholder)
                 .error(placeholder)
                 .into(vh.binding.avatar);
+
+        vh.itemView.setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onFavoriteClick(chat);
+        });
     }
 
     /**

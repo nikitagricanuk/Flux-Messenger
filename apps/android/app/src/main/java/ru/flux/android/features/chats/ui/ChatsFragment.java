@@ -58,6 +58,27 @@ public class ChatsFragment extends Fragment {
                 Navigation.findNavController(v).navigate(R.id.newMessageBottomSheet));
 
         favoriteAdapter = new FavoriteAdapter();
+
+        favoriteAdapter.setOnFavoriteClickListener(chat -> {
+            Bundle args = new Bundle();
+            args.putString("chatId", chat.id);
+            args.putString("chatName", chat.name);
+            args.putBoolean("isGroup", "group".equals(chat.type));
+            args.putString("chatAvatarUrl", chat.avatarUrl);
+
+            if (chat.memberIds != null && currentUserId != null) {
+                for (String memberId : chat.memberIds) {
+                    if (!memberId.equals(currentUserId)) {
+                        args.putString("peerId", memberId);
+                        break;
+                    }
+                }
+            }
+
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_chatsFragment_to_chatFragment, args);
+        });
+
         binding.favoritesRecycler.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.favoritesRecycler.setAdapter(favoriteAdapter);
