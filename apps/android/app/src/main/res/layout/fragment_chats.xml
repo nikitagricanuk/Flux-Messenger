@@ -100,6 +100,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/segment_tabs" />
 
+    <ru.flux.android.core.views.ShimmerLayout
+        android:id="@+id/shimmerChats"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/segment_tabs">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+            <include layout="@layout/skeleton_item_chat" />
+
+        </LinearLayout>
+
+    </ru.flux.android.core.views.ShimmerLayout>
+
     <LinearLayout
         android:id="@+id/searchBar"
         android:layout_width="0dp"

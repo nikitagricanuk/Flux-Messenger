@@ -52,7 +52,6 @@ public class SettingsFragment extends Fragment {
             binding.profileName.setText(name.trim());
             binding.profileUsername.setText(user.nickname != null ? "@" + user.nickname : "");
             boolean hasBio = user.bio != null && !user.bio.isBlank();
-            binding.profileBio.setVisibility(hasBio ? View.VISIBLE : View.GONE);
             if (hasBio) binding.profileBio.setText(user.bio);
             if (user.avatarUrl != null && !user.avatarUrl.isBlank()) {
                 InitialsDrawable placeholder = new InitialsDrawable(

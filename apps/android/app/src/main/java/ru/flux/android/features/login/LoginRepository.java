@@ -85,12 +85,13 @@ public class LoginRepository {
         }
     }
 
-    public Result<PasskeyRegistrationOptions> getPasskeyRegistrationOptions(String phone) {
+    public Result<PasskeyRegistrationOptions> getPasskeyRegistrationOptions(
+            String phone, String firstName, String lastName, String username) {
         Log.d(TAG, "getPasskeyRegistrationOptions: phone=" + phone);
         try {
             String url = resolveUrl(BuildConfig.PASSKEY_OPTIONS_PATH);
             Response<ResponseBody> response =
-                    authApi.getPasskeyOptions(url, new PasskeyRegistrationRequest(phone)).execute();
+                    authApi.getPasskeyOptions(url, new PasskeyRegistrationRequest(phone, firstName, lastName, username)).execute();
             if (response.isSuccessful() && response.body() != null) {
                 String optionsJson = response.body().string();
                 String nonce = response.headers().get("X-Challenge-Nonce");

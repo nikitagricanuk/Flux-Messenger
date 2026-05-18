@@ -27,6 +27,11 @@ public class UserController {
         return service.getAllUsers();
     }
 
+    @GetMapping("/batch")
+    public List<UserResponse> getUsersByIds(@RequestParam List<UUID> ids) {
+        return service.getUsersByIds(ids);
+    }
+
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable UUID id) {
         return service.getUserById(id);

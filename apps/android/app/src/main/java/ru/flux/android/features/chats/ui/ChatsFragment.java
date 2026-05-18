@@ -116,6 +116,10 @@ public class ChatsFragment extends Fragment {
         });
         binding.chatsRecycler.setAdapter(adapter);
 
+        viewModel.isLoadingChats().observe(getViewLifecycleOwner(), loading -> {
+            binding.shimmerChats.setVisibility(loading ? View.VISIBLE : View.GONE);
+            binding.chatsRecycler.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        });
         viewModel.getChats().observe(getViewLifecycleOwner(), adapter::setChats);
         viewModel.getError().observe(getViewLifecycleOwner(), msg -> {
             if (msg != null) {

@@ -133,13 +133,16 @@ public class PasskeyAuthManager {
         });
     }
 
-    /** Called after the user provides a phone number for first-time registration. */
+    /** Called after the user fills in registration details for first-time registration. */
     public void register(@NonNull ComponentActivity activity,
                          @NonNull String phone,
+                         @NonNull String firstName,
+                         @NonNull String lastName,
+                         @NonNull String username,
                          @NonNull Callback callback) {
         ioExecutor.execute(() -> {
             Result<PasskeyRegistrationOptions> optionsResult =
-                    loginRepository.getPasskeyRegistrationOptions(phone);
+                    loginRepository.getPasskeyRegistrationOptions(phone, firstName, lastName, username);
             if (!(optionsResult instanceof Result.Success)) {
                 String msg = optionsResult instanceof Result.Error
                         ? ((Result.Error) optionsResult).getError().getMessage()

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Response;
 import ru.flux.android.core.network.UpdateUserRequest;
@@ -28,6 +29,7 @@ public class SettingsViewModel extends AndroidViewModel {
     private final MutableLiveData<UserResponse> user = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final AtomicBoolean loading = new AtomicBoolean(false);
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
@@ -38,6 +40,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public void loadUser() {
         if (user.getValue() != null) return;
+        if (!loading.compareAndSet(false, true)) return;
         Log.d(TAG, "loadUser");
         executor.execute(() -> {
             try {
@@ -53,6 +56,8 @@ public class SettingsViewModel extends AndroidViewModel {
             } catch (GeneralSecurityException | IOException e) {
                 Log.e(TAG, "loadUser: exception", e);
                 error.postValue(e.getMessage());
+            } finally {
+                loading.set(false);
             }
         });
     }

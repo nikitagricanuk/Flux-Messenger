@@ -4,7 +4,9 @@ import android.content.Context;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -29,6 +31,10 @@ public class ApiClient {
                     .create(AuthApi.class);
 
             OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .connectionPool(new ConnectionPool(5, 5, TimeUnit.MINUTES))
                     .addInterceptor(new AuthInterceptor(tokenManager, bareAuthApi))
                     .build();
 

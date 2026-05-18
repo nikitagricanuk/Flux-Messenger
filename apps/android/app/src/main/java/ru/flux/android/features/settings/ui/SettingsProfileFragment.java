@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -95,6 +96,12 @@ public class SettingsProfileFragment extends Fragment {
             if (err != null) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show();
         });
 
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() { saveAndGoBack(); }
+                });
         binding.btnBack.setOnClickListener(v -> saveAndGoBack());
         binding.tvSignOut.setOnClickListener(v -> logout());
         binding.tvDeleteAccount.setOnClickListener(v ->

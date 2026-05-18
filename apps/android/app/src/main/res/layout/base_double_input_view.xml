@@ -25,6 +25,7 @@
                 android:background="@null"
                 android:includeFontPadding="false"
                 android:paddingStart="0dp"
+                android:textColor="@color/black"
                 android:paddingTop="0dp"
                 android:paddingBottom="5dp"
                 android:textSize="16sp" />
@@ -53,6 +54,7 @@
                 android:includeFontPadding="false"
                 android:paddingStart="0dp"
                 android:paddingTop="5dp"
+                android:textColor="@color/black"
                 android:paddingBottom="0dp" />
 
         </com.google.android.material.textfield.TextInputLayout>

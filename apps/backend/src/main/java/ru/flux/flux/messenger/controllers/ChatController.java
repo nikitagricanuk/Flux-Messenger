@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.flux.flux.messenger.User;
 import ru.flux.flux.messenger.dto.AddFavoriteRequest;
 import ru.flux.flux.messenger.dto.FavoriteResponse;
+import ru.flux.flux.messenger.dto.UserResponse;
 import ru.flux.flux.messenger.services.ChatService;
 import ru.flux.flux.messenger.dto.ChatResponse;
 import ru.flux.flux.messenger.dto.CreateChatRequest;
@@ -39,6 +40,11 @@ public class ChatController {
     @GetMapping("/{id}")
     public ChatResponse getChatById(@PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
         return chatService.getChatById(id, currentUser.getId());
+    }
+
+    @GetMapping("/{id}/members")
+    public List<UserResponse> getChatMembers(@PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
+        return chatService.getChatMembers(id, currentUser.getId());
     }
 
     @PostMapping("/direct")

@@ -117,11 +117,17 @@ public class SignUpCompletion3rdPartyFragment extends Fragment {
         }
 
         binding.login.setEnabled(false);
+        String firstName = binding.avatarInput.getFirstText().toString().trim();
+        String lastName = binding.avatarInput.getSecondText().toString().trim();
+        String username = binding.etUsername.getText().toString().trim();
         String phone = binding.phoneInput.getPhone();
 
         passkeyAuthManager.register(
                 (ComponentActivity) requireActivity(),
                 phone,
+                firstName,
+                lastName,
+                username,
                 new PasskeyAuthManager.Callback() {
                     @Override
                     public void onSuccess() {

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -124,28 +125,28 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     public void loadMembers(List<String> memberIds) {
-        List<UserResponse> result = new ArrayList<>();
-        for (String memberId : memberIds) {
-            try {
-                ApiClient.api(getApplication()).getUserById(UUID.fromString(memberId))
-                        .enqueue(new Callback<UserResponse>() {
-                            @Override
-                            public void onResponse(@NonNull Call<UserResponse> call,
-                                                   @NonNull Response<UserResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    result.add(response.body());
-                                    members.postValue(new ArrayList<>(result));
-                                }
+        if (memberIds == null || memberIds.isEmpty()) return;
+        try {
+            List<UUID> ids = memberIds.stream().map(UUID::fromString).collect(Collectors.toList());
+            ApiClient.api(getApplication()).getUsersByIds(ids)
+                    .enqueue(new Callback<List<UserResponse>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<List<UserResponse>> call,
+                                               @NonNull Response<List<UserResponse>> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                members.postValue(response.body());
+                            } else {
+                                Log.e(TAG, "getUsersByIds failed: " + response.code());
                             }
-                            @Override
-                            public void onFailure(@NonNull Call<UserResponse> call,
-                                                  @NonNull Throwable t) {
-                                Log.e(TAG, "loadMembers error", t);
-                            }
-                        });
-            } catch (Exception e) {
-                Log.e(TAG, "ApiClient error", e);
-            }
+                        }
+                        @Override
+                        public void onFailure(@NonNull Call<List<UserResponse>> call,
+                                              @NonNull Throwable t) {
+                            Log.e(TAG, "loadMembers error", t);
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e(TAG, "ApiClient error", e);
         }
     }
 

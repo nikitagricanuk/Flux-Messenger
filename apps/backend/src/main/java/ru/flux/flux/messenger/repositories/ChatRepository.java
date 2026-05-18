@@ -33,6 +33,12 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
     @Query("SELECT c FROM Chat c JOIN c.members cm WHERE cm.user.id = :userId")
     List<Chat> findByMemberId(@Param("userId") UUID userId);
 
+    @Query("SELECT DISTINCT c FROM Chat c JOIN FETCH c.members cm JOIN FETCH cm.user WHERE cm.user.id = :userId")
+    List<Chat> findByMemberIdWithMembers(@Param("userId") UUID userId);
+
+    @Query("SELECT DISTINCT c FROM Chat c JOIN FETCH c.members cm JOIN FETCH cm.user WHERE c.id = :id")
+    Optional<Chat> findWithMembersById(@Param("id") UUID id);
+
     @Query(value = """
         SELECT c.* FROM chat c
         WHERE c.type = 'GROUP'

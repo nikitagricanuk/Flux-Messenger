@@ -106,23 +106,27 @@ public class UserService {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return user.getContactIds().stream().map(contactId -> {
-            User contact = repository.findById(contactId)
-                    .orElseThrow(() -> new UserNotFoundException(contactId));
-
-            String name = contact.getLastName() != null
-                    ? contact.getFirstName() + " " + contact.getLastName()
-                    : contact.getFirstName();
-
+        // user.contacts is loaded once; each UserContact.contact is EAGER, so no N+1 here
+        return user.getContacts().stream().map(uc -> {
+            User contact = uc.getContact();
+            String firstName = uc.getFirstNameOverride() != null ? uc.getFirstNameOverride() : contact.getFirstName();
+            String lastName = uc.getLastNameOverride() != null ? uc.getLastNameOverride() : contact.getLastName();
+            String name = lastName != null && !lastName.isBlank()
+                    ? firstName + " " + lastName : firstName;
             String contactInfo = contact.getPhone() != null ? contact.getPhone() : contact.getEmail();
 
-            List<SharedGroupInfo> sharedGroups = chatRepository.findSharedGroups(userId, contactId)
+            List<SharedGroupInfo> sharedGroups = chatRepository.findSharedGroups(userId, contact.getId())
                     .stream()
                     .map(chat -> new SharedGroupInfo(chat.getId(), chat.getAvatarUrl()))
                     .toList();
 
             return new ContactResponse(contact.getId(), name, contactInfo, contact.getAvatarUrl(), sharedGroups);
         }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsersByIds(List<UUID> ids) {
+        return repository.findAllById(ids).stream().map(this::toResponse).toList();
     }
 
     @Transactional

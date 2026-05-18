@@ -87,6 +87,12 @@ public interface ApiService {
     @GET("users/{id}")
     Call<UserResponse> getUserById(@Path("id") UUID id);
 
+    @GET("users/batch")
+    Call<List<UserResponse>> getUsersByIds(@retrofit2.http.Query("ids") List<UUID> ids);
+
+    @GET("chats/{chatId}/members")
+    Call<List<UserResponse>> getChatMembers(@Path("chatId") UUID chatId);
+
     @Multipart
     @POST("messages/upload")
     Call<ResponseBody> uploadMedia(@Part MultipartBody.Part file);

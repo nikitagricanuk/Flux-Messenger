@@ -19,11 +19,16 @@ import ru.flux.flux.messenger.repositories.ChatRepository;
 import ru.flux.flux.messenger.repositories.MessageRepository;
 import ru.flux.flux.messenger.repositories.UserRepository;
 
+import ru.flux.flux.messenger.dto.UserResponse;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatService {
@@ -45,10 +50,43 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public List<ChatResponse> getAllChats(UUID currentUserId) {
-        return repository.findAll()
-                .stream()
-                .filter(chat -> chat.getMemberIds().contains(currentUserId))
-                .map(chat -> toResponse(chat, currentUserId))
+        List<Chat> chats = repository.findByMemberIdWithMembers(currentUserId);
+        if (chats.isEmpty()) return List.of();
+
+        // Batch-load peer users for all DIRECT chats in one query
+        List<UUID> peerIds = chats.stream()
+                .filter(c -> c.getType() == ChatType.DIRECT)
+                .flatMap(c -> c.getMemberIds().stream().filter(id -> !id.equals(currentUserId)))
+                .distinct()
+                .toList();
+        Map<UUID, User> peerMap = peerIds.isEmpty() ? Map.of()
+                : userRepository.findAllById(peerIds).stream()
+                        .collect(Collectors.toMap(User::getId, u -> u));
+
+        // Batch-load last message for each chat in one query
+        List<UUID> chatIds = chats.stream().map(Chat::getId).toList();
+        Map<UUID, Message> lastMessages = messageRepository.findLastMessagesForChats(chatIds)
+                .stream().collect(Collectors.toMap(m -> m.getChat().getId(), m -> m));
+
+        return chats.stream()
+                .map(chat -> toResponse(chat, currentUserId, peerMap, lastMessages))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getChatMembers(UUID chatId, UUID currentUserId) {
+        Chat chat = repository.findWithMembersById(chatId)
+                .orElseThrow(() -> new ChatNotFoundException(chatId));
+        if (!chat.getMemberIds().contains(currentUserId)) {
+            throw new SecurityException("User is not a member of this chat");
+        }
+        return chat.getMembers().stream()
+                .map(cm -> {
+                    User u = cm.getUser();
+                    return new UserResponse(u.getId(), u.getFirstName(), u.getLastName(),
+                            u.getHandle(), u.getDateOfBirth(), u.getPhone(), u.getEmail(),
+                            u.getAvatarUrl(), u.isNotifications(), u.getBio());
+                })
                 .toList();
     }
 
@@ -155,6 +193,12 @@ public class ChatService {
     }
 
     private ChatResponse toResponse(Chat chat, UUID currentUserId) {
+        return toResponse(chat, currentUserId, null, null);
+    }
+
+    private ChatResponse toResponse(Chat chat, UUID currentUserId,
+                                     Map<UUID, User> peerMap,
+                                     Map<UUID, Message> lastMessages) {
         String name = chat.getName();
         String profilePicture = chat.getAvatarUrl();
 
@@ -165,7 +209,8 @@ public class ChatService {
                     .orElse(null);
 
             if (peerId != null) {
-                User peer = userRepository.findById(peerId).orElse(null);
+                User peer = peerMap != null ? peerMap.get(peerId)
+                        : userRepository.findById(peerId).orElse(null);
                 if (peer != null) {
                     String lastName = peer.getLastName();
                     name = (lastName != null && !lastName.isBlank())
@@ -180,7 +225,8 @@ public class ChatService {
             }
         }
 
-        Message lastMessageEntity = messageRepository.findTopByChatIdOrderByCreatedAtDesc(chat.getId());
+        Message lastMessageEntity = lastMessages != null ? lastMessages.get(chat.getId())
+                : messageRepository.findTopByChatIdOrderByCreatedAtDesc(chat.getId());
         String lastMessage = lastMessageEntity != null ? lastMessageEntity.getText() : "";
         LocalDateTime lastMessageAt = lastMessageEntity != null
                 ? LocalDateTime.ofInstant(lastMessageEntity.getCreatedAt(), ZoneId.systemDefault())

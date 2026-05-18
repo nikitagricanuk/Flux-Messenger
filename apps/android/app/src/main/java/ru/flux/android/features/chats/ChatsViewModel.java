@@ -38,6 +38,7 @@ public class ChatsViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> chatCreated = new MutableLiveData<>();
     private final MutableLiveData<String> currentUserId = new MutableLiveData<>();
     private final MutableLiveData<List<Contact>> selectedGroupMembers = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingChats = new MutableLiveData<>(false);
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -53,6 +54,7 @@ public class ChatsViewModel extends AndroidViewModel {
     public LiveData<Boolean> getChatCreated() { return chatCreated; }
     public LiveData<String> getCurrentUserId() { return currentUserId; }
     public LiveData<List<Contact>> getSelectedGroupMembers() { return selectedGroupMembers; }
+    public LiveData<Boolean> isLoadingChats() { return loadingChats; }
     public void setSelectedGroupMembers(List<Contact> members) { selectedGroupMembers.setValue(members); }
     public void clearError() { error.setValue(null); }
 
@@ -184,6 +186,7 @@ public class ChatsViewModel extends AndroidViewModel {
     }
 
     private void fetchChats() {
+        loadingChats.postValue(true);
         executor.execute(() -> {
             try {
                 Response<List<ChatResponse>> response = ApiClient.api(getApplication()).getChats().execute();
@@ -199,6 +202,8 @@ public class ChatsViewModel extends AndroidViewModel {
             } catch (GeneralSecurityException | IOException e) {
                 Log.e(TAG, "loadChats: exception", e);
                 error.postValue(e.getMessage());
+            } finally {
+                loadingChats.postValue(false);
             }
         });
     }
