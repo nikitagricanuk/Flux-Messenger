@@ -29,27 +29,35 @@ public class AuthInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
-        String token = getValidToken();
-
         Request request = chain.request();
-        if (token != null) {
-            Log.d(TAG, "intercept: attaching token ..." + token.substring(Math.max(0, token.length() - 8)) + " for " + request.method() + " " + request.url());
-            request = request.newBuilder()
-                    .header("Authorization", "Bearer " + token)
-                    .build();
-        } else {
-            Log.w(TAG, "intercept: no valid token for " + request.url());
+
+        // /api/auth/** endpoints (sign-in, sign-up, refresh, passkey/*) are public:
+        // they neither accept a bearer token nor benefit from a refresh-and-retry on
+        // 4xx, and some (passkey finish/complete) consume single-use server-side
+        // nonces, so a blind retry corrupts state. Skip token handling for them.
+        boolean isPublicAuth = request.url().encodedPath().startsWith("/api/auth/");
+
+        if (!isPublicAuth) {
+            String token = getValidToken();
+            if (token != null) {
+                Log.d(TAG, "intercept: attaching token ..." + token.substring(Math.max(0, token.length() - 8)) + " for " + request.method() + " " + request.url());
+                request = request.newBuilder()
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+            } else {
+                Log.w(TAG, "intercept: no valid token for " + request.url());
+            }
         }
 
         Response response = chain.proceed(request);
         Log.v(TAG, "intercept: " + request.method() + " " + request.url() + " -> " + response.code());
 
-        if (response.code() == 401 || response.code() == 403) {
+        if (!isPublicAuth && (response.code() == 401 || response.code() == 403)) {
             Log.w(TAG, "intercept: " + response.code() + " received, attempting token refresh");
             response.close();
             String refreshed = refreshTokens();
             if (refreshed == null) {
-                Log.e(TAG, "intercept: token refresh failed, retrying without auth");
+                Log.e(TAG, "intercept: token refresh failed, propagating " + response.code());
                 return chain.proceed(chain.request());
             }
             Log.d(TAG, "intercept: token refreshed, retrying request");
